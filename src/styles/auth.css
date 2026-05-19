@@ -1,5 +1,4 @@
-/* /* 
-   Auth Flow - Clean SaaS Aesthetic
+/* Auth Flow - Clean SaaS Aesthetic
    Minimalist, professional, high conversion focus
 */
 
@@ -131,33 +130,35 @@
   display: block;
 }
 
-.input-wrapper input {
+.auth-form .input-wrapper input {
   width: 100%;
 }
 
-.input-icon {
+.auth-form .input-icon {
   position: absolute;
-  left: 1rem;
+  left: 1.35rem;
   top: 50%;
   transform: translateY(-50%);
   color: var(--text-muted);
   pointer-events: none;
   transition: color 0.2s ease;
   flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
 }
 
-.form-input:focus + .input-icon,
-.input-wrapper:has(.form-input:focus) .input-icon {
+.auth-form .form-input:focus + .input-icon,
+.auth-form .input-wrapper:has(.form-input:focus) .input-icon {
   color: var(--brand-primary);
 }
 
-.input-wrapper:has(.form-input:not(:placeholder-shown)) .input-icon {
+.auth-form .input-wrapper:has(.form-input:not(:placeholder-shown)) .input-icon {
   color: var(--brand-primary);
 }
 
-.form-input {
+.auth-form .form-input {
   width: 100%;
-  padding: 1rem 1rem 1rem 3.5rem;
+  padding: 1rem 1rem 1rem 4.9rem;
   font-size: 0.95rem;
   color: var(--text-primary);
   background-color: #ffffff;
@@ -166,6 +167,7 @@
   transition: all 0.2s ease;
   outline: none;
   line-height: 1.5;
+  box-sizing: border-box;
 }
 
 .form-input::placeholder {
@@ -412,14 +414,14 @@
     font-size: 0.9rem;
   }
   
-  .form-input {
-    padding: 0.95rem 1rem 0.95rem 3.5rem;
+  .auth-form .form-input {
+    padding: 0.95rem 1rem 0.95rem 4.35rem;
     font-size: 16px; /* Prevents zoom on iOS */
     min-height: 56px;
   }
   
-  .input-icon {
-    left: 1rem;
+  .auth-form .input-icon {
+    left: 1.2rem;
   }
   
   .form-group label {
@@ -472,15 +474,15 @@
     font-size: 0.85rem;
   }
   
-  .form-input {
-    padding: 0.9rem 0.875rem 0.9rem 3.35rem;
+  .auth-form .form-input {
+    padding: 0.9rem 0.875rem 0.9rem 4.45rem;
     font-size: 16px;
     border-radius: var(--radius-sm);
     min-height: 54px;
   }
   
-  .input-icon {
-    left: 0.95rem;
+  .auth-form .input-icon {
+    left: 1.15rem;
   }
   
   .form-group label {
@@ -532,160 +534,5 @@
   
   .text-sm {
     font-size: 0.8rem;
-  }
-} */
-
-
-/* ==================== FORMS & INPUTS ==================== */
-.auth-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.form-group label {
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: var(--text-primary);
-}
-
-.label-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  width: 100%;
-}
-
-.label-row .link-muted {
-  flex-shrink: 0;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--brand-primary);
-  white-space: nowrap;
-}
-
-.label-row .link-muted:hover {
-  color: var(--brand-primary);
-}
-
-/* Input Wrapper */
-.input-wrapper {
-  position: relative;
-  width: 100%;
-}
-
-.input-icon {
-  position: absolute;
-  left: 1.15rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--text-muted);
-  pointer-events: none;
-  transition: color 0.2s ease;
-  font-size: 1.15rem;
-  width: 1.15rem;
-  height: 1.15rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Main Input */
-.form-input {
-  width: 100%;
-  /* Reserve space for the left icon so placeholder/text never overlaps it */
-  padding: 1.15rem 1rem 1.15rem 4.25rem;
-  font-size: 1rem;
-  line-height: 1.5;
-  color: var(--text-primary);
-  background-color: #ffffff;
-  border: 1.5px solid var(--border-dark);
-  border-radius: var(--radius-lg);
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  box-sizing: border-box;
-  min-height: 58px;
-}
-
-.form-input::placeholder {
-  color: #94a3b8;
-  font-weight: 400;
-}
-
-.form-input:focus {
-  border-color: var(--brand-primary);
-  box-shadow: 0 0 0 4px var(--brand-light), 0 8px 20px rgba(15, 23, 42, 0.08);
-  outline: none;
-  padding-left: 4.25rem; /* Keep consistent with non-focused state */
-}
-
-.form-input:hover:not(:focus) {
-  border-color: var(--text-muted);
-}
-
-.form-input:focus-visible {
-  outline: none;
-  border-color: var(--brand-primary);
-  box-shadow: 0 0 0 4px var(--brand-light), 0 8px 20px rgba(15, 23, 42, 0.08);
-}
-
-/* Icon color change on focus or when filled */
-.input-wrapper:has(.form-input:focus) .input-icon,
-.input-wrapper:has(.form-input:not(:placeholder-shown)) .input-icon {
-  color: var(--brand-primary);
-}
-
-/* Error State */
-.form-input.input-error {
-  border-color: var(--error);
-  background-color: var(--error-bg);
-}
-
-.form-input.input-error:focus {
-  box-shadow: 0 0 0 4px #fee2e2;
-}
-
-/* Error Text */
-.error-text {
-  font-size: 0.825rem;
-  color: var(--error);
-  font-weight: 500;
-  margin-top: 0.25rem;
-}
-
-/* ==================== OVERRIDE (CONFLICT RESOLUTION) ====================
-   Keep placeholder/text from overlapping the left icon on auth forms.
-   Using high specificity + !important to override earlier conflicting rules.
-*/
-.auth-form .form-input {
-  padding-left: 4.25rem !important;
-}
-
-.auth-form .form-input:focus {
-  padding-left: 4.25rem !important;
-}
-
-/* Match the icon left offset changes in the earlier responsive rules */
-@media (max-width: 768px) {
-  .auth-form .form-input {
-    padding-left: 3.85rem !important;
-  }
-  .auth-form .form-input:focus {
-    padding-left: 3.85rem !important;
-  }
-}
-
-@media (max-width: 480px) {
-  .auth-form .form-input {
-    padding-left: 3.65rem !important;
-  }
-  .auth-form .form-input:focus {
-    padding-left: 3.65rem !important;
   }
 }

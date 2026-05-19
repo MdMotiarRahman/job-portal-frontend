@@ -11,6 +11,7 @@ import Register from './components/Register';
 import AdminDashboard from './components/AdminDashboard';
 import EmployerDashboard from './components/EmployerDashboard';
 import SeekerDashboard from './components/SeekerDashboard';
+import ProtectedRoute from './components/ProtectedRoute';
 import authService from './services/auth.service';
 
 const Navigation = () => {
@@ -123,9 +124,9 @@ const Footer = () => {
               Connecting top talent with the world's most innovative companies. Built for modern professionals.
             </p>
             <div className="social-links">
-              <a href="#" className="social-link">Twitter</a>
-              <a href="#" className="social-link">GitHub</a>
-              <a href="#" className="social-link">LinkedIn</a>
+              <a href="https://twitter.com" target="_blank" rel="noreferrer" className="social-link">Twitter</a>
+              <a href="https://github.com" target="_blank" rel="noreferrer" className="social-link">GitHub</a>
+              <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="social-link">LinkedIn</a>
             </div>
           </div>
 
@@ -171,9 +172,30 @@ const App = () => {
             <Route path="/home" element={<HomePage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/employer" element={<EmployerDashboard />} />
-            <Route path="/seeker" element={<SeekerDashboard />} />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/employer"
+              element={
+                <ProtectedRoute allowedRoles={['employer']}>
+                  <EmployerDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/seeker"
+              element={
+                <ProtectedRoute allowedRoles={['seeker']}>
+                  <SeekerDashboard />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </main>
 
