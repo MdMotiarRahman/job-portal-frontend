@@ -1,0 +1,284 @@
+/* MAIN PAGE */
+.seeker-dashboard {
+  max-width: 1250px;
+  margin: auto;
+  padding: 20px;
+  background: #f8fafc;
+  min-height: 100vh;
+}
+
+/* TOP */
+.dashboard-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+  gap: 20px;
+}
+
+.dashboard-top h1 {
+  font-size: 58px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 10px;
+}
+
+.dashboard-top h1 span {
+  color: #4f46e5;
+}
+
+.dashboard-top p {
+  font-size: 20px;
+  color: #64748b;
+}
+
+/* BUTTONS */
+.dashboard-buttons {
+  display: flex;
+  gap: 18px;
+}
+
+.dashboard-btn {
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: white;
+  text-decoration: none;
+  padding: 16px 30px;
+  border-radius: 18px;
+  font-weight: 700;
+  font-size: 17px;
+  box-shadow: 0 15px 30px rgba(79, 70, 229, 0.25);
+  transition: 0.3s;
+}
+
+.dashboard-btn:hover {
+  transform: translateY(-4px);
+  color: white;
+}
+
+.dashboard-btn.primary {
+  background: #0f172a;
+}
+
+/* PROFILE CARD */
+.profile-card {
+  background: white;
+  border-radius: 35px;
+  padding: 50px;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+  margin-bottom: 50px;
+}
+
+/* HEADER */
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 35px;
+  margin-bottom: 40px;
+}
+
+/* IMAGE */
+.avatar {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 6px solid #6366f1;
+  box-shadow: 0 20px 40px rgba(99, 102, 241, 0.3);
+  flex-shrink: 0;
+  background: #eef2ff;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* INFO */
+.profile-info h2 {
+  font-size: 60px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 10px;
+}
+
+.email-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #64748b;
+  font-size: 24px;
+}
+
+/* GRID */
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 25px;
+  margin-top: 30px;
+}
+
+/* ITEM */
+.profile-item {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 24px;
+  padding: 28px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: 0.3s;
+}
+
+.profile-item:hover {
+  transform: translateY(-5px);
+  background: white;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+}
+
+.icon-box {
+  width: 65px;
+  height: 65px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  flex-shrink: 0;
+}
+
+.profile-item h4 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: #111827;
+}
+
+.profile-item p {
+  font-size: 20px;
+  color: #64748b;
+  margin: 0;
+}
+
+/* BIO */
+.bio-box {
+  margin-top: 40px;
+  background: #f8fafc;
+  padding: 35px;
+  border-radius: 24px;
+}
+
+.bio-box h3 {
+  font-size: 30px;
+  margin-bottom: 15px;
+  color: #0f172a;
+}
+
+.bio-box p {
+  color: #475569;
+  line-height: 1.8;
+  font-size: 18px;
+}
+
+/* APPLICATIONS */
+.applications-section {
+  margin-top: 40px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 25px;
+}
+
+.section-title h2 {
+  font-size: 36px;
+  font-weight: 800;
+}
+
+/* APPLICATION CARD */
+.application-card {
+  background: white;
+  padding: 35px;
+  border-radius: 25px;
+  margin-bottom: 25px;
+  box-shadow: 0 15px 35px rgba(15,23,42,0.08);
+}
+
+.application-card h3 {
+  font-size: 28px;
+  margin-bottom: 15px;
+}
+
+.cover-letter {
+  margin-top: 10px;
+  color: #475569;
+}
+
+/* RESUME */
+.resume-btn {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 12px 24px;
+  background: #4f46e5;
+  color: white;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.resume-btn:hover {
+  background: #4338ca;
+  color: white;
+}
+
+/* EMPTY */
+.empty-state {
+  background: white;
+  padding: 70px;
+  text-align: center;
+  border-radius: 25px;
+  color: #64748b;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+
+  .dashboard-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .dashboard-top h1 {
+    font-size: 42px;
+  }
+
+  .profile-card {
+    padding: 30px;
+  }
+
+  .profile-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .profile-info h2 {
+    font-size: 42px;
+  }
+
+  .email-row {
+    font-size: 18px;
+  }
+
+  .dashboard-buttons {
+    width: 100%;
+  }
+
+  .dashboard-btn {
+    flex: 1;
+    text-align: center;
+  }
+}
