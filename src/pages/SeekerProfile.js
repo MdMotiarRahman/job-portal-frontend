@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import '../styles/seekerProfile.css';
+
 const emptyProfile = {
   fullName: '',
   phone: '',
@@ -11,11 +12,13 @@ const emptyProfile = {
   github: '',
   bio: '',
   profileImage: '',
+  resume: '',
 };
 
 const SeekerProfile = () => {
   const [profile, setProfile] = useState(emptyProfile);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedResume, setSelectedResume] = useState(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ text: '', type: '' });
 
@@ -43,6 +46,7 @@ const SeekerProfile = () => {
           github: data.github || '',
           bio: data.bio || '',
           profileImage: data.profileImage || '',
+          resume: data.resume || '',
         });
       } catch (error) {
         console.log(error);
@@ -84,6 +88,10 @@ const SeekerProfile = () => {
         formData.append('profileImage', selectedImage);
       }
 
+      if (selectedResume) {
+        formData.append('resume', selectedResume);
+      }
+
       const response = await fetch('http://localhost:5000/api/seeker/profile', {
         method: 'PUT',
         headers: {
@@ -109,9 +117,11 @@ const SeekerProfile = () => {
         github: data.github || '',
         bio: data.bio || '',
         profileImage: data.profileImage || '',
+        resume: data.resume || '',
       });
 
       setSelectedImage(null);
+      setSelectedResume(null);
       setMessage({ text: 'Profile updated successfully', type: 'success' });
     } catch (error) {
       console.log(error);
@@ -269,6 +279,32 @@ const SeekerProfile = () => {
               onChange={handleChange}
               rows="7"
             />
+          </div>
+
+          <div className="field full-width">
+            <label>Resume</label>
+            <input
+              type="file"
+              accept=".pdf"
+              onChange={(e) => setSelectedResume(e.target.files[0])}
+            />
+
+            {profile.resume && !selectedResume && (
+              <a
+                href={profile.resume.startsWith('http') ? profile.resume : `http://localhost:5000/${profile.resume.replace(/\\/g, '/')}`}
+                target="_blank"
+                rel="noreferrer"
+                className="resume-link"
+              >
+                View current resume
+              </a>
+            )}
+
+            {selectedResume && (
+              <p className="file-note">
+                Selected resume: {selectedResume.name}
+              </p>
+            )}
           </div>
 
           <div className="actions">

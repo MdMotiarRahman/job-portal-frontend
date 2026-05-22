@@ -222,7 +222,7 @@ const SeekerDashboard = () => {
 
               {app.resume && (
                 <a
-                  href={`http://localhost:5000/${app.resume}`}
+                  href={app.resume.startsWith('http') ? app.resume : `http://localhost:5000/${app.resume.replace(/\\/g, '/')}`}
                   target="_blank"
                   rel="noreferrer"
                   className="resume-btn"

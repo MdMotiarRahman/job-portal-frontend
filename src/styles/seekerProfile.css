@@ -245,6 +245,25 @@
 
 /* ================= BUTTON ================= */
 
+.resume-link {
+  display: inline-block;
+  margin-top: 14px;
+  color: #4f46e5;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.resume-link:hover {
+  text-decoration: underline;
+}
+
+.file-note {
+  margin-top: 12px;
+  color: #475569;
+  font-size: 15px;
+  font-weight: 600;
+}
+
 .actions {
   margin-top: 40px;
 }
