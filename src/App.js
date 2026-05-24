@@ -46,6 +46,7 @@ const Navigation = () => {
   const [user, setUser] = useState(
     authService.getCurrentUser()
   );
+  const userRole = authService.getCurrentUserRole();
 
   useEffect(() => {
     const handleLogin = () => {
@@ -108,6 +109,24 @@ const Navigation = () => {
             >
               Home
             </Link>
+          ) : userRole === 'admin' ? (
+            <>
+              <Link
+                to="/admin"
+                className={`nav-link ${isActive('/admin') ? 'active' : ''}`}
+              >
+                Admin Dashboard
+              </Link>
+            </>
+          ) : userRole === 'employer' ? (
+            <>
+              <Link
+                to="/employer"
+                className={`nav-link ${isActive('/employer') ? 'active' : ''}`}
+              >
+                Dashboard
+              </Link>
+            </>
           ) : (
             <>
               <Link
@@ -182,6 +201,22 @@ const Navigation = () => {
             >
               <Home size={18} />
               Home
+            </Link>
+          ) : userRole === 'admin' ? (
+            <Link
+              to="/admin"
+              className="mobile-link"
+              onClick={() => setIsOpen(false)}
+            >
+              Dashboard
+            </Link>
+          ) : userRole === 'employer' ? (
+            <Link
+              to="/employer"
+              className="mobile-link"
+              onClick={() => setIsOpen(false)}
+            >
+              Dashboard
             </Link>
           ) : (
             <>
