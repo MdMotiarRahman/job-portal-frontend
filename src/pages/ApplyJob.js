@@ -1,54 +1,102 @@
 import React, { useState } from 'react';
-import { applyJob } from '../services/seekerService';
+
+import { useParams } from 'react-router-dom';
+
+import { applyJob }
+from '../services/seekerService';
+
 import '../styles/applyJob.css';
 
 const ApplyJob = () => {
-  const [formData, setFormData] = useState({
-    jobTitle: '',
-    coverLetter: '',
-  });
 
-  const [resume, setResume] = useState(null);
+  const { id } = useParams();
+
+  const [formData, setFormData] =
+    useState({
+
+      jobTitle: '',
+
+      coverLetter: '',
+
+    });
+
+  const [resume, setResume] =
+    useState(null);
 
   const handleChange = (e) => {
+
     setFormData({
+
       ...formData,
-      [e.target.name]: e.target.value,
+
+      [e.target.name]:
+        e.target.value,
+
     });
+
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit =
+    async (e) => {
+
     e.preventDefault();
 
     try {
-      const data = new FormData();
 
-      data.append('jobTitle', formData.jobTitle);
-      data.append('coverLetter', formData.coverLetter);
+      const data =
+        new FormData();
+
+      data.append(
+        'jobTitle',
+        formData.jobTitle
+      );
+
+      data.append(
+        'coverLetter',
+        formData.coverLetter
+      );
 
       if (resume) {
-        data.append('resume', resume);
+
+        data.append(
+          'resume',
+          resume
+        );
+
       }
 
-      await applyJob(data);
+      await applyJob(id, data);
 
-      alert('Application submitted successfully');
+      alert(
+        'Application submitted successfully'
+      );
 
       setFormData({
+
         jobTitle: '',
+
         coverLetter: '',
+
       });
 
       setResume(null);
+
     } catch (error) {
+
       console.log(error);
+
       alert('Error applying');
+
     }
+
   };
 
   return (
+
     <div className="apply-job-page">
+
       <div className="apply-card">
+
         <h1>Apply Job</h1>
 
         <form onSubmit={handleSubmit}>
@@ -70,20 +118,48 @@ const ApplyJob = () => {
             required
           />
 
-          <input
-            type="file"
-            accept=".pdf"
-            onChange={(e) => setResume(e.target.files[0])}
-          />
+          <div className="file-upload-box">
+
+  <input
+    type="file"
+    id="resumeUpload"
+    accept=".pdf"
+    hidden
+    onChange={(e) =>
+      setResume(
+        e.target.files[0]
+      )
+    }
+    required
+  />
+
+  <label
+    htmlFor="resumeUpload"
+    className="custom-file-upload"
+  >
+    Choose Resume
+  </label>
+
+  {resume && (
+    <p className="file-name">
+      {resume.name}
+    </p>
+  )}
+
+</div>
 
           <button type="submit">
             Submit Application
           </button>
 
         </form>
+
       </div>
+
     </div>
+
   );
+
 };
 
 export default ApplyJob;

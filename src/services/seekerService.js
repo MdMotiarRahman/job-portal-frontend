@@ -32,11 +32,15 @@ export const getMyApplications = () => {
   });
 };
 
-export const applyJob = (formData) => {
-  return axios.post(`${API_URL}/apply`, formData, {
-    headers: {
-      ...authHeader(),
-      'Content-Type': 'multipart/form-data',
-    },
-  });
+export const applyJob = (jobId, formData) => {
+  return axios.post(
+    `${API_URL}/apply/${jobId}`,
+    formData,
+    {
+      headers: {
+        ...authHeader(),
+        'Content-Type': 'multipart/form-data',
+      },
+    }
+  );
 };

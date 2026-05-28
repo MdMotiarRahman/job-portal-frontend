@@ -61,3 +61,29 @@
   margin-bottom: 20px;
   color: #111827;
 }
+
+.file-upload-box {
+  margin-bottom: 20px;
+}
+
+.custom-file-upload {
+  display: inline-block;
+  padding: 14px 22px;
+  background: #4f46e5;
+  color: white;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.custom-file-upload:hover {
+  background: #4338ca;
+}
+
+.file-name {
+  margin-top: 10px;
+  color: #374151;
+  font-size: 15px;
+  font-weight: 500;
+}
