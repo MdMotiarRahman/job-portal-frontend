@@ -1,0 +1,126 @@
+.admin-application-management {
+  color: #1f2937;
+}
+
+.admin-application-management .admin-header-card,
+.admin-application-management .admin-section,
+.admin-application-management .admin-stat-card {
+  background: #ffffff;
+  border: 1px solid #d7dde5;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.admin-application-management .admin-header-card,
+.admin-application-management .admin-section {
+  border-radius: 14px;
+}
+
+.admin-application-management .admin-header h1 {
+  color: #111827;
+  font-size: 2rem;
+  font-weight: 650;
+  letter-spacing: 0;
+}
+
+.admin-application-management .admin-subtitle,
+.admin-application-management .admin-muted-text,
+.admin-application-management .admin-pagination span {
+  color: #6b7280;
+}
+
+.admin-application-management .admin-refresh-btn,
+.admin-application-management .admin-action-btn,
+.admin-application-management .admin-select,
+.admin-application-management .admin-search-field {
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+.admin-application-management .admin-refresh-btn,
+.admin-application-management .admin-action-btn {
+  background: #ffffff;
+  border: 1px solid #cfd6df;
+  color: #1f2937;
+}
+
+.admin-application-management .admin-refresh-btn:hover,
+.admin-application-management .admin-action-btn:hover {
+  transform: none;
+  background: #f8fafc;
+  box-shadow: none;
+}
+
+.admin-application-management .admin-table th {
+  background: #f8fafc;
+  color: #111827;
+  border-bottom: 1px solid #d7dde5;
+  font-weight: 600;
+}
+
+.admin-application-management .admin-table td {
+  color: #374151;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: top;
+}
+
+.admin-application-cover {
+  max-width: 320px;
+  color: #4b5563;
+  line-height: 1.5;
+}
+
+.admin-application-link {
+  color: #1d4ed8;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.admin-application-link:hover {
+  text-decoration: underline;
+}
+
+.admin-application-status-cell {
+  display: grid;
+  gap: 8px;
+  min-width: 150px;
+}
+
+.admin-application-status-select {
+  min-width: 140px;
+}
+
+.admin-application-management .admin-badge {
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-weight: 600;
+}
+
+.admin-application-management .admin-badge-success {
+  background: #ecfdf3;
+  color: #166534;
+  border-color: #bbf7d0;
+}
+
+.admin-application-management .admin-badge-warning {
+  background: #fff7ed;
+  color: #9a3412;
+  border-color: #fed7aa;
+}
+
+.admin-application-management .admin-badge-error {
+  background: #fef2f2;
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
+@media (max-width: 768px) {
+  .admin-application-management .admin-header h1 {
+    font-size: 1.6rem;
+  }
+
+  .admin-application-management .admin-filter-row,
+  .admin-application-management .admin-pagination {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
