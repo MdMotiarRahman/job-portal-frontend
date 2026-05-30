@@ -1,926 +1,808 @@
-
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from 'react';
 import {
+  BadgeDollarSign,
   Briefcase,
   Building2,
-  MapPin,
-  BadgeDollarSign,
-  Clock3,
   CheckCircle2,
-  XCircle,
+  Clock3,
+  Edit3,
   Eye,
+  FileText,
+  MapPin,
   PlusCircle,
   RefreshCcw,
-} from "lucide-react";
+  Trash2,
+  X,
+} from 'lucide-react';
+import employerService from '../services/employer.service';
+import '../styles/dashboard.css';
 
-import employerService from "../services/employer.service";
-import "../styles/dashboard.css";
+const emptyForm = {
+  title: '',
+  location: '',
+  jobType: 'Full-time',
+  experienceLevel: 'Entry',
+  status: 'active',
+  salaryMin: '',
+  salaryMax: '',
+  salaryCurrency: 'USD',
+  skills: '',
+  requirements: '',
+  description: '',
+};
+
+const applicationStatuses = [
+  'Pending',
+  'Reviewing',
+  'Shortlisted',
+  'Interview Scheduled',
+  'Accepted',
+  'Rejected',
+];
+
+const formatDate = (value) => {
+  if (!value) return '-';
+  return new Date(value).toLocaleDateString();
+};
+
+const formatSalary = (salary) => {
+  if (!salary?.min && !salary?.max) return 'Not listed';
+
+  const currency = salary.currency || 'USD';
+  const min = salary.min ? Number(salary.min).toLocaleString() : 'Open';
+  const max = salary.max ? Number(salary.max).toLocaleString() : 'Open';
+  return `${currency} ${min} - ${max}`;
+};
+
+const getApprovalClass = (job) => {
+  if (job.isApproved) return 'status-pill status-approved';
+  if (job.status === 'closed') return 'status-pill status-neutral';
+  return 'status-pill status-pending';
+};
+
+const getApplicationStatusClass = (status) => {
+  const value = String(status || '').toLowerCase();
+  if (['accepted', 'shortlisted', 'interview scheduled'].includes(value)) {
+    return 'status-pill status-approved';
+  }
+  if (value === 'rejected') return 'status-pill status-rejected';
+  if (value === 'reviewing') return 'status-pill status-neutral';
+  return 'status-pill status-pending';
+};
 
 const EmployerDashboard = () => {
-
+  const [summary, setSummary] = useState(null);
   const [jobs, setJobs] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [creating, setCreating] = useState(false);
+  const [applications, setApplications] = useState([]);
+  const [selectedJobId, setSelectedJobId] = useState('');
+  const [editingJob, setEditingJob] = useState(null);
+  const [formData, setFormData] = useState(emptyForm);
+  const [applicationDrafts, setApplicationDrafts] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
 
-  const [selectedApplicants, setSelectedApplicants] = useState([]);
-  const [showApplicants, setShowApplicants] = useState(false);
-  const [selectedJobTitle, setSelectedJobTitle] = useState("");
-
-  const [formData, setFormData] = useState({
-    title: "",
-    company: "",
-    location: "",
-    salary: "",
-    type: "",
-    description: "",
-    requirements: "",
-  });
-
-  // =========================
-  // LOAD JOBS
-  // =========================
-
-  const loadJobs = async () => {
+  const loadDashboard = async () => {
+    setLoading(true);
+    setError('');
 
     try {
+      const [summaryData, jobList, applicationList] = await Promise.all([
+        employerService.getSummary(),
+        employerService.getMyJobs(),
+        employerService.getApplications(),
+      ]);
 
-      setLoading(true);
-
-      const data = await employerService.getMyJobs();
-
-      setJobs(data);
-
-    } catch (error) {
-
-      console.log(error);
-
+      setSummary(summaryData);
+      setJobs(jobList);
+      setApplications(applicationList);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to load employer dashboard.');
     } finally {
-
       setLoading(false);
-
     }
-
   };
 
   useEffect(() => {
-
-    loadJobs();
-
+    loadDashboard();
   }, []);
 
-  // =========================
-  // STATS
-  // =========================
-
   const stats = useMemo(() => {
-
-    return {
-
-      total: jobs.length,
-
-      pending: jobs.filter(
-        (job) => job.status === "pending"
-      ).length,
-
-      approved: jobs.filter(
-        (job) => job.status === "approved"
-      ).length,
-
-      rejected: jobs.filter(
-        (job) => job.status === "rejected"
-      ).length,
-
-    };
-
+    return jobs.reduce(
+      (jobStats, job) => {
+        jobStats.total += 1;
+        jobStats.applications += Array.isArray(job.applications) ? job.applications.length : 0;
+        if (job.isApproved) jobStats.approved += 1;
+        if (!job.isApproved) jobStats.pending += 1;
+        if (job.status === 'closed') jobStats.closed += 1;
+        return jobStats;
+      },
+      { total: 0, pending: 0, approved: 0, closed: 0, applications: 0 }
+    );
   }, [jobs]);
 
-  // =========================
-  // FORM CHANGE
-  // =========================
+  const visibleApplications = useMemo(() => {
+    if (!selectedJobId) return applications;
+    return applications.filter((application) => application.job?._id === selectedJobId);
+  }, [applications, selectedJobId]);
 
-  const handleChange = (e) => {
+  const resetForm = () => {
+    setEditingJob(null);
+    setFormData(emptyForm);
+  };
 
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((currentForm) => ({
+      ...currentForm,
+      [name]: value,
+    }));
+  };
+
+  const openEditJob = (job) => {
+    setEditingJob(job);
     setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
+      title: job.title || '',
+      location: job.location || '',
+      jobType: job.jobType || 'Full-time',
+      experienceLevel: job.experienceLevel || 'Entry',
+      status: job.status || 'active',
+      salaryMin: job.salary?.min ?? '',
+      salaryMax: job.salary?.max ?? '',
+      salaryCurrency: job.salary?.currency || 'USD',
+      skills: (job.skills || []).join(', '),
+      requirements: (job.requirements || []).join('\n'),
+      description: job.description || '',
     });
 
+    document.getElementById('employer-job-form')?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
   };
 
-  // =========================
-  // CREATE JOB
-  // =========================
+  const buildPayload = () => ({
+    ...formData,
+    salaryMin: formData.salaryMin === '' ? null : Number(formData.salaryMin),
+    salaryMax: formData.salaryMax === '' ? null : Number(formData.salaryMax),
+    skills: formData.skills,
+    requirements: formData.requirements
+      .split('\n')
+      .map((requirement) => requirement.trim())
+      .filter(Boolean),
+  });
 
-  const handleSubmit = async (e) => {
-
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setSaving(true);
+    setError('');
+    setMessage('');
 
     try {
+      const response = editingJob
+        ? await employerService.updateJob(editingJob._id, buildPayload())
+        : await employerService.createJob(buildPayload());
 
-      setCreating(true);
-
-      const payload = {
-
-        ...formData,
-
-        salary: Number(formData.salary),
-
-        requirements: formData.requirements
-          .split(",")
-          .map((item) => item.trim())
-          .filter(Boolean),
-
-      };
-
-      await employerService.createJob(payload);
-
-      alert("Job created successfully");
-
-      setFormData({
-        title: "",
-        company: "",
-        location: "",
-        salary: "",
-        type: "",
-        description: "",
-        requirements: "",
-      });
-
-      loadJobs();
-
-    } catch (error) {
-
-      console.log(error);
-
-      alert(
-        error?.response?.data?.message ||
-        "Error creating job"
-      );
-
+      setMessage(response.message || 'Job saved successfully.');
+      resetForm();
+      await loadDashboard();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to save job.');
     } finally {
-
-      setCreating(false);
-
+      setSaving(false);
     }
-
   };
 
-  // =========================
-  // VIEW APPLICANTS
-  // =========================
-
-  const viewApplicants = async (jobId, title) => {
+  const runJobAction = async (action, successMessage) => {
+    setError('');
+    setMessage('');
 
     try {
-
-      const data =
-        await employerService.getApplicants(jobId);
-
-      setSelectedApplicants(data);
-
-      setSelectedJobTitle(title);
-
-      setShowApplicants(true);
-
-    } catch (error) {
-
-      console.log(error);
-
-      alert(
-        error?.response?.data?.message ||
-        "Unable to load applicants"
-      );
-
+      await action();
+      setMessage(successMessage);
+      await loadDashboard();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Job action failed.');
     }
-
   };
 
-  // =========================
-  // STATUS STYLE
-  // =========================
+  const handleDeleteJob = async (job) => {
+    const confirmed = window.confirm(
+      `Delete "${job.title}" and all applications for this job? This cannot be undone.`
+    );
+    if (!confirmed) return;
 
-  const getStatusClass = (status) => {
-
-    const value =
-      String(status || "").toLowerCase();
-
-    if (value === "approved") {
-      return "status-pill status-approved";
-    }
-
-    if (value === "rejected") {
-      return "status-pill status-rejected";
-    }
-
-    return "status-pill status-pending";
-
+    await runJobAction(() => employerService.deleteJob(job._id), 'Job deleted successfully.');
   };
 
-  // =========================
-  // DATE FORMAT
-  // =========================
+  const viewJobApplications = (jobId) => {
+    setSelectedJobId(jobId);
+    document.getElementById('employer-applications')?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
+  };
 
-  const formatDate = (value) => {
+  const getApplicationDraft = (application) => {
+    return applicationDrafts[application._id] || {
+      status: application.status || 'Pending',
+      interviewDate: application.interviewDate || '',
+      interviewTime: application.interviewTime || '',
+      interviewMode: application.interviewMode || '',
+      employerMessage: application.employerMessage || '',
+    };
+  };
 
-    if (!value) return "—";
+  const updateApplicationDraft = (applicationId, field, value) => {
+    setApplicationDrafts((currentDrafts) => ({
+      ...currentDrafts,
+      [applicationId]: {
+        ...currentDrafts[applicationId],
+        [field]: value,
+      },
+    }));
+  };
 
-    return new Date(value).toLocaleDateString();
+  const saveApplication = async (application) => {
+    setError('');
+    setMessage('');
 
+    try {
+      const draft = getApplicationDraft(application);
+      await employerService.updateApplication(application._id, draft);
+      setMessage('Application updated successfully.');
+      const nextApplications = await employerService.getApplications();
+      setApplications(nextApplications);
+      setApplicationDrafts((currentDrafts) => {
+        const { [application._id]: removedDraft, ...remainingDrafts } = currentDrafts;
+        return remainingDrafts;
+      });
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to update application.');
+    }
   };
 
   return (
-
-    <div className="dashboard-page">
-
+    <div className="dashboard-page employer-dashboard-page">
       <div className="dashboard-container">
-
-        {/* HERO */}
-
         <div className="dashboard-hero">
-
-          <div className="hero-card">
-
+          <div className="hero-card employer-hero-card">
             <div className="hero-badge">
-
               <Briefcase size={16} />
               Employer Workspace
-
             </div>
-
-            <h1 className="hero-title">
-              Manage hiring in one place.
-            </h1>
-
+            <h1 className="hero-title">Run hiring from one calm cockpit.</h1>
             <p className="hero-subtitle">
-              Create jobs, track approval status,
-              and review applicants easily.
+              Create and manage job posts, track approval status, and move candidates through
+              review without leaving your dashboard.
             </p>
-
             <div className="hero-actions">
-
               <button
                 type="button"
                 className="hero-action primary"
                 onClick={() =>
-                  document
-                    .getElementById("create-job-panel")
-                    ?.scrollIntoView({
-                      behavior: "smooth",
-                      block: "start",
-                    })
+                  document.getElementById('employer-job-form')?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start',
+                  })
                 }
               >
-
                 <PlusCircle size={18} />
                 Create Job
-
               </button>
-
-              <button
-                type="button"
-                className="hero-action secondary"
-                onClick={loadJobs}
-              >
-
+              <button type="button" className="hero-action secondary" onClick={loadDashboard}>
                 <RefreshCcw size={18} />
-                Refresh Jobs
-
+                Refresh
               </button>
-
             </div>
 
+            {summary?.profile ? (
+              <div className="employer-verification-strip">
+                <Building2 size={18} />
+                <span>
+                  Verification status:{' '}
+                  <strong>{summary.profile.verificationStatus || 'pending'}</strong>
+                </span>
+              </div>
+            ) : null}
           </div>
-
-          {/* STATS */}
 
           <div className="summary-grid">
-
             <div className="summary-card">
-
               <div className="summary-label">
-
                 <Briefcase size={16} />
                 Total Jobs
-
               </div>
-
-              <div className="summary-value">
-                {stats.total}
-              </div>
-
+              <div className="summary-value">{stats.total}</div>
             </div>
-
             <div className="summary-card">
-
               <div className="summary-label">
-
                 <Clock3 size={16} />
-                Pending
-
+                Pending Approval
               </div>
-
-              <div className="summary-value">
-                {stats.pending}
-              </div>
-
+              <div className="summary-value">{stats.pending}</div>
             </div>
-
             <div className="summary-card">
-
               <div className="summary-label">
-
                 <CheckCircle2 size={16} />
                 Approved
-
               </div>
-
-              <div className="summary-value">
-                {stats.approved}
-              </div>
-
+              <div className="summary-value">{stats.approved}</div>
             </div>
-
             <div className="summary-card">
-
               <div className="summary-label">
-
-                <XCircle size={16} />
-                Rejected
-
+                <FileText size={16} />
+                Applications
               </div>
-
-              <div className="summary-value">
-                {stats.rejected}
-              </div>
-
+              <div className="summary-value">{stats.applications}</div>
             </div>
-
           </div>
-
         </div>
 
-        {/* CREATE JOB */}
+        {error ? <div className="dashboard-alert dashboard-alert-error">{error}</div> : null}
+        {message ? <div className="dashboard-alert dashboard-alert-success">{message}</div> : null}
 
-        <div
-          className="panel-card"
-          id="create-job-panel"
-        >
-
+        <section className="panel-card" id="employer-job-form">
           <div className="section-head">
-
-            <h2 className="section-title">
-              Create Job
-            </h2>
-
+            <h2 className="section-title">{editingJob ? 'Edit Job' : 'Create Job'}</h2>
+            {editingJob ? (
+              <button type="button" className="section-action" onClick={resetForm}>
+                <X size={16} />
+                Cancel Edit
+              </button>
+            ) : null}
           </div>
 
           <form onSubmit={handleSubmit}>
-
             <div className="form-grid">
+              <label className="dashboard-field">
+                <span>Job Title</span>
+                <input
+                  type="text"
+                  name="title"
+                  className="form-control"
+                  value={formData.title}
+                  onChange={handleChange}
+                  required
+                />
+              </label>
 
-              <input
-                type="text"
-                name="title"
-                placeholder="Job Title"
-                className="form-control"
-                value={formData.title}
-                onChange={handleChange}
-                required
-              />
+              <label className="dashboard-field">
+                <span>Location</span>
+                <input
+                  type="text"
+                  name="location"
+                  className="form-control"
+                  value={formData.location}
+                  onChange={handleChange}
+                  required
+                />
+              </label>
 
-              <input
-                type="text"
-                name="company"
-                placeholder="Company"
-                className="form-control"
-                value={formData.company}
-                onChange={handleChange}
-                required
-              />
+              <label className="dashboard-field">
+                <span>Job Type</span>
+                <select
+                  name="jobType"
+                  className="form-select"
+                  value={formData.jobType}
+                  onChange={handleChange}
+                >
+                  <option>Full-time</option>
+                  <option>Part-time</option>
+                  <option>Contract</option>
+                  <option>Internship</option>
+                </select>
+              </label>
 
-              <input
-                type="text"
-                name="location"
-                placeholder="Location"
-                className="form-control"
-                value={formData.location}
-                onChange={handleChange}
-                required
-              />
+              <label className="dashboard-field">
+                <span>Experience Level</span>
+                <select
+                  name="experienceLevel"
+                  className="form-select"
+                  value={formData.experienceLevel}
+                  onChange={handleChange}
+                >
+                  <option>Entry</option>
+                  <option>Mid</option>
+                  <option>Senior</option>
+                </select>
+              </label>
 
-              <input
-                type="number"
-                name="salary"
-                placeholder="Salary"
-                className="form-control"
-                value={formData.salary}
-                onChange={handleChange}
-                required
-              />
+              <label className="dashboard-field">
+                <span>Status</span>
+                <select
+                  name="status"
+                  className="form-select"
+                  value={formData.status}
+                  onChange={handleChange}
+                >
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                  <option value="closed">Closed</option>
+                </select>
+              </label>
 
-              <input
-                type="text"
-                name="type"
-                placeholder="Job Type"
-                className="form-control"
-                value={formData.type}
-                onChange={handleChange}
-              />
+              <label className="dashboard-field">
+                <span>Currency</span>
+                <input
+                  type="text"
+                  name="salaryCurrency"
+                  className="form-control"
+                  value={formData.salaryCurrency}
+                  onChange={handleChange}
+                />
+              </label>
 
-              <input
-                type="text"
-                name="requirements"
-                placeholder="React, Node.js, MongoDB"
-                className="form-control full"
-                value={formData.requirements}
-                onChange={handleChange}
-                required
-              />
+              <label className="dashboard-field">
+                <span>Minimum Salary</span>
+                <input
+                  type="number"
+                  min="0"
+                  name="salaryMin"
+                  className="form-control"
+                  value={formData.salaryMin}
+                  onChange={handleChange}
+                />
+              </label>
 
-              <textarea
-                name="description"
-                placeholder="Job Description"
-                className="form-control full"
-                rows="5"
-                value={formData.description}
-                onChange={handleChange}
-                required
-              />
+              <label className="dashboard-field">
+                <span>Maximum Salary</span>
+                <input
+                  type="number"
+                  min="0"
+                  name="salaryMax"
+                  className="form-control"
+                  value={formData.salaryMax}
+                  onChange={handleChange}
+                />
+              </label>
 
+              <label className="dashboard-field full">
+                <span>Skills (comma separated)</span>
+                <input
+                  type="text"
+                  name="skills"
+                  className="form-control"
+                  placeholder="React, Node.js, MongoDB"
+                  value={formData.skills}
+                  onChange={handleChange}
+                  required
+                />
+              </label>
+
+              <label className="dashboard-field full">
+                <span>Requirements (one per line)</span>
+                <textarea
+                  name="requirements"
+                  className="form-control"
+                  rows="3"
+                  value={formData.requirements}
+                  onChange={handleChange}
+                />
+              </label>
+
+              <label className="dashboard-field full">
+                <span>Description</span>
+                <textarea
+                  name="description"
+                  className="form-control"
+                  rows="5"
+                  value={formData.description}
+                  onChange={handleChange}
+                  required
+                />
+              </label>
             </div>
 
-            <div className="d-flex gap-2 mt-3">
-
-              <button
-                type="submit"
-                className="primary-btn"
-                disabled={creating}
-              >
-
-                {creating
-                  ? "Creating..."
-                  : "Create Job"}
-
+            <div className="dashboard-form-actions">
+              <button type="submit" className="primary-btn" disabled={saving}>
+                {saving ? 'Saving...' : editingJob ? 'Update Job' : 'Create Job'}
               </button>
-
+              {editingJob ? (
+                <span className="muted-text">
+                  Editing a job sends it back to admin approval before it appears publicly.
+                </span>
+              ) : null}
             </div>
-
           </form>
+        </section>
 
-        </div>
-
-        {/* JOBS */}
-
-        <div className="panel-card">
-
+        <section className="panel-card">
           <div className="section-head">
-
-            <h2 className="section-title">
-              My Jobs
-            </h2>
-
+            <h2 className="section-title">My Jobs</h2>
+            <button type="button" className="section-action" onClick={loadDashboard}>
+              <RefreshCcw size={16} />
+              Reload
+            </button>
           </div>
 
           {loading ? (
-
-            <div className="loading-row">
-              Loading jobs...
-            </div>
-
+            <div className="loading-row">Loading dashboard...</div>
           ) : jobs.length === 0 ? (
-
-            <div className="empty-state">
-              No jobs found.
-            </div>
-
+            <div className="empty-state">No jobs yet. Create your first job above.</div>
           ) : (
-
             <div className="jobs-grid">
-
               {jobs.map((job) => (
-
-                <div
-                  key={job._id}
-                  className="job-card"
-                >
-
+                <article key={job._id} className="job-card">
                   <div className="job-top">
-
                     <div>
-
-                      <h3 className="job-title">
-                        {job.title}
-                      </h3>
-
-                      <div className="job-company">
-                        {job.company}
-                      </div>
-
+                      <h3 className="job-title">{job.title}</h3>
+                      <div className="job-company">{job.company?.name || summary?.user?.name}</div>
                     </div>
-
-                    <span
-                      className={getStatusClass(job.status)}
-                    >
-                      {job.status}
+                    <span className={getApprovalClass(job)}>
+                      {job.isApproved ? 'Approved' : job.status === 'closed' ? 'Closed' : 'Pending'}
                     </span>
-
                   </div>
 
                   <div className="job-meta">
-
                     <span>
-
-                      <Building2 size={14} />
-                      {job.company}
-
-                    </span>
-
-                    <span>
-
                       <MapPin size={14} />
                       {job.location}
-
                     </span>
-
                     <span>
-
-                      <BadgeDollarSign size={14} />
-                      {job.salary}
-
+                      <Briefcase size={14} />
+                      {job.jobType}
                     </span>
-
+                    <span>
+                      <BadgeDollarSign size={14} />
+                      {formatSalary(job.salary)}
+                    </span>
                   </div>
+
+                  <p className="muted-text job-description">{job.description}</p>
+
+                  {job.skills?.length ? (
+                    <div className="chip-list">
+                      {job.skills.slice(0, 5).map((skill) => (
+                        <span className="chip" key={skill}>
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
 
                   <div className="card-divider" />
 
-                  <p className="muted-text mb-2">
-                    {job.description}
-                  </p>
-
-                  <div className="d-flex justify-content-between align-items-center mt-3">
-
+                  <div className="job-footer">
+                    <small className="muted-text">Posted {formatDate(job.createdAt)}</small>
                     <small className="muted-text">
-
-                      Posted on{" "}
-                      {formatDate(job.createdAt)}
-
+                      {Array.isArray(job.applications) ? job.applications.length : 0} applications
                     </small>
+                  </div>
 
+                  <div className="job-actions">
                     <button
                       type="button"
-                      className="primary-btn"
-                      onClick={() =>
-                        viewApplicants(
-                          job._id,
-                          job.title
-                        )
-                      }
+                      className="secondary-btn"
+                      onClick={() => viewJobApplications(job._id)}
                     >
-
-                      <Eye size={16} />
-                      View Applicants
-
+                      <Eye size={15} />
+                      Applicants
                     </button>
-
+                    <button type="button" className="secondary-btn" onClick={() => openEditJob(job)}>
+                      <Edit3 size={15} />
+                      Edit
+                    </button>
+                    {job.status === 'closed' ? (
+                      <button
+                        type="button"
+                        className="secondary-btn"
+                        onClick={() =>
+                          runJobAction(
+                            () => employerService.reopenJob(job._id),
+                            'Job reopened successfully.'
+                          )
+                        }
+                      >
+                        Reopen
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        className="secondary-btn"
+                        onClick={() =>
+                          runJobAction(
+                            () => employerService.closeJob(job._id),
+                            'Job closed successfully.'
+                          )
+                        }
+                      >
+                        Close
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      className="danger-btn"
+                      onClick={() => handleDeleteJob(job)}
+                    >
+                      <Trash2 size={15} />
+                      Delete
+                    </button>
                   </div>
-
-                </div>
-
+                </article>
               ))}
-
             </div>
-
           )}
+        </section>
 
-        </div>
+        <section className="panel-card" id="employer-applications">
+          <div className="section-head">
+            <h2 className="section-title">Applications</h2>
+            <select
+              className="form-select employer-filter-select"
+              value={selectedJobId}
+              onChange={(event) => setSelectedJobId(event.target.value)}
+            >
+              <option value="">All jobs</option>
+              {jobs.map((job) => (
+                <option key={job._id} value={job._id}>
+                  {job.title}
+                </option>
+              ))}
+            </select>
+          </div>
 
-        {/* APPLICANTS */}
+          {visibleApplications.length === 0 ? (
+            <div className="empty-state">No applications found for this view.</div>
+          ) : (
+            <div className="application-list">
+              {visibleApplications.map((application) => {
+                const draft = getApplicationDraft(application);
+                const isRejected = draft.status === 'Rejected';
 
-        {showApplicants && (
-
-          <div className="panel-card mt-4">
-
-            <div className="section-head">
-
-              <h2 className="section-title">
-
-                Applicants for "
-                {selectedJobTitle}"
-
-              </h2>
-
-              <button
-                type="button"
-                className="section-action"
-                onClick={() =>
-                  setShowApplicants(false)
-                }
-              >
-                Close
-              </button>
-
-            </div>
-
-            {selectedApplicants.length === 0 ? (
-
-              <div className="empty-state">
-                No applicants yet.
-              </div>
-
-            ) : (
-
-              selectedApplicants.map((applicant) => (
-
-                <div
-                  key={applicant._id}
-                  className="applicant-card"
-                >
-
-                  <div className="applicant-head">
-
-                    <div>
-
-                      <h4 className="applicant-name">
-                        {applicant.seeker?.name}
-                      </h4>
-
-                      <div className="applicant-email">
-                        {applicant.seeker?.email}
+                return (
+                  <article className="applicant-card" key={application._id}>
+                    <div className="applicant-head">
+                      <div>
+                        <h4 className="applicant-name">
+                          {application.seeker?.name || 'Unknown candidate'}
+                        </h4>
+                        <div className="applicant-email">{application.seeker?.email}</div>
+                        <div className="muted-text">
+                          Applied for {application.job?.title || application.jobTitle} on{' '}
+                          {formatDate(application.createdAt)}
+                        </div>
                       </div>
-
+                      <span className={getApplicationStatusClass(application.status)}>
+                        {application.status}
+                      </span>
                     </div>
 
-                    <span
-                      className={getStatusClass(
-                        applicant.status
-                      )}
-                    >
-                      {applicant.status}
-                    </span>
+                    <div className="card-divider" />
 
-                  </div>
+                    <p className="muted-text">
+                      <strong>Cover Letter:</strong>{' '}
+                      {application.coverLetter || 'No cover letter provided.'}
+                    </p>
 
-                  <div className="card-divider" />
-
-                  <p className="muted-text mb-2">
-
-                    <strong>Cover Letter:</strong>{" "}
-                    {applicant.coverLetter || "—"}
-
-                  </p>
-
-                  <p className="muted-text mb-2">
-
-                    <strong>Resume:</strong>{" "}
-
-                    {applicant.resume ? (
-
+                    {application.resume ? (
                       <a
+                        className="resume-link"
                         href={
-                          applicant.resume.startsWith("http")
-                            ? applicant.resume
-                            : `http://localhost:5000/${applicant.resume}`
+                          application.resume.startsWith('http')
+                            ? application.resume
+                            : `http://localhost:5000/${application.resume.replace(/\\/g, '/')}`
                         }
                         target="_blank"
                         rel="noreferrer"
                       >
                         Open Resume
                       </a>
-
                     ) : (
-
-                      "Not uploaded"
-
+                      <p className="muted-text">No resume uploaded.</p>
                     )}
 
-                  </p>
-
-                  <p className="muted-text mb-0">
-
-                    <strong>Applied:</strong>{" "}
-                    {formatDate(applicant.createdAt)}
-
-                  </p>
-
-                  {/* ACTIONS */}
-
-                  <div className="mt-3">
-
-                    {/* STATUS */}
-
-                    <select
-                      className="form-control mb-2"
-                      value={applicant.status || "Pending"}
-                      onChange={async (e) => {
-
-                        const newStatus = e.target.value;
-
-                        try {
-
-                          await employerService.updateApplicationStatus(
-                            applicant._id,
-                            {
-                              status: newStatus
-                            }
-                          );
-
-                          // CLEAR INTERVIEW INFO IF REJECTED
-                          if (newStatus === "Rejected") {
-
-                            await employerService.updateApplicationDetails(
-                              applicant._id,
-                              {
-                                interviewDate: "",
-                                interviewTime: "",
-                                interviewMode: "",
-                                employerMessage:
-                                  "Sorry, you were not selected for this job."
-                              }
-                            );
-
+                    <div className="application-action-grid">
+                      <label className="dashboard-field">
+                        <span>Status</span>
+                        <select
+                          className="form-select"
+                          value={draft.status}
+                          onChange={(event) =>
+                            updateApplicationDraft(application._id, 'status', event.target.value)
                           }
+                        >
+                          {applicationStatuses.map((status) => (
+                            <option key={status}>{status}</option>
+                          ))}
+                        </select>
+                      </label>
 
-                          viewApplicants(
-                            applicant.job._id,
-                            selectedJobTitle
-                          );
+                      {!isRejected ? (
+                        <>
+                          <label className="dashboard-field">
+                            <span>Interview Date</span>
+                            <input
+                              type="date"
+                              className="form-control"
+                              value={draft.interviewDate}
+                              onChange={(event) =>
+                                updateApplicationDraft(
+                                  application._id,
+                                  'interviewDate',
+                                  event.target.value
+                                )
+                              }
+                            />
+                          </label>
 
-                        } catch (error) {
+                          <label className="dashboard-field">
+                            <span>Interview Time</span>
+                            <input
+                              type="text"
+                              className="form-control"
+                              placeholder="10:30 AM"
+                              value={draft.interviewTime}
+                              onChange={(event) =>
+                                updateApplicationDraft(
+                                  application._id,
+                                  'interviewTime',
+                                  event.target.value
+                                )
+                              }
+                            />
+                          </label>
 
-                          console.log(error);
+                          <label className="dashboard-field">
+                            <span>Mode / Location</span>
+                            <input
+                              type="text"
+                              className="form-control"
+                              placeholder="Google Meet or office address"
+                              value={draft.interviewMode}
+                              onChange={(event) =>
+                                updateApplicationDraft(
+                                  application._id,
+                                  'interviewMode',
+                                  event.target.value
+                                )
+                              }
+                            />
+                          </label>
+                        </>
+                      ) : null}
 
-                        }
-
-                      }}
-                    >
-
-                      <option>Pending</option>
-                      <option>Reviewing</option>
-                      <option>Shortlisted</option>
-                      <option>Interview Scheduled</option>
-                      <option>Accepted</option>
-                      <option>Rejected</option>
-
-                    </select>
-
-                    {/* SHOW ONLY IF NOT REJECTED */}
-
-                    {applicant.status !== "Rejected" && (
-
-                      <>
-
-                        <input
-                          type="date"
-                          className="form-control mb-2"
-                          value={applicant.interviewDate || ""}
-                          onChange={async (e) => {
-
-                            try {
-
-                              await employerService.updateApplicationDetails(
-                                applicant._id,
-                                {
-                                  interviewDate: e.target.value
-                                }
-                              );
-
-                              viewApplicants(
-                                applicant.job._id,
-                                selectedJobTitle
-                              );
-
-                            } catch (error) {
-
-                              console.log(error);
-
-                            }
-
-                          }}
-                        />
-
-                        <input
-                          type="text"
-                          className="form-control mb-2"
-                          placeholder="Interview Time"
-                          value={applicant.interviewTime || ""}
-                          onChange={async (e) => {
-
-                            try {
-
-                              await employerService.updateApplicationDetails(
-                                applicant._id,
-                                {
-                                  interviewTime: e.target.value
-                                }
-                              );
-
-                              viewApplicants(
-                                applicant.job._id,
-                                selectedJobTitle
-                              );
-
-                            } catch (error) {
-
-                              console.log(error);
-
-                            }
-
-                          }}
-                        />
-
-                        <input
-                          type="text"
-                          className="form-control mb-2"
-                          placeholder="Interview Mode / Location"
-                          value={applicant.interviewMode || ""}
-                          onChange={async (e) => {
-
-                            try {
-
-                              await employerService.updateApplicationDetails(
-                                applicant._id,
-                                {
-                                  interviewMode: e.target.value
-                                }
-                              );
-
-                              viewApplicants(
-                                applicant.job._id,
-                                selectedJobTitle
-                              );
-
-                            } catch (error) {
-
-                              console.log(error);
-
-                            }
-
-                          }}
-                        />
-
+                      <label className="dashboard-field application-message-field">
+                        <span>Message to Candidate</span>
                         <textarea
                           className="form-control"
-                          placeholder="Employer Message"
-                          value={applicant.employerMessage || ""}
-                          onChange={async (e) => {
-
-                            try {
-
-                              await employerService.updateApplicationDetails(
-                                applicant._id,
-                                {
-                                  employerMessage: e.target.value
-                                }
-                              );
-
-                              viewApplicants(
-                                applicant.job._id,
-                                selectedJobTitle
-                              );
-
-                            } catch (error) {
-
-                              console.log(error);
-
-                            }
-
-                          }}
+                          rows="3"
+                          value={draft.employerMessage}
+                          placeholder={
+                            isRejected
+                              ? 'Optional rejection note'
+                              : 'Share interview details or next steps'
+                          }
+                          onChange={(event) =>
+                            updateApplicationDraft(
+                              application._id,
+                              'employerMessage',
+                              event.target.value
+                            )
+                          }
                         />
+                      </label>
+                    </div>
 
-                      </>
-
-                    )}
-
-                    {/* REJECTED MESSAGE */}
-
-                    {applicant.status === "Rejected" && (
-
-                      <div className="rejected-message mt-2">
-
-                        Sorry, you were not selected for this job.
-
-                      </div>
-
-                    )}
-
-                  </div>
-
-                </div>
-
-              ))
-
-            )}
-
-          </div>
-
-        )}
-
+                    <div className="dashboard-form-actions">
+                      <button
+                        type="button"
+                        className="primary-btn"
+                        onClick={() => saveApplication(application)}
+                      >
+                        Save Application
+                      </button>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          )}
+        </section>
       </div>
-
     </div>
-
   );
-
 };
 
 export default EmployerDashboard;
