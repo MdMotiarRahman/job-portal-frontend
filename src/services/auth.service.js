@@ -58,7 +58,8 @@ const decodeTokenPayload = (
     const base64 =
       payload
         .replace(/-/g, '+')
-        .replace(/_/g, '/');
+        .replace(/_/g, '/')
+        .padEnd(Math.ceil(payload.length / 4) * 4, '=');
 
     const decoded =
       atob(base64);
@@ -163,8 +164,13 @@ const getCurrentUserRole =
   const decoded =
     decodeTokenPayload(token);
 
-  // FIXED HERE
-  return decoded?.role || null;
+  return (
+    decoded?.role
+    || decoded?.user?.role
+    || currentUser?.user?.role
+    || currentUser?.role
+    || null
+  );
 
 };
 

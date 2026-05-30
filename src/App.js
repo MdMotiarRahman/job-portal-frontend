@@ -205,7 +205,7 @@ const Navigation = () => {
             <>
               {/* ADMIN */}
 
-              {user.user.role === 'admin' && (
+              {userRole === 'admin' && (
 
                 <Link
                   to="/admin"
@@ -218,7 +218,7 @@ const Navigation = () => {
 
               {/* EMPLOYER */}
 
-              {user.user.role === 'employer' && (
+              {userRole === 'employer' && (
 
                 <Link
                   to="/employer"
@@ -231,7 +231,7 @@ const Navigation = () => {
 
               {/* SEEKER */}
 
-              {user.user.role === 'seeker' && (
+              {userRole === 'seeker' && (
 
                 <>
                   <Link
@@ -394,7 +394,7 @@ const Navigation = () => {
             <>
               {/* ADMIN */}
 
-              {user.user.role === 'admin' && (
+              {userRole === 'admin' && (
 
                 <Link
                   to="/admin"
@@ -408,7 +408,7 @@ const Navigation = () => {
 
               {/* EMPLOYER */}
 
-              {user.user.role === 'employer' && (
+              {userRole === 'employer' && (
 
                 <Link
                   to="/employer"
@@ -422,7 +422,7 @@ const Navigation = () => {
 
               {/* SEEKER */}
 
-              {user.user.role === 'seeker' && (
+              {userRole === 'seeker' && (
 
                 <>
                   <Link

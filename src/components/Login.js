@@ -44,17 +44,11 @@ const Login = () => {
 
     try {
       await authService.login(email, password);
-      const user = authService.getCurrentUser();
+      const role = authService.getCurrentUserRole();
       
-      if (user) {
-        const token = user.token;
-        const decodedToken = JSON.parse(atob(token.split('.')[1]));
-        const role = decodedToken.role;
-        
-        if (role === 'admin') navigate('/admin');
-        else if (role === 'employer') navigate('/employer');
-        else navigate('/seeker');
-      }
+      if (role === 'admin') navigate('/admin');
+      else if (role === 'employer') navigate('/employer');
+      else navigate('/seeker');
     } catch (error) {
       const resMessage = (error.response?.data?.message) || error.message || 'Invalid credentials. Please try again.';
       setApiError(resMessage);
