@@ -103,7 +103,7 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
     },
   ], []);
 
-  const isActive = useCallback((path) => {
+  const isActive = useCallback((path, exactSearch = false) => {
     const [pathname, search = ''] = path.split('?');
     const currentPath = location.pathname;
     const currentSearch = location.search.replace(/^\?/, '');
@@ -112,12 +112,16 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
       return currentPath === pathname && currentSearch === search;
     }
 
+    if (exactSearch) {
+      return currentPath === pathname && !currentSearch;
+    }
+
     return currentPath === pathname || currentPath.startsWith(`${pathname}/`);
   }, [location.pathname, location.search]);
 
   useEffect(() => {
     const activeMenu = menuItems.find((item) =>
-      item.submenu?.some((subitem) => isActive(subitem.path))
+      item.submenu?.some((subitem) => isActive(subitem.path, true))
     );
 
     if (activeMenu) {
@@ -214,10 +218,10 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
                         <button
                           key={idx}
                           className={`admin-submenu-item ${
-                            isActive(subitem.path) ? 'active' : ''
+                            isActive(subitem.path, true) ? 'active' : ''
                           }`}
                           onClick={() => handleNavigation(subitem.path)}
-                          aria-current={isActive(subitem.path) ? 'page' : undefined}
+                          aria-current={isActive(subitem.path, true) ? 'page' : undefined}
                         >
                           {subitem.label}
                         </button>

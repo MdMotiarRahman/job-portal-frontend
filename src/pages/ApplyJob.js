@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { applyJob } from '../services/seekerService';
 import '../styles/applyJob.css';
 
 const ApplyJob = () => {
+  const { id } = useParams();
   const [formData, setFormData] = useState({
     jobTitle: '',
     coverLetter: '',
@@ -25,6 +27,9 @@ const ApplyJob = () => {
 
       data.append('jobTitle', formData.jobTitle);
       data.append('coverLetter', formData.coverLetter);
+      if (id) {
+        data.append('jobId', id);
+      }
 
       if (resume) {
         data.append('resume', resume);

@@ -30,6 +30,15 @@ export const deleteUser = (userId) =>
 export const getJobs = (params = {}) =>
   axios.get(`${API_URL}/jobs`, { ...authHeader(), params });
 
+export const getJobById = (jobId) =>
+  axios.get(`${API_URL}/jobs/${jobId}`, authHeader());
+
+export const createJob = (payload) =>
+  axios.post(`${API_URL}/jobs`, payload, authHeader());
+
+export const updateJob = (jobId, payload) =>
+  axios.put(`${API_URL}/jobs/${jobId}`, payload, authHeader());
+
 export const approveJob = (jobId, notes = '') =>
   axios.put(`${API_URL}/jobs/${jobId}/approve`, { notes }, authHeader());
 
@@ -38,6 +47,12 @@ export const rejectJob = (jobId, reason) =>
 
 export const closeJob = (jobId) =>
   axios.put(`${API_URL}/jobs/${jobId}/close`, {}, authHeader());
+
+export const reopenJob = (jobId) =>
+  axios.put(`${API_URL}/jobs/${jobId}/reopen`, {}, authHeader());
+
+export const deleteJob = (jobId) =>
+  axios.delete(`${API_URL}/jobs/${jobId}`, authHeader());
 
 export const getApplications = (params = {}) =>
   axios.get(`${API_URL}/applications`, { ...authHeader(), params });

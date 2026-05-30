@@ -28,6 +28,7 @@ import HomePage from './components/Home';
 import Login from './components/Login';
 import Register from './components/Register';
 import AdminDashboard from './components/AdminDashboard';
+import AdminJobManagement from './components/AdminJobManagement';
 import EmployerDashboard from './components/EmployerDashboard';
 import SeekerDashboard from './components/SeekerDashboard';
 
@@ -363,6 +364,15 @@ const AppContent = () => {
           <Route
             path="/admin"
             element={<Navigate to="/admin/dashboard" replace />}
+          />
+
+          <Route
+            path="/admin/jobs"
+            element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AdminJobManagement />
+              </ProtectedRoute>
+            }
           />
 
           <Route
