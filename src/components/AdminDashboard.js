@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { RefreshCw } from 'lucide-react';
 import {
   getDashboardStats,
   getAnalytics,
@@ -13,6 +14,7 @@ import {
   getApplications,
   updateApplicationStatus,
 } from '../services/adminService';
+import AdminLayout from './AdminLayout';
 import '../styles/adminDashboard.css';
 
 const statusActions = ['activate', 'deactivate', 'ban', 'unban'];
@@ -142,179 +144,205 @@ const AdminDashboard = () => {
   };
 
   if (loading) {
-    return <div className="admin-page admin-loading">Loading admin dashboard...</div>;
+    return (
+      <AdminLayout>
+        <div className="admin-page admin-loading">Loading admin dashboard...</div>
+      </AdminLayout>
+    );
   }
 
   return (
-    <div className="admin-page">
-      <div className="admin-header-card">
-        <div className="admin-header">
-          <div>
-            <h1>Admin Portal</h1>
-            <p className="admin-subtitle">Monitor users, jobs, applications, and platform activity.</p>
+    <AdminLayout>
+      <div className="admin-page">
+        <div className="admin-header-card">
+          <div className="admin-header">
+            <div>
+              <h1>Admin Portal</h1>
+              <p className="admin-subtitle">Monitor users, jobs, applications, and platform activity.</p>
+            </div>
+            <button className="admin-refresh-btn" onClick={loadAll}>
+              <RefreshCw size={16} strokeWidth={2} />
+              Refresh
+            </button>
           </div>
-          <button className="admin-refresh-btn" onClick={loadAll}>Refresh</button>
         </div>
+
+        {error ? <div className="admin-alert admin-alert-error">{error}</div> : null}
+        {success ? <div className="admin-alert admin-alert-success">{success}</div> : null}
+
+        <section className="admin-stats-grid">
+          <div className="admin-stat-card">
+            <h3>Total Users</h3>
+            <p className="admin-stat-value">{stats?.users?.total ?? 0}</p>
+          </div>
+          <div className="admin-stat-card">
+            <h3>Active Jobs</h3>
+            <p className="admin-stat-value">{stats?.jobs?.active ?? 0}</p>
+          </div>
+          <div className="admin-stat-card">
+            <h3>Pending Jobs</h3>
+            <p className="admin-stat-value">{stats?.jobs?.pending ?? 0}</p>
+          </div>
+          <div className="admin-stat-card">
+            <h3>Total Applications</h3>
+            <p className="admin-stat-value">{stats?.applications?.total ?? 0}</p>
+          </div>
+        </section>
+
+        <section className="admin-section">
+          <h2 className="admin-section-title">Users</h2>
+          <div className="admin-table-wrap">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map((user) => (
+                  <tr key={user._id}>
+                    <td>{user.name}</td>
+                    <td>{user.email}</td>
+                    <td>
+                      <span className="admin-badge admin-badge-role">{user.role}</span>
+                    </td>
+                    <td>
+                      <span className={`admin-badge admin-badge-${
+                        user.isBanned ? 'error' : user.isActive ? 'success' : 'warning'
+                      }`}>
+                        {user.isBanned ? 'Banned' : user.isActive ? 'Active' : 'Inactive'}
+                      </span>
+                    </td>
+                    <td className="admin-actions-cell">
+                      <button className="admin-action-btn admin-action-neutral" onClick={() => handleUserAction(user._id, user.isActive ? 'deactivate' : 'activate')}>
+                        {user.isActive ? 'Deactivate' : 'Activate'}
+                      </button>
+                      <button className="admin-action-btn admin-action-warning" onClick={() => handleUserAction(user._id, user.isBanned ? 'unban' : 'ban')}>
+                        {user.isBanned ? 'Unban' : 'Ban'}
+                      </button>
+                      <button className="admin-action-btn admin-action-success" onClick={() => handleVerifyUser(user._id)}>
+                        Verify
+                      </button>
+                      <button className="admin-action-btn admin-action-danger" onClick={() => handleDeleteUser(user._id)}>
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section className="admin-section">
+          <h2 className="admin-section-title">Jobs</h2>
+          <div className="admin-table-wrap">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Company</th>
+                  <th>Status</th>
+                  <th>Approval</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {jobs.map((job) => (
+                  <tr key={job._id}>
+                    <td>{job.title}</td>
+                    <td>{job.company?.name || 'N/A'}</td>
+                    <td>
+                      <span className="admin-badge admin-badge-status">{job.status}</span>
+                    </td>
+                    <td>
+                      <span className={`admin-badge ${job.isApproved ? 'admin-badge-success' : 'admin-badge-warning'}`}>
+                        {job.isApproved ? 'Approved' : 'Pending'}
+                      </span>
+                    </td>
+                    <td className="admin-actions-cell">
+                      <button className="admin-action-btn admin-action-success" onClick={() => handleApproveJob(job._id)}>
+                        Approve
+                      </button>
+                      <button className="admin-action-btn admin-action-warning" onClick={() => handleRejectJob(job._id)}>
+                        Reject
+                      </button>
+                      <button className="admin-action-btn admin-action-danger" onClick={() => handleCloseJob(job._id)}>
+                        Close
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section className="admin-section">
+          <h2 className="admin-section-title">Applications</h2>
+          <div className="admin-table-wrap">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Job</th>
+                  <th>Seeker</th>
+                  <th>Current Status</th>
+                  <th>Update Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {applications.map((app) => (
+                  <tr key={app._id}>
+                    <td>{app.jobTitle}</td>
+                    <td>{app.seeker?.name || 'N/A'}</td>
+                    <td>
+                      <span className={`admin-badge admin-badge-${app.status.toLowerCase()}`}>
+                        {app.status}
+                      </span>
+                    </td>
+                    <td>
+                      <select
+                        className="admin-select"
+                        value={app.status}
+                        onChange={(e) => handleApplicationStatus(app._id, e.target.value)}
+                      >
+                        {appStatuses.map((status) => (
+                          <option key={status} value={status}>
+                            {status}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section className="admin-section">
+          <h2 className="admin-section-title">Monthly Analytics</h2>
+          <div className="admin-analytics-grid">
+            <div className="admin-stat-card">
+              <h3>New Users</h3>
+              <p className="admin-stat-value">{analytics?.newUsers ?? 0}</p>
+            </div>
+            <div className="admin-stat-card">
+              <h3>New Jobs</h3>
+              <p className="admin-stat-value">{analytics?.newJobs ?? 0}</p>
+            </div>
+            <div className="admin-stat-card">
+              <h3>New Applications</h3>
+              <p className="admin-stat-value">{analytics?.newApplications ?? 0}</p>
+            </div>
+          </div>
+        </section>
       </div>
-
-      {error ? <div className="admin-alert admin-alert-error">{error}</div> : null}
-      {success ? <div className="admin-alert admin-alert-success">{success}</div> : null}
-
-      <section className="admin-stats-grid">
-        <div className="admin-stat-card">
-          <h3>Total Users</h3>
-          <p>{stats?.users?.total ?? 0}</p>
-        </div>
-        <div className="admin-stat-card">
-          <h3>Active Jobs</h3>
-          <p>{stats?.jobs?.active ?? 0}</p>
-        </div>
-        <div className="admin-stat-card">
-          <h3>Pending Jobs</h3>
-          <p>{stats?.jobs?.pending ?? 0}</p>
-        </div>
-        <div className="admin-stat-card">
-          <h3>Total Applications</h3>
-          <p>{stats?.applications?.total ?? 0}</p>
-        </div>
-      </section>
-
-      <section className="admin-section">
-        <h2 className="admin-section-title">Users</h2>
-        <div className="admin-table-wrap">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((user) => (
-                <tr key={user._id}>
-                  <td>{user.name}</td>
-                  <td>{user.email}</td>
-                  <td>{user.role}</td>
-                  <td>
-                    {user.isBanned ? 'Banned' : user.isActive ? 'Active' : 'Inactive'}
-                  </td>
-                  <td className="admin-actions-cell">
-                    <button className="admin-action-btn admin-action-neutral" onClick={() => handleUserAction(user._id, user.isActive ? 'deactivate' : 'activate')}>
-                      {user.isActive ? 'Deactivate' : 'Activate'}
-                    </button>
-                    <button className="admin-action-btn admin-action-warning" onClick={() => handleUserAction(user._id, user.isBanned ? 'unban' : 'ban')}>
-                      {user.isBanned ? 'Unban' : 'Ban'}
-                    </button>
-                    <button className="admin-action-btn admin-action-success" onClick={() => handleVerifyUser(user._id)}>
-                      Verify
-                    </button>
-                    <button className="admin-action-btn admin-action-danger" onClick={() => handleDeleteUser(user._id)}>
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section className="admin-section">
-        <h2 className="admin-section-title">Jobs</h2>
-        <div className="admin-table-wrap">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Title</th>
-                <th>Company</th>
-                <th>Status</th>
-                <th>Approval</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {jobs.map((job) => (
-                <tr key={job._id}>
-                  <td>{job.title}</td>
-                  <td>{job.company?.name || 'N/A'}</td>
-                  <td>{job.status}</td>
-                  <td>{job.isApproved ? 'Approved' : 'Pending'}</td>
-                  <td className="admin-actions-cell">
-                    <button className="admin-action-btn admin-action-success" onClick={() => handleApproveJob(job._id)}>
-                      Approve
-                    </button>
-                    <button className="admin-action-btn admin-action-warning" onClick={() => handleRejectJob(job._id)}>
-                      Reject
-                    </button>
-                    <button className="admin-action-btn admin-action-danger" onClick={() => handleCloseJob(job._id)}>
-                      Close
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section className="admin-section">
-        <h2 className="admin-section-title">Applications</h2>
-        <div className="admin-table-wrap">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Job</th>
-                <th>Seeker</th>
-                <th>Current Status</th>
-                <th>Update Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {applications.map((app) => (
-                <tr key={app._id}>
-                  <td>{app.jobTitle}</td>
-                  <td>{app.seeker?.name || 'N/A'}</td>
-                  <td>{app.status}</td>
-                  <td>
-                    <select
-                      value={app.status}
-                      onChange={(e) => handleApplicationStatus(app._id, e.target.value)}
-                    >
-                      {appStatuses.map((status) => (
-                        <option key={status} value={status}>
-                          {status}
-                        </option>
-                      ))}
-                    </select>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section className="admin-section">
-        <h2 className="admin-section-title">Monthly Analytics</h2>
-        <div className="admin-analytics-grid">
-          <div className="admin-stat-card">
-            <h3>New Users</h3>
-            <p>{analytics?.newUsers ?? 0}</p>
-          </div>
-          <div className="admin-stat-card">
-            <h3>New Jobs</h3>
-            <p>{analytics?.newJobs ?? 0}</p>
-          </div>
-          <div className="admin-stat-card">
-            <h3>New Applications</h3>
-            <p>{analytics?.newApplications ?? 0}</p>
-          </div>
-        </div>
-      </section>
-    </div>
+    </AdminLayout>
   );
 };
 
