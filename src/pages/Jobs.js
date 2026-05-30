@@ -144,7 +144,7 @@ const Jobs = () => {
           <div className="jobs-hero-panel">
             <span>Live listings</span>
             <strong>{pagination.total}</strong>
-            <p>Approved active jobs from the database</p>
+            <p>Active jobs from the database</p>
           </div>
         </div>
       </section>
