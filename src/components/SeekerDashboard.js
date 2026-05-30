@@ -12,7 +12,6 @@ import {
   GraduationCap,
   Code,
   Building2,
-  DollarSign,
 } from 'lucide-react';
 
 import {
@@ -271,24 +270,30 @@ const SeekerDashboard = () => {
 
                 <Building2 size={16} />
                 {" "}
-                {job.company}
+                {job.company?.name || job.company || 'N/A'}
+
+              </p>
+
+              <p>
+
+                <MapPin size={16} />
+                {" "}
+                {job.location || 'Location not specified'}
 
               </p>
 
               <p className="cover-letter">
-                {app.coverLetter}
+                {job.description
+                  ? `${job.description.slice(0, 140)}${job.description.length > 140 ? '...' : ''}`
+                  : 'No description provided.'}
               </p>
 
-              {app.resume && (
-                <a
-                  href={app.resume.startsWith('http') ? app.resume : `http://localhost:5000/${app.resume.replace(/\\/g, '/')}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="resume-btn"
-                >
-                  View Resume
-                </a>
-              )}
+              <Link
+                to={`/apply-job/${job._id}`}
+                className="resume-btn"
+              >
+                Apply Now
+              </Link>
 
             </div>
 

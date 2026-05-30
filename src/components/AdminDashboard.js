@@ -1,36 +1,27 @@
-import React, { useEffect, useState }, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import {
-  ShieldCheck,
-  Clock3,
-  MapPin,
-  Building2,
-  BadgeDollarSign,
-  FileText,
-  RefreshCcw,
-  CheckCircle2,
-  XCircle,
-  User2,
   Briefcase,
-} from "lucide-react";
+  FileText,
+  RefreshCw,
+  ShieldCheck,
+  Users,
+} from 'lucide-react';
 
-import adminService from "../services/admin.service";
-import "../styles/dashboard.css";
-import { RefreshCw } from 'lucide-react';
+import AdminLayout from './AdminLayout';
 import {
-  getDashboardStats,
+  approveJob,
+  closeJob,
+  deleteUser,
   getAnalytics,
+  getApplications,
+  getDashboardStats,
+  getJobs,
   getUsers,
+  rejectJob,
+  updateApplicationStatus,
   updateUserStatus,
   verifyUser,
-  deleteUser,
-  getJobs,
-  approveJob,
-  rejectJob,
-  closeJob,
-  getApplications,
-  updateApplicationStatus,
 } from '../services/adminService';
-import AdminLayout from './AdminLayout';
 import '../styles/adminDashboard.css';
 
 const statusActions = ['activate', 'deactivate', 'ban', 'unban'];
@@ -49,6 +40,7 @@ const AdminDashboard = () => {
   const loadAll = async () => {
     setLoading(true);
     setError('');
+
     try {
       const [statsRes, analyticsRes, usersRes, jobsRes, appsRes] = await Promise.all([
         getDashboardStats(),
@@ -75,16 +67,19 @@ const AdminDashboard = () => {
   }, []);
 
   const handleUserAction = async (userId, action) => {
-    const validAction = statusActions.includes(action);
-    if (!validAction) return;
+    if (!statusActions.includes(action)) return;
 
     try {
+      setError('');
+      setSuccess('');
       let payload = {};
+
       if (action === 'ban') {
         const reason = window.prompt('Enter ban reason');
         if (!reason) return;
         payload = { reason };
       }
+
       await updateUserStatus(userId, action, payload);
       setSuccess(`User ${action}d successfully.`);
       await loadAll();
@@ -95,6 +90,8 @@ const AdminDashboard = () => {
 
   const handleVerifyUser = async (userId) => {
     try {
+      setError('');
+      setSuccess('');
       await verifyUser(userId);
       setSuccess('User verified successfully.');
       await loadAll();
@@ -108,6 +105,8 @@ const AdminDashboard = () => {
     if (!ok) return;
 
     try {
+      setError('');
+      setSuccess('');
       await deleteUser(userId);
       setSuccess('User deleted successfully.');
       await loadAll();
@@ -118,6 +117,8 @@ const AdminDashboard = () => {
 
   const handleApproveJob = async (jobId) => {
     try {
+      setError('');
+      setSuccess('');
       await approveJob(jobId, '');
       setSuccess('Job approved successfully.');
       await loadAll();
@@ -131,6 +132,8 @@ const AdminDashboard = () => {
     if (!reason) return;
 
     try {
+      setError('');
+      setSuccess('');
       await rejectJob(jobId, reason);
       setSuccess('Job rejected successfully.');
       await loadAll();
@@ -141,6 +144,8 @@ const AdminDashboard = () => {
 
   const handleCloseJob = async (jobId) => {
     try {
+      setError('');
+      setSuccess('');
       await closeJob(jobId);
       setSuccess('Job closed successfully.');
       await loadAll();
@@ -151,6 +156,8 @@ const AdminDashboard = () => {
 
   const handleApplicationStatus = async (applicationId, status) => {
     try {
+      setError('');
+      setSuccess('');
       await updateApplicationStatus(applicationId, status);
       setSuccess('Application status updated.');
       await loadAll();
@@ -167,62 +174,6 @@ const AdminDashboard = () => {
     );
   }
 
-  const [jobs, setJobs] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [actionId, setActionId] = useState(null);
-  const [notice, setNotice] = useState("");
-
-  const loadPendingJobs = async () => {
-    try {
-      setLoading(true);
-      setNotice("");
-      const data = await adminService.getPendingJobs();
-      setJobs(data);
-    } catch (error) {
-      console.log(error);
-      setNotice(error?.response?.data?.message || "Unable to load jobs");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadPendingJobs();
-  }, []);
-
-  const handleApprove = async (jobId) => {
-    try {
-      setActionId(jobId);
-      await adminService.approveJob(jobId);
-      setNotice("Job approved successfully.");
-      await loadPendingJobs();
-    } catch (error) {
-      console.log(error);
-      setNotice(error?.response?.data?.message || "Unable to approve job");
-    } finally {
-      setActionId(null);
-    }
-  };
-
-  const handleReject = async (jobId) => {
-    try {
-      setActionId(jobId);
-      await adminService.rejectJob(jobId);
-      setNotice("Job rejected successfully.");
-      await loadPendingJobs();
-    } catch (error) {
-      console.log(error);
-      setNotice(error?.response?.data?.message || "Unable to reject job");
-    } finally {
-      setActionId(null);
-    }
-  };
-
-  const formatDate = (value) => {
-    if (!value) return "—";
-    return new Date(value).toLocaleDateString();
-  };
-
   return (
     <AdminLayout>
       <div className="admin-page">
@@ -230,7 +181,9 @@ const AdminDashboard = () => {
           <div className="admin-header">
             <div>
               <h1>Admin Portal</h1>
-              <p className="admin-subtitle">Monitor users, jobs, applications, and platform activity.</p>
+              <p className="admin-subtitle">
+                Monitor users, jobs, applications, and platform activity.
+              </p>
             </div>
             <button className="admin-refresh-btn" onClick={loadAll}>
               <RefreshCw size={16} strokeWidth={2} />
@@ -244,19 +197,27 @@ const AdminDashboard = () => {
 
         <section className="admin-stats-grid">
           <div className="admin-stat-card">
-            <h3>Total Users</h3>
+            <h3>
+              <Users size={18} /> Total Users
+            </h3>
             <p className="admin-stat-value">{stats?.users?.total ?? 0}</p>
           </div>
           <div className="admin-stat-card">
-            <h3>Active Jobs</h3>
+            <h3>
+              <Briefcase size={18} /> Active Jobs
+            </h3>
             <p className="admin-stat-value">{stats?.jobs?.active ?? 0}</p>
           </div>
           <div className="admin-stat-card">
-            <h3>Pending Jobs</h3>
+            <h3>
+              <ShieldCheck size={18} /> Pending Jobs
+            </h3>
             <p className="admin-stat-value">{stats?.jobs?.pending ?? 0}</p>
           </div>
           <div className="admin-stat-card">
-            <h3>Total Applications</h3>
+            <h3>
+              <FileText size={18} /> Total Applications
+            </h3>
             <p className="admin-stat-value">{stats?.applications?.total ?? 0}</p>
           </div>
         </section>
@@ -275,36 +236,56 @@ const AdminDashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {users.map((user) => (
-                  <tr key={user._id}>
-                    <td>{user.name}</td>
-                    <td>{user.email}</td>
-                    <td>
-                      <span className="admin-badge admin-badge-role">{user.role}</span>
-                    </td>
-                    <td>
-                      <span className={`admin-badge admin-badge-${
-                        user.isBanned ? 'error' : user.isActive ? 'success' : 'warning'
-                      }`}>
-                        {user.isBanned ? 'Banned' : user.isActive ? 'Active' : 'Inactive'}
-                      </span>
-                    </td>
-                    <td className="admin-actions-cell">
-                      <button className="admin-action-btn admin-action-neutral" onClick={() => handleUserAction(user._id, user.isActive ? 'deactivate' : 'activate')}>
-                        {user.isActive ? 'Deactivate' : 'Activate'}
-                      </button>
-                      <button className="admin-action-btn admin-action-warning" onClick={() => handleUserAction(user._id, user.isBanned ? 'unban' : 'ban')}>
-                        {user.isBanned ? 'Unban' : 'Ban'}
-                      </button>
-                      <button className="admin-action-btn admin-action-success" onClick={() => handleVerifyUser(user._id)}>
-                        Verify
-                      </button>
-                      <button className="admin-action-btn admin-action-danger" onClick={() => handleDeleteUser(user._id)}>
-                        Delete
-                      </button>
-                    </td>
+                {users.length === 0 ? (
+                  <tr>
+                    <td colSpan={5}>No users found.</td>
                   </tr>
-                ))}
+                ) : (
+                  users.map((user) => (
+                    <tr key={user._id}>
+                      <td>{user.name}</td>
+                      <td>{user.email}</td>
+                      <td>
+                        <span className="admin-badge admin-badge-role">{user.role}</span>
+                      </td>
+                      <td>
+                        <span
+                          className={`admin-badge admin-badge-${
+                            user.isBanned ? 'error' : user.isActive ? 'success' : 'warning'
+                          }`}
+                        >
+                          {user.isBanned ? 'Banned' : user.isActive ? 'Active' : 'Inactive'}
+                        </span>
+                      </td>
+                      <td className="admin-actions-cell">
+                        <button
+                          className="admin-action-btn admin-action-neutral"
+                          onClick={() => handleUserAction(user._id, user.isActive ? 'deactivate' : 'activate')}
+                        >
+                          {user.isActive ? 'Deactivate' : 'Activate'}
+                        </button>
+                        <button
+                          className="admin-action-btn admin-action-warning"
+                          onClick={() => handleUserAction(user._id, user.isBanned ? 'unban' : 'ban')}
+                        >
+                          {user.isBanned ? 'Unban' : 'Ban'}
+                        </button>
+                        <button
+                          className="admin-action-btn admin-action-success"
+                          onClick={() => handleVerifyUser(user._id)}
+                        >
+                          Verify
+                        </button>
+                        <button
+                          className="admin-action-btn admin-action-danger"
+                          onClick={() => handleDeleteUser(user._id)}
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -324,31 +305,50 @@ const AdminDashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {jobs.map((job) => (
-                  <tr key={job._id}>
-                    <td>{job.title}</td>
-                    <td>{job.company?.name || 'N/A'}</td>
-                    <td>
-                      <span className="admin-badge admin-badge-status">{job.status}</span>
-                    </td>
-                    <td>
-                      <span className={`admin-badge ${job.isApproved ? 'admin-badge-success' : 'admin-badge-warning'}`}>
-                        {job.isApproved ? 'Approved' : 'Pending'}
-                      </span>
-                    </td>
-                    <td className="admin-actions-cell">
-                      <button className="admin-action-btn admin-action-success" onClick={() => handleApproveJob(job._id)}>
-                        Approve
-                      </button>
-                      <button className="admin-action-btn admin-action-warning" onClick={() => handleRejectJob(job._id)}>
-                        Reject
-                      </button>
-                      <button className="admin-action-btn admin-action-danger" onClick={() => handleCloseJob(job._id)}>
-                        Close
-                      </button>
-                    </td>
+                {jobs.length === 0 ? (
+                  <tr>
+                    <td colSpan={5}>No jobs found.</td>
                   </tr>
-                ))}
+                ) : (
+                  jobs.map((job) => (
+                    <tr key={job._id}>
+                      <td>{job.title}</td>
+                      <td>{job.company?.name || 'N/A'}</td>
+                      <td>
+                        <span className="admin-badge admin-badge-status">{job.status}</span>
+                      </td>
+                      <td>
+                        <span
+                          className={`admin-badge ${
+                            job.isApproved ? 'admin-badge-success' : 'admin-badge-warning'
+                          }`}
+                        >
+                          {job.isApproved ? 'Approved' : 'Pending'}
+                        </span>
+                      </td>
+                      <td className="admin-actions-cell">
+                        <button
+                          className="admin-action-btn admin-action-success"
+                          onClick={() => handleApproveJob(job._id)}
+                        >
+                          Approve
+                        </button>
+                        <button
+                          className="admin-action-btn admin-action-warning"
+                          onClick={() => handleRejectJob(job._id)}
+                        >
+                          Reject
+                        </button>
+                        <button
+                          className="admin-action-btn admin-action-danger"
+                          onClick={() => handleCloseJob(job._id)}
+                        >
+                          Close
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -367,30 +367,36 @@ const AdminDashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {applications.map((app) => (
-                  <tr key={app._id}>
-                    <td>{app.jobTitle}</td>
-                    <td>{app.seeker?.name || 'N/A'}</td>
-                    <td>
-                      <span className={`admin-badge admin-badge-${app.status.toLowerCase()}`}>
-                        {app.status}
-                      </span>
-                    </td>
-                    <td>
-                      <select
-                        className="admin-select"
-                        value={app.status}
-                        onChange={(e) => handleApplicationStatus(app._id, e.target.value)}
-                      >
-                        {appStatuses.map((status) => (
-                          <option key={status} value={status}>
-                            {status}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
+                {applications.length === 0 ? (
+                  <tr>
+                    <td colSpan={4}>No applications found.</td>
                   </tr>
-                ))}
+                ) : (
+                  applications.map((app) => (
+                    <tr key={app._id}>
+                      <td>{app.jobTitle}</td>
+                      <td>{app.seeker?.name || 'N/A'}</td>
+                      <td>
+                        <span className={`admin-badge admin-badge-${app.status.toLowerCase()}`}>
+                          {app.status}
+                        </span>
+                      </td>
+                      <td>
+                        <select
+                          className="admin-select"
+                          value={app.status}
+                          onChange={(e) => handleApplicationStatus(app._id, e.target.value)}
+                        >
+                          {appStatuses.map((status) => (
+                            <option key={status} value={status}>
+                              {status}
+                            </option>
+                          ))}
+                        </select>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
