@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { FileText, RefreshCw, Search } from 'lucide-react';
+import { FileText, RefreshCw, Search, X } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import AdminLayout from './AdminLayout';
 import { getApplications, updateApplicationStatus } from '../services/adminService';
@@ -36,6 +36,8 @@ const AdminApplicationManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState('');
+  const [reviewApplication, setReviewApplication] = useState(null);
+  const [nextStatus, setNextStatus] = useState('Pending');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
@@ -98,6 +100,18 @@ const AdminApplicationManagement = () => {
     loadApplications();
   };
 
+  const openReviewPanel = (application) => {
+    setReviewApplication(application);
+    setNextStatus(application.status || 'Pending');
+    setError('');
+    setSuccess('');
+  };
+
+  const closeReviewPanel = () => {
+    setReviewApplication(null);
+    setNextStatus('Pending');
+  };
+
   const handleStatusChange = async (applicationId, status) => {
     setUpdatingId(applicationId);
     setError('');
@@ -113,6 +127,7 @@ const AdminApplicationManagement = () => {
         )
       );
       setSuccess('Application status updated.');
+      closeReviewPanel();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to update application status.');
     } finally {
@@ -199,16 +214,17 @@ const AdminApplicationManagement = () => {
                   <th>Resume</th>
                   <th>Status</th>
                   <th>Submitted</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan="6">Loading applications...</td>
+                    <td colSpan="7">Loading applications...</td>
                   </tr>
                 ) : applications.length === 0 ? (
                   <tr>
-                    <td colSpan="6">No applications found.</td>
+                    <td colSpan="7">No applications found.</td>
                   </tr>
                 ) : (
                   applications.map((application) => (
@@ -241,21 +257,18 @@ const AdminApplicationManagement = () => {
                           <span className={`admin-badge ${getStatusBadgeClass(application.status)}`}>
                             {application.status}
                           </span>
-                          <select
-                            className="admin-select admin-application-status-select"
-                            value={application.status}
-                            disabled={updatingId === application._id}
-                            onChange={(event) => handleStatusChange(application._id, event.target.value)}
-                          >
-                            {appStatuses.map((status) => (
-                              <option key={status} value={status}>
-                                {status}
-                              </option>
-                            ))}
-                          </select>
                         </div>
                       </td>
                       <td>{new Date(application.createdAt).toLocaleDateString()}</td>
+                      <td>
+                        <button
+                          type="button"
+                          className="admin-action-btn admin-action-neutral"
+                          onClick={() => openReviewPanel(application)}
+                        >
+                          Review
+                        </button>
+                      </td>
                     </tr>
                   ))
                 )}
@@ -287,6 +300,92 @@ const AdminApplicationManagement = () => {
             </div>
           </div>
         </section>
+
+        {reviewApplication ? (
+          <div className="admin-application-modal-backdrop" role="presentation">
+            <section className="admin-application-modal" role="dialog" aria-modal="true" aria-labelledby="application-review-title">
+              <div className="admin-application-modal-header">
+                <div>
+                  <p className="admin-subtitle" style={{ marginBottom: 4 }}>Application review</p>
+                  <h2 id="application-review-title">
+                    {reviewApplication.seeker?.name || 'Unknown seeker'}
+                  </h2>
+                </div>
+                <button
+                  type="button"
+                  className="admin-icon-btn admin-application-modal-close"
+                  onClick={closeReviewPanel}
+                  aria-label="Close application review"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+
+              <div className="admin-application-review-grid">
+                <div>
+                  <span>Job</span>
+                  <strong>{reviewApplication.job?.title || reviewApplication.jobTitle || 'Untitled job'}</strong>
+                </div>
+                <div>
+                  <span>Candidate Email</span>
+                  <strong>{reviewApplication.seeker?.email || 'Not available'}</strong>
+                </div>
+                <div>
+                  <span>Current Status</span>
+                  <strong>{reviewApplication.status}</strong>
+                </div>
+                <div>
+                  <span>Submitted</span>
+                  <strong>{new Date(reviewApplication.createdAt).toLocaleDateString()}</strong>
+                </div>
+              </div>
+
+              <div className="admin-application-review-section">
+                <span>Cover Letter</span>
+                <p>{reviewApplication.coverLetter || 'No cover letter provided.'}</p>
+              </div>
+
+              <label className="admin-application-review-status">
+                <span>Update Status</span>
+                <select
+                  className="admin-select"
+                  value={nextStatus}
+                  onChange={(event) => setNextStatus(event.target.value)}
+                >
+                  {appStatuses.map((status) => (
+                    <option key={status} value={status}>
+                      {status}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <div className="admin-application-modal-actions">
+                {reviewApplication.resume ? (
+                  <a
+                    className="admin-action-btn admin-action-neutral"
+                    href={reviewApplication.resume}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    View Resume
+                  </a>
+                ) : null}
+                <button type="button" className="admin-action-btn admin-action-neutral" onClick={closeReviewPanel}>
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="admin-primary-btn"
+                  disabled={updatingId === reviewApplication._id || nextStatus === reviewApplication.status}
+                  onClick={() => handleStatusChange(reviewApplication._id, nextStatus)}
+                >
+                  {updatingId === reviewApplication._id ? 'Updating...' : 'Update Status'}
+                </button>
+              </div>
+            </section>
+          </div>
+        ) : null}
       </div>
     </AdminLayout>
   );

@@ -82,11 +82,7 @@
 .admin-application-status-cell {
   display: grid;
   gap: 8px;
-  min-width: 150px;
-}
-
-.admin-application-status-select {
-  min-width: 140px;
+  min-width: 110px;
 }
 
 .admin-application-management .admin-badge {
@@ -113,14 +109,119 @@
   border-color: #fecaca;
 }
 
+.admin-application-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.42);
+}
+
+.admin-application-modal {
+  width: min(720px, 100%);
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+  background: #ffffff;
+  border: 1px solid #d7dde5;
+  border-radius: 14px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18);
+  padding: 22px;
+}
+
+.admin-application-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.admin-application-modal-header h2 {
+  margin: 0;
+  color: #111827;
+  font-size: 1.35rem;
+  font-weight: 650;
+  letter-spacing: 0;
+}
+
+.admin-application-modal-close {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  padding: 0;
+  border-radius: 10px;
+}
+
+.admin-application-review-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.admin-application-review-grid div,
+.admin-application-review-section,
+.admin-application-review-status {
+  display: grid;
+  gap: 7px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.admin-application-review-grid span,
+.admin-application-review-section span,
+.admin-application-review-status span {
+  color: #6b7280;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.admin-application-review-grid strong {
+  color: #111827;
+  font-size: 0.95rem;
+  font-weight: 650;
+}
+
+.admin-application-review-section,
+.admin-application-review-status {
+  margin-top: 14px;
+}
+
+.admin-application-review-section p {
+  margin: 0;
+  color: #374151;
+  line-height: 1.6;
+}
+
+.admin-application-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
 @media (max-width: 768px) {
   .admin-application-management .admin-header h1 {
     font-size: 1.6rem;
   }
 
   .admin-application-management .admin-filter-row,
-  .admin-application-management .admin-pagination {
+  .admin-application-management .admin-pagination,
+  .admin-application-modal-actions {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .admin-application-review-grid {
+    grid-template-columns: 1fr;
   }
 }
