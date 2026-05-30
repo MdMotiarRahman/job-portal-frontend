@@ -34,6 +34,7 @@ import SeekerDashboard from './components/SeekerDashboard';
 
 import SeekerProfile from './pages/SeekerProfile';
 import ApplyJob from './pages/ApplyJob';
+import Jobs from './pages/Jobs';
 
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -105,12 +106,21 @@ const Navigation = () => {
         <div className="navbar-menu desktop-only">
 
           {!user ? (
-            <Link
-              to="/home"
-              className={`nav-link ${isActive('/home') ? 'active' : ''}`}
-            >
-              Home
-            </Link>
+            <>
+              <Link
+                to="/home"
+                className={`nav-link ${isActive('/home') ? 'active' : ''}`}
+              >
+                Home
+              </Link>
+
+              <Link
+                to="/jobs"
+                className={`nav-link ${isActive('/jobs') ? 'active' : ''}`}
+              >
+                Jobs
+              </Link>
+            </>
           ) : userRole === 'admin' ? (
             <>
               <Link
@@ -118,6 +128,13 @@ const Navigation = () => {
                 className={`nav-link ${isActive('/admin') ? 'active' : ''}`}
               >
                 Admin Dashboard
+              </Link>
+
+              <Link
+                to="/jobs"
+                className={`nav-link ${isActive('/jobs') ? 'active' : ''}`}
+              >
+                Jobs
               </Link>
             </>
           ) : userRole === 'employer' ? (
@@ -127,6 +144,13 @@ const Navigation = () => {
                 className={`nav-link ${isActive('/employer') ? 'active' : ''}`}
               >
                 Dashboard
+              </Link>
+
+              <Link
+                to="/jobs"
+                className={`nav-link ${isActive('/jobs') ? 'active' : ''}`}
+              >
+                Jobs
               </Link>
             </>
           ) : (
@@ -143,6 +167,13 @@ const Navigation = () => {
                 className={`nav-link ${isActive('/seeker/profile') ? 'active' : ''}`}
               >
                 Profile
+              </Link>
+
+              <Link
+                to="/jobs"
+                className={`nav-link ${isActive('/jobs') ? 'active' : ''}`}
+              >
+                Jobs
               </Link>
             </>
           )}
@@ -196,30 +227,63 @@ const Navigation = () => {
         <div className="mobile-menu">
 
           {!user ? (
-            <Link
-              to="/home"
-              className="mobile-link"
-              onClick={() => setIsOpen(false)}
-            >
-              <Home size={18} />
-              Home
-            </Link>
+            <>
+              <Link
+                to="/home"
+                className="mobile-link"
+                onClick={() => setIsOpen(false)}
+              >
+                <Home size={18} />
+                Home
+              </Link>
+
+              <Link
+                to="/jobs"
+                className="mobile-link"
+                onClick={() => setIsOpen(false)}
+              >
+                <Briefcase size={18} />
+                Jobs
+              </Link>
+            </>
           ) : userRole === 'admin' ? (
-            <Link
-              to="/admin"
-              className="mobile-link"
-              onClick={() => setIsOpen(false)}
-            >
-              Dashboard
-            </Link>
+            <>
+              <Link
+                to="/admin"
+                className="mobile-link"
+                onClick={() => setIsOpen(false)}
+              >
+                Dashboard
+              </Link>
+
+              <Link
+                to="/jobs"
+                className="mobile-link"
+                onClick={() => setIsOpen(false)}
+              >
+                <Briefcase size={18} />
+                Jobs
+              </Link>
+            </>
           ) : userRole === 'employer' ? (
-            <Link
-              to="/employer"
-              className="mobile-link"
-              onClick={() => setIsOpen(false)}
-            >
-              Dashboard
-            </Link>
+            <>
+              <Link
+                to="/employer"
+                className="mobile-link"
+                onClick={() => setIsOpen(false)}
+              >
+                Dashboard
+              </Link>
+
+              <Link
+                to="/jobs"
+                className="mobile-link"
+                onClick={() => setIsOpen(false)}
+              >
+                <Briefcase size={18} />
+                Jobs
+              </Link>
+            </>
           ) : (
             <>
               <Link
@@ -236,6 +300,15 @@ const Navigation = () => {
                 onClick={() => setIsOpen(false)}
               >
                 Profile
+              </Link>
+
+              <Link
+                to="/jobs"
+                className="mobile-link"
+                onClick={() => setIsOpen(false)}
+              >
+                <Briefcase size={18} />
+                Jobs
               </Link>
             </>
           )}
@@ -308,6 +381,10 @@ const Footer = () => {
             <Link to="/seeker/profile">
               Profile
             </Link>
+
+            <Link to="/jobs">
+              Jobs
+            </Link>
           </div>
 
         </div>
@@ -357,6 +434,11 @@ const AppContent = () => {
           <Route
             path="/register"
             element={<Register />}
+          />
+
+          <Route
+            path="/jobs"
+            element={<Jobs />}
           />
 
           {/* ADMIN */}
