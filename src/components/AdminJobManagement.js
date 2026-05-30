@@ -14,6 +14,7 @@ import {
   updateJob,
 } from '../services/adminService';
 import '../styles/adminDashboard.css';
+import '../styles/adminJobManagement.css';
 
 const emptyForm = {
   title: '',
@@ -46,11 +47,15 @@ const getInitialFilter = (search) => {
   return params.get('status') || '';
 };
 
-const getJobStatusBadge = (job) => {
-  if (job.status === 'closed') return 'admin-badge-error';
-  if (!job.isApproved) return 'admin-badge-warning';
-  if (job.status === 'active') return 'admin-badge-success';
-  return 'admin-badge-status';
+const formatSalary = (salary) => {
+  if (!salary?.min && !salary?.max) {
+    return 'Not listed';
+  }
+
+  const currency = salary.currency || 'USD';
+  const min = salary.min ? Number(salary.min).toLocaleString() : 'Open';
+  const max = salary.max ? Number(salary.max).toLocaleString() : 'Open';
+  return `${currency} ${min} - ${max}`;
 };
 
 const AdminJobManagement = () => {
@@ -65,7 +70,7 @@ const AdminJobManagement = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(true);
   const [editingJob, setEditingJob] = useState(null);
   const [form, setForm] = useState(emptyForm);
 
@@ -75,9 +80,7 @@ const AdminJobManagement = () => {
       limit: 10,
     };
 
-    if (searchTerm.trim()) {
-      params.search = searchTerm.trim();
-    }
+    if (searchTerm.trim()) params.search = searchTerm.trim();
 
     if (filterStatus === 'pending') {
       params.isApproved = false;
@@ -232,6 +235,16 @@ const AdminJobManagement = () => {
     }
   };
 
+  const runAction = async (action) => {
+    setError('');
+    setSuccess('');
+    try {
+      await action();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Job action failed.');
+    }
+  };
+
   const handleApprove = async (jobId) => {
     const notes = window.prompt('Approval notes (optional)') || '';
     await approveJob(jobId, notes);
@@ -269,31 +282,24 @@ const AdminJobManagement = () => {
     await loadJobs();
   };
 
-  const runAction = async (action) => {
-    setError('');
-    setSuccess('');
-    try {
-      await action();
-    } catch (err) {
-      setError(err.response?.data?.message || 'Job action failed.');
-    }
-  };
-
   return (
     <AdminLayout>
-      <div className="admin-page">
+      <div className="admin-page admin-job-management">
         <div className="admin-header-card">
           <div className="admin-header">
             <div>
-              <h1>Job Management</h1>
-              <p className="admin-subtitle">Create, review, approve, close, and maintain job postings.</p>
+              <p className="admin-subtitle" style={{ marginBottom: 6 }}>Job management</p>
+              <h1>Jobs</h1>
+              <p className="admin-subtitle">
+                Review job postings, manage approvals, and keep the public board accurate.
+              </p>
             </div>
             <div className="admin-toolbar">
-              <button className="admin-refresh-btn" onClick={loadJobs}>
+              <button className="admin-refresh-btn" onClick={loadJobs} type="button">
                 <RefreshCw size={16} strokeWidth={2} />
                 Refresh
               </button>
-              <button className="admin-primary-btn" onClick={openCreateForm}>
+              <button className="admin-primary-btn" onClick={openCreateForm} type="button">
                 <Plus size={16} strokeWidth={2} />
                 Add Job
               </button>
@@ -330,7 +336,12 @@ const AdminJobManagement = () => {
                 <Briefcase size={18} />
                 {editingJob ? 'Edit Job' : 'Create Job'}
               </h2>
-              <button className="admin-icon-btn" onClick={resetForm} aria-label="Close job form">
+              <button
+                className="admin-icon-btn admin-job-close-btn"
+                onClick={resetForm}
+                aria-label="Close job form"
+                type="button"
+              >
                 <X size={18} />
               </button>
             </div>
@@ -500,41 +511,57 @@ const AdminJobManagement = () => {
                         <span className="admin-badge admin-badge-status">{job.jobType}</span>
                       </td>
                       <td>
-                        <span className={`admin-badge ${getJobStatusBadge(job)}`}>{job.status}</span>
+                        <span className="admin-badge admin-badge-status">{job.status}</span>
                       </td>
                       <td>
                         <span className={`admin-badge ${job.isApproved ? 'admin-badge-success' : 'admin-badge-warning'}`}>
                           {job.isApproved ? 'Approved' : 'Pending'}
                         </span>
                       </td>
-                      <td>
-                        {job.salary?.min || job.salary?.max
-                          ? `${job.salary?.currency || 'USD'} ${job.salary?.min || 0} - ${job.salary?.max || 'Open'}`
-                          : 'Not listed'}
-                      </td>
+                      <td>{formatSalary(job.salary)}</td>
                       <td className="admin-actions-cell">
-                        <button className="admin-action-btn admin-action-neutral" onClick={() => openEditForm(job)}>
+                        <button type="button" className="admin-action-btn admin-action-neutral" onClick={() => openEditForm(job)}>
                           <Edit3 size={13} />
                           Edit
                         </button>
                         {!job.isApproved ? (
-                          <button className="admin-action-btn admin-action-success" onClick={() => runAction(() => handleApprove(job._id))}>
+                          <button
+                            type="button"
+                            className="admin-action-btn admin-action-success"
+                            onClick={() => runAction(() => handleApprove(job._id))}
+                          >
                             Approve
                           </button>
                         ) : null}
-                        <button className="admin-action-btn admin-action-warning" onClick={() => runAction(() => handleReject(job._id))}>
+                        <button
+                          type="button"
+                          className="admin-action-btn admin-action-warning"
+                          onClick={() => runAction(() => handleReject(job._id))}
+                        >
                           Reject
                         </button>
                         {job.status === 'closed' ? (
-                          <button className="admin-action-btn admin-action-success" onClick={() => runAction(() => handleReopen(job._id))}>
+                          <button
+                            type="button"
+                            className="admin-action-btn admin-action-success"
+                            onClick={() => runAction(() => handleReopen(job._id))}
+                          >
                             Reopen
                           </button>
                         ) : (
-                          <button className="admin-action-btn admin-action-danger" onClick={() => runAction(() => handleClose(job._id))}>
+                          <button
+                            type="button"
+                            className="admin-action-btn admin-action-danger"
+                            onClick={() => runAction(() => handleClose(job._id))}
+                          >
                             Close
                           </button>
                         )}
-                        <button className="admin-action-btn admin-action-danger" onClick={() => runAction(() => handleDelete(job._id))}>
+                        <button
+                          type="button"
+                          className="admin-action-btn admin-action-danger"
+                          onClick={() => runAction(() => handleDelete(job._id))}
+                        >
                           <Trash2 size={13} />
                           Delete
                         </button>
@@ -552,6 +579,7 @@ const AdminJobManagement = () => {
             </span>
             <div className="admin-pagination-actions">
               <button
+                type="button"
                 className="admin-action-btn admin-action-neutral"
                 disabled={pagination.page <= 1}
                 onClick={() => setPagination((currentPagination) => ({ ...currentPagination, page: currentPagination.page - 1 }))}
@@ -559,6 +587,7 @@ const AdminJobManagement = () => {
                 Previous
               </button>
               <button
+                type="button"
                 className="admin-action-btn admin-action-neutral"
                 disabled={pagination.page >= pagination.pages}
                 onClick={() => setPagination((currentPagination) => ({ ...currentPagination, page: currentPagination.page + 1 }))}

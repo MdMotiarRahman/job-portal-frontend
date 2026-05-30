@@ -1,0 +1,221 @@
+.admin-job-management {
+  color: #1f2937;
+}
+
+.admin-job-management .admin-header-card,
+.admin-job-management .admin-section,
+.admin-job-management .admin-stat-card {
+  background: #ffffff;
+  border: 1px solid #d7dde5;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.admin-job-management .admin-header-card {
+  border-radius: 14px;
+}
+
+.admin-job-management .admin-header {
+  align-items: flex-start;
+}
+
+.admin-job-management .admin-header h1 {
+  color: #111827;
+  letter-spacing: -0.02em;
+  font-size: 2rem;
+  font-weight: 650;
+}
+
+.admin-job-management .admin-subtitle {
+  color: #6b7280;
+  max-width: 58ch;
+  line-height: 1.6;
+}
+
+.admin-job-management .admin-toolbar,
+.admin-job-management .admin-filter-row,
+.admin-job-management .admin-form-actions,
+.admin-job-management .admin-actions-cell {
+  gap: 10px;
+}
+
+.admin-job-management .admin-refresh-btn,
+.admin-job-management .admin-primary-btn,
+.admin-job-management .admin-action-btn,
+.admin-job-management .admin-select,
+.admin-job-management .admin-search-field,
+.admin-job-management .admin-form-field input,
+.admin-job-management .admin-form-field select,
+.admin-job-management .admin-form-field textarea,
+.admin-job-management .admin-checkbox-field {
+  border-radius: 10px;
+}
+
+.admin-job-management .admin-refresh-btn,
+.admin-job-management .admin-action-btn,
+.admin-job-management .admin-primary-btn {
+  background: #ffffff;
+  border: 1px solid #cfd6df;
+  color: #1f2937;
+  box-shadow: none;
+}
+
+.admin-job-management .admin-primary-btn {
+  background: #1f2937;
+  color: #ffffff;
+  border-color: #1f2937;
+}
+
+.admin-job-management .admin-primary-btn:hover,
+.admin-job-management .admin-refresh-btn:hover,
+.admin-job-management .admin-action-btn:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.admin-job-management .admin-refresh-btn:hover,
+.admin-job-management .admin-action-btn:hover {
+  background: #f8fafc;
+}
+
+.admin-job-management .admin-stat-value {
+  color: #111827;
+}
+
+.admin-job-management .admin-stat-card h3,
+.admin-job-management .admin-section-title,
+.admin-job-management .admin-table th {
+  color: #111827;
+}
+
+.admin-job-management .admin-table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.admin-job-management .admin-table th {
+  background: #f8fafc;
+  border-bottom: 1px solid #d7dde5;
+  font-weight: 600;
+}
+
+.admin-job-management .admin-table td {
+  border-bottom: 1px solid #e5e7eb;
+  color: #374151;
+}
+
+.admin-job-management .admin-badge {
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: #f3f4f6;
+  color: #374151;
+  font-weight: 600;
+}
+
+.admin-job-management .admin-badge-success {
+  background: #ecfdf3;
+  color: #166534;
+  border-color: #bbf7d0;
+}
+
+.admin-job-management .admin-badge-warning {
+  background: #fff7ed;
+  color: #9a3412;
+  border-color: #fed7aa;
+}
+
+.admin-job-management .admin-badge-error {
+  background: #fef2f2;
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
+.admin-job-management .admin-badge-status {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-color: #bfdbfe;
+}
+
+.admin-job-management .admin-form-field span,
+.admin-job-management .admin-checkbox-field span,
+.admin-job-management .admin-muted-text,
+.admin-job-management .admin-pagination,
+.admin-job-management .admin-pagination span {
+  color: #6b7280;
+}
+
+.admin-job-management .admin-form-field input,
+.admin-job-management .admin-form-field select,
+.admin-job-management .admin-form-field textarea,
+.admin-job-management .admin-search-field,
+.admin-job-management .admin-select {
+  background: #ffffff;
+  border: 1px solid #cfd6df;
+  color: #111827;
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.02);
+}
+
+.admin-job-management .admin-form-field input:focus,
+.admin-job-management .admin-form-field select:focus,
+.admin-job-management .admin-form-field textarea:focus,
+.admin-job-management .admin-search-field input:focus,
+.admin-job-management .admin-select:focus {
+  outline: none;
+  border-color: #94a3b8;
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.18);
+}
+
+.admin-job-management .admin-checkbox-field {
+  background: #ffffff;
+  border: 1px solid #d7dde5;
+  color: #111827;
+}
+
+.admin-job-management .admin-alert {
+  border-radius: 12px;
+  border: 1px solid #d7dde5;
+  box-shadow: none;
+}
+
+.admin-job-management .admin-alert-error {
+  background: #fef2f2;
+  color: #991b1b;
+  border-color: #fecaca;
+}
+
+.admin-job-management .admin-alert-success {
+  background: #f0fdf4;
+  color: #166534;
+  border-color: #bbf7d0;
+}
+
+.admin-job-management .admin-job-close-btn {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  padding: 0;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+.admin-job-management .admin-job-close-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+@media (max-width: 768px) {
+  .admin-job-management .admin-header h1 {
+    font-size: 1.6rem;
+  }
+
+  .admin-job-management .admin-toolbar,
+  .admin-job-management .admin-filter-row,
+  .admin-job-management .admin-actions-cell,
+  .admin-job-management .admin-form-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
