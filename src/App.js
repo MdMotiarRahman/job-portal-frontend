@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+
 import {
   BrowserRouter as Router,
   Route,
@@ -27,6 +28,7 @@ import './App.css';
 import HomePage from './components/Home';
 import Login from './components/Login';
 import Register from './components/Register';
+
 import AdminDashboard from './components/AdminDashboard';
 import AdminJobManagement from './components/AdminJobManagement';
 import AdminApplicationManagement from './components/AdminApplicationManagement';
@@ -36,15 +38,23 @@ import SeekerDashboard from './components/SeekerDashboard';
 import SeekerProfile from './pages/SeekerProfile';
 import ApplyJob from './pages/ApplyJob';
 import Jobs from './pages/Jobs';
+import MyApplications from './pages/MyApplications';
 
 import ProtectedRoute from './components/ProtectedRoute';
 
 import authService from './services/auth.service';
 
+
+// ============================
+// NAVIGATION
+// ============================
+
 const Navigation = () => {
+
   const [isOpen, setIsOpen] = useState(false);
 
   const location = useLocation();
+
   const navigate = useNavigate();
 
   const [user, setUser] = useState(
@@ -53,6 +63,7 @@ const Navigation = () => {
   const userRole = authService.getCurrentUserRole();
 
   useEffect(() => {
+
     const handleLogin = () => {
       setUser(authService.getCurrentUser());
     };
@@ -61,19 +72,40 @@ const Navigation = () => {
       setUser(null);
     };
 
-    window.addEventListener('auth:login', handleLogin);
-    window.addEventListener('auth:logout', handleLogout);
+    window.addEventListener(
+      'auth:login',
+      handleLogin
+    );
+
+    window.addEventListener(
+      'auth:logout',
+      handleLogout
+    );
 
     return () => {
-      window.removeEventListener('auth:login', handleLogin);
-      window.removeEventListener('auth:logout', handleLogout);
+
+      window.removeEventListener(
+        'auth:login',
+        handleLogin
+      );
+
+      window.removeEventListener(
+        'auth:logout',
+        handleLogout
+      );
+
     };
+
   }, []);
 
   const logOut = () => {
+
     authService.logout();
+
     setUser(null);
+
     navigate('/login');
+
   };
 
   const isActive = (path) => {
@@ -81,34 +113,47 @@ const Navigation = () => {
   };
 
   return (
+
     <nav className="modern-navbar">
 
       <div className="navbar-container">
 
-       {user ? (
-  <div className="navbar-brand">
-    <div className="brand-logo">
-      <Briefcase size={24} />
-    </div>
+        {/* LOGO */}
 
-    <span>JobPortal</span>
-  </div>
-) : (
-  <Link to="/" className="navbar-brand">
-    <div className="brand-logo">
-      <Briefcase size={24} />
-    </div>
+        {user ? (
 
-    <span>JobPortal</span>
-  </Link>
-)}
+          <div className="navbar-brand">
+
+            <div className="brand-logo">
+              <Briefcase size={24} />
+            </div>
+
+            <span>JobPortal</span>
+
+          </div>
+
+        ) : (
+
+          <Link to="/" className="navbar-brand">
+
+            <div className="brand-logo">
+              <Briefcase size={24} />
+            </div>
+
+            <span>JobPortal</span>
+
+          </Link>
+
+        )}
 
         {/* DESKTOP MENU */}
+
         <div className="navbar-menu desktop-only">
 
           {!user ? (
             <>
-              <Link
+  
+            <Link
                 to="/home"
                 className={`nav-link ${isActive('/home') ? 'active' : ''}`}
               >
@@ -154,21 +199,54 @@ const Navigation = () => {
                 Jobs
               </Link>
             </>
-          ) : (
-            <>
-              <Link
-                to="/seeker"
-                className={`nav-link ${isActive('/seeker') ? 'active' : ''}`}
-              >
-                Dashboard
-              </Link>
 
-              <Link
-                to="/seeker/profile"
-                className={`nav-link ${isActive('/seeker/profile') ? 'active' : ''}`}
-              >
-                Profile
-              </Link>
+          ) : (
+
+            <>
+              {/* ADMIN */}
+
+              {user.user.role === 'admin' && (
+
+                <Link
+                  to="/admin"
+                  className={`nav-link ${isActive('/admin') ? 'active' : ''}`}
+                >
+                  Admin Dashboard
+                </Link>
+
+              )}
+
+              {/* EMPLOYER */}
+
+              {user.user.role === 'employer' && (
+
+                <Link
+                  to="/employer"
+                  className={`nav-link ${isActive('/employer') ? 'active' : ''}`}
+                >
+                  Employer Dashboard
+                </Link>
+
+              )}
+
+              {/* SEEKER */}
+
+              {user.user.role === 'seeker' && (
+
+                <>
+                  <Link
+                    to="/seeker"
+                    className={`nav-link ${isActive('/seeker') ? 'active' : ''}`}
+                  >
+                    Dashboard
+                  </Link>
+
+                  <Link
+                    to="/seeker/profile"
+                    className={`nav-link ${isActive('/seeker/profile') ? 'active' : ''}`}
+                  >
+                    Profile
+                  </Link>
 
               <Link
                 to="/jobs"
@@ -176,15 +254,29 @@ const Navigation = () => {
               >
                 Jobs
               </Link>
+
+                  <Link
+                    to="/seeker/applications"
+                    className={`nav-link ${isActive('/seeker/applications') ? 'active' : ''}`}
+                  >
+                    My Applications
+                  </Link>
+                </>
+
+              )}
+
             </>
+
           )}
 
         </div>
 
         {/* RIGHT SIDE */}
+
         <div className="navbar-actions desktop-only">
 
           {user ? (
+
             <button
               onClick={logOut}
               className="btn-logout"
@@ -192,7 +284,9 @@ const Navigation = () => {
               <LogOut size={18} />
               Logout
             </button>
+
           ) : (
+
             <>
               <Link
                 to="/login"
@@ -209,27 +303,36 @@ const Navigation = () => {
                 <ArrowRight size={16} />
               </Link>
             </>
+
           )}
 
         </div>
 
         {/* MOBILE BUTTON */}
+
         <button
           className="mobile-menu-btn"
           onClick={() => setIsOpen(!isOpen)}
         >
-          {isOpen ? <X size={24} /> : <Menu size={24} />}
+          {isOpen ? (
+            <X size={24} />
+          ) : (
+            <Menu size={24} />
+          )}
         </button>
 
       </div>
 
       {/* MOBILE MENU */}
+
       {isOpen && (
+
         <div className="mobile-menu">
 
           {!user ? (
             <>
-              <Link
+  
+            <Link
                 to="/home"
                 className="mobile-link"
                 onClick={() => setIsOpen(false)}
@@ -285,23 +388,58 @@ const Navigation = () => {
                 Jobs
               </Link>
             </>
-          ) : (
-            <>
-              <Link
-                to="/seeker"
-                className="mobile-link"
-                onClick={() => setIsOpen(false)}
-              >
-                Dashboard
-              </Link>
 
-              <Link
-                to="/seeker/profile"
-                className="mobile-link"
-                onClick={() => setIsOpen(false)}
-              >
-                Profile
-              </Link>
+          ) : (
+
+            <>
+              {/* ADMIN */}
+
+              {user.user.role === 'admin' && (
+
+                <Link
+                  to="/admin"
+                  className="mobile-link"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Admin Dashboard
+                </Link>
+
+              )}
+
+              {/* EMPLOYER */}
+
+              {user.user.role === 'employer' && (
+
+                <Link
+                  to="/employer"
+                  className="mobile-link"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Employer Dashboard
+                </Link>
+
+              )}
+
+              {/* SEEKER */}
+
+              {user.user.role === 'seeker' && (
+
+                <>
+                  <Link
+                    to="/seeker"
+                    className="mobile-link"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Dashboard
+                  </Link>
+
+                  <Link
+                    to="/seeker/profile"
+                    className="mobile-link"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Profile
+                  </Link>
 
               <Link
                 to="/jobs"
@@ -311,10 +449,24 @@ const Navigation = () => {
                 <Briefcase size={18} />
                 Jobs
               </Link>
+
+                  <Link
+                    to="/seeker/applications"
+                    className="mobile-link"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    My Applications
+                  </Link>
+                </>
+
+              )}
+
             </>
+
           )}
 
           {user ? (
+
             <button
               onClick={logOut}
               className="mobile-link logout-mobile-btn"
@@ -322,7 +474,9 @@ const Navigation = () => {
               <LogOut size={18} />
               Logout
             </button>
+
           ) : (
+
             <>
               <Link
                 to="/login"
@@ -341,16 +495,28 @@ const Navigation = () => {
                 Register
               </Link>
             </>
+
           )}
 
         </div>
+
       )}
+
     </nav>
+
   );
+
 };
 
+
+// ============================
+// FOOTER
+// ============================
+
 const Footer = () => {
+
   return (
+
     <footer className="modern-footer">
 
       <div className="footer-container">
@@ -360,8 +526,11 @@ const Footer = () => {
           <div className="footer-brand-col">
 
             <Link to="/" className="footer-brand">
+
               <Briefcase size={24} />
+
               <span>JobPortal</span>
+
             </Link>
 
             <p className="footer-description">
@@ -371,6 +540,7 @@ const Footer = () => {
           </div>
 
           <div className="footer-links-col">
+
             <h4 className="footer-heading">
               Platform
             </h4>
@@ -386,27 +556,43 @@ const Footer = () => {
             <Link to="/jobs">
               Jobs
             </Link>
+
+            <Link to="/seeker/applications">
+              My Applications
+            </Link>
+
           </div>
 
         </div>
 
         <div className="footer-bottom">
+
           <p>
             © {new Date().getFullYear()} JobPortal. All rights reserved.
           </p>
+
         </div>
 
       </div>
 
     </footer>
+
   );
+
 };
+
+
+// ============================
+// APP
+// ============================
 
 const AppContent = () => {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
 
+
   return (
+
     <div className={`app-wrapper ${isAdminRoute ? 'admin-app-wrapper' : ''}`}>
 
       {!isAdminRoute && <Navigation />}
@@ -507,6 +693,15 @@ const AppContent = () => {
             }
           />
 
+            <Route
+              path="/seeker/applications"
+              element={
+                <ProtectedRoute allowedRoles={['seeker']}>
+                  <MyApplications />
+                </ProtectedRoute>
+              }
+            />
+
           <Route
             path="/apply-job/:id"
             element={
@@ -532,7 +727,9 @@ const App = () => {
       <AppContent />
 
     </Router>
+
   );
+
 };
 
 export default App;

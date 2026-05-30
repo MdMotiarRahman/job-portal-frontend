@@ -59,7 +59,12 @@ const ApplyJob = () => {
       data.append('coverLetter', formData.coverLetter);
 
       if (resume) {
-        data.append('resume', resume);
+
+        data.append(
+          'resume',
+          resume
+        );
+
       }
 
       await applyJob(data);
@@ -75,9 +80,11 @@ const ApplyJob = () => {
     } finally {
       setSubmitting(false);
     }
+
   };
 
   return (
+
     <div className="apply-job-page">
       <div className="apply-job-shell">
         <Link to="/jobs" className="apply-back-link">
@@ -139,8 +146,11 @@ const ApplyJob = () => {
           </form>
         </section>
       </div>
+
     </div>
+
   );
+
 };
 
 export default ApplyJob;

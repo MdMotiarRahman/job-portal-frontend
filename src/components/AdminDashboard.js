@@ -1,4 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState }, { useEffect, useState } from "react";
+import {
+  ShieldCheck,
+  Clock3,
+  MapPin,
+  Building2,
+  BadgeDollarSign,
+  FileText,
+  RefreshCcw,
+  CheckCircle2,
+  XCircle,
+  User2,
+  Briefcase,
+} from "lucide-react";
+
+import adminService from "../services/admin.service";
+import "../styles/dashboard.css";
 import { RefreshCw } from 'lucide-react';
 import {
   getDashboardStats,
@@ -150,6 +166,62 @@ const AdminDashboard = () => {
       </AdminLayout>
     );
   }
+
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [actionId, setActionId] = useState(null);
+  const [notice, setNotice] = useState("");
+
+  const loadPendingJobs = async () => {
+    try {
+      setLoading(true);
+      setNotice("");
+      const data = await adminService.getPendingJobs();
+      setJobs(data);
+    } catch (error) {
+      console.log(error);
+      setNotice(error?.response?.data?.message || "Unable to load jobs");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadPendingJobs();
+  }, []);
+
+  const handleApprove = async (jobId) => {
+    try {
+      setActionId(jobId);
+      await adminService.approveJob(jobId);
+      setNotice("Job approved successfully.");
+      await loadPendingJobs();
+    } catch (error) {
+      console.log(error);
+      setNotice(error?.response?.data?.message || "Unable to approve job");
+    } finally {
+      setActionId(null);
+    }
+  };
+
+  const handleReject = async (jobId) => {
+    try {
+      setActionId(jobId);
+      await adminService.rejectJob(jobId);
+      setNotice("Job rejected successfully.");
+      await loadPendingJobs();
+    } catch (error) {
+      console.log(error);
+      setNotice(error?.response?.data?.message || "Unable to reject job");
+    } finally {
+      setActionId(null);
+    }
+  };
+
+  const formatDate = (value) => {
+    if (!value) return "—";
+    return new Date(value).toLocaleDateString();
+  };
 
   return (
     <AdminLayout>

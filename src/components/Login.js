@@ -49,7 +49,7 @@ const Login = () => {
       if (user) {
         const token = user.token;
         const decodedToken = JSON.parse(atob(token.split('.')[1]));
-        const role = decodedToken.user.role;
+        const role = decodedToken.role;
         
         if (role === 'admin') navigate('/admin');
         else if (role === 'employer') navigate('/employer');
