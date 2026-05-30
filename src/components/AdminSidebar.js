@@ -190,6 +190,7 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
                       }
                     }}
                     aria-current={isActive(item.path) ? 'page' : undefined}
+                    aria-expanded={item.submenu ? expandedMenu === item.id : undefined}
                   >
                     <span className="admin-nav-icon">
                       <IconComponent size={18} strokeWidth={1.5} />
@@ -208,7 +209,7 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
 
                   {/* Submenu */}
                   {item.submenu && expandedMenu === item.id && (
-                    <div className="admin-submenu">
+                    <div className="admin-submenu" aria-label={`${item.label} submenu`}>
                       {item.submenu.map((subitem, idx) => (
                         <button
                           key={idx}
