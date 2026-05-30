@@ -23,10 +23,10 @@
 /* HEADER CARD */
 .admin-header-card {
   background: var(--bg-primary);
-  border: 1px solid var(--border-color);
+  border: 1px solid rgba(226, 232, 240, 0.6);
   border-radius: var(--radius-xl);
   padding: var(--space-lg);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.06);
   margin-bottom: var(--space-xl);
 }
 
@@ -54,7 +54,7 @@
 
 .admin-refresh-btn {
   padding: var(--space-sm) var(--space-lg);
-  border: 1px solid var(--border-color);
+  border: 1px solid rgba(226, 232, 240, 0.8);
   border-radius: var(--radius-lg);
   background: var(--bg-primary);
   color: var(--text-primary);
@@ -115,10 +115,10 @@
 
 .admin-stat-card {
   background: linear-gradient(135deg, var(--bg-primary) 0%, rgba(248, 250, 252, 0.5) 100%);
-  border: 1px solid var(--border-color);
+  border: 1px solid rgba(226, 232, 240, 0.55);
   border-radius: var(--radius-lg);
   padding: var(--space-lg);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
   transition: all var(--transition-base);
   position: relative;
   overflow: hidden;
@@ -137,8 +137,8 @@
 }
 
 .admin-stat-card:hover {
-  border-color: var(--brand-primary);
-  box-shadow: var(--shadow-lg);
+  border-color: rgba(99, 102, 241, 0.28);
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.08);
   transform: translateY(-2px);
 }
 
@@ -169,16 +169,16 @@
 /* SECTIONS */
 .admin-section {
   background: var(--bg-primary);
-  border: 1px solid var(--border-color);
+  border: 1px solid rgba(226, 232, 240, 0.55);
   border-radius: var(--radius-lg);
   padding: var(--space-lg);
   margin-bottom: var(--space-xl);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
   transition: all var(--transition-base);
 }
 
 .admin-section:hover {
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.07);
 }
 
 .admin-section-title {
@@ -196,7 +196,8 @@
 .admin-table-wrap {
   overflow-x: auto;
   border-radius: var(--radius-md);
-  border: 1px solid var(--border-color);
+  border: none;
+  box-shadow: inset 0 0 0 1px rgba(226, 232, 240, 0.55);
 }
 
 .admin-table {
@@ -207,7 +208,7 @@
 
 .admin-table th,
 .admin-table td {
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.55);
   padding: var(--space-md);
   text-align: left;
   vertical-align: middle;
@@ -235,7 +236,7 @@
 
 .admin-table tbody tr:hover {
   background: var(--bg-tertiary);
-  box-shadow: inset 0 0 8px rgba(99, 102, 241, 0.05);
+  box-shadow: none;
 }
 
 .admin-table tbody tr:nth-child(even) td {
@@ -550,4 +551,3 @@
     border: 1px solid #cbd5e1;
   }
 }
-

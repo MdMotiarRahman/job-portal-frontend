@@ -49,6 +49,15 @@ body {
   flex: 1;
 }
 
+.admin-app-wrapper,
+.admin-main-content {
+  min-height: 100vh;
+}
+
+.admin-main-content {
+  display: block;
+}
+
 /* =========================================
    Modern Navbar
    ========================================= */

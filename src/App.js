@@ -4,6 +4,7 @@ import {
   Route,
   Routes,
   Link,
+  Navigate,
   useLocation,
   useNavigate
 } from 'react-router-dom';
@@ -322,98 +323,111 @@ const Footer = () => {
   );
 };
 
+const AppContent = () => {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith('/admin');
+
+  return (
+    <div className={`app-wrapper ${isAdminRoute ? 'admin-app-wrapper' : ''}`}>
+
+      {!isAdminRoute && <Navigation />}
+
+      <main className={`main-content ${isAdminRoute ? 'admin-main-content' : ''}`}>
+
+        <Routes>
+
+          {/* PUBLIC */}
+
+          <Route
+            path="/"
+            element={<HomePage />}
+          />
+
+          <Route
+            path="/home"
+            element={<HomePage />}
+          />
+
+          <Route
+            path="/login"
+            element={<Login />}
+          />
+
+          <Route
+            path="/register"
+            element={<Register />}
+          />
+
+          {/* ADMIN */}
+
+          <Route
+            path="/admin"
+            element={<Navigate to="/admin/dashboard" replace />}
+          />
+
+          <Route
+            path="/admin/*"
+            element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* EMPLOYER */}
+
+          <Route
+            path="/employer"
+            element={
+              <ProtectedRoute allowedRoles={['employer']}>
+                <EmployerDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* SEEKER */}
+
+          <Route
+            path="/seeker"
+            element={
+              <ProtectedRoute allowedRoles={['seeker']}>
+                <SeekerDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/seeker/profile"
+            element={
+              <ProtectedRoute allowedRoles={['seeker']}>
+                <SeekerProfile />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/apply-job/:id"
+            element={
+              <ProtectedRoute allowedRoles={['seeker']}>
+                <ApplyJob />
+              </ProtectedRoute>
+            }
+          />
+
+        </Routes>
+
+      </main>
+
+      {!isAdminRoute && <Footer />}
+
+    </div>
+  );
+};
+
 const App = () => {
   return (
     <Router>
-
-      <div className="app-wrapper">
-
-        <Navigation />
-
-        <main className="main-content">
-
-          <Routes>
-
-            {/* PUBLIC */}
-
-            <Route
-              path="/"
-              element={<HomePage />}
-            />
-
-            <Route
-              path="/home"
-              element={<HomePage />}
-            />
-
-            <Route
-              path="/login"
-              element={<Login />}
-            />
-
-            <Route
-              path="/register"
-              element={<Register />}
-            />
-
-            {/* ADMIN */}
-
-            <Route
-              path="/admin"
-              element={
-                <ProtectedRoute allowedRoles={['admin']}>
-                  <AdminDashboard />
-                </ProtectedRoute>
-              }
-            />
-
-            {/* EMPLOYER */}
-
-            <Route
-              path="/employer"
-              element={
-                <ProtectedRoute allowedRoles={['employer']}>
-                  <EmployerDashboard />
-                </ProtectedRoute>
-              }
-            />
-
-            {/* SEEKER */}
-
-            <Route
-              path="/seeker"
-              element={
-                <ProtectedRoute allowedRoles={['seeker']}>
-                  <SeekerDashboard />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route
-              path="/seeker/profile"
-              element={
-                <ProtectedRoute allowedRoles={['seeker']}>
-                  <SeekerProfile />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route
-              path="/apply-job/:id"
-              element={
-                <ProtectedRoute allowedRoles={['seeker']}>
-                  <ApplyJob />
-                </ProtectedRoute>
-              }
-            />
-
-          </Routes>
-
-        </main>
-
-        <Footer />
-
-      </div>
+      <AppContent />
 
     </Router>
   );

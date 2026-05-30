@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   BarChart3,
@@ -21,7 +21,7 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
   const location = useLocation();
   const [expandedMenu, setExpandedMenu] = useState(null);
 
-  const menuItems = [
+  const menuItems = useMemo(() => [
     {
       id: 'dashboard',
       label: 'Dashboard',
@@ -86,9 +86,9 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
       path: '/admin/reports',
       submenu: null,
     },
-  ];
+  ], []);
 
-  const settingsItems = [
+  const settingsItems = useMemo(() => [
     {
       id: 'settings',
       label: 'Settings',
@@ -101,11 +101,29 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
       icon: User,
       path: '/admin/profile',
     },
-  ];
+  ], []);
 
-  const isActive = (path) => {
-    return location.pathname === path || location.pathname.startsWith(path);
-  };
+  const isActive = useCallback((path) => {
+    const [pathname, search = ''] = path.split('?');
+    const currentPath = location.pathname;
+    const currentSearch = location.search.replace(/^\?/, '');
+
+    if (search) {
+      return currentPath === pathname && currentSearch === search;
+    }
+
+    return currentPath === pathname || currentPath.startsWith(`${pathname}/`);
+  }, [location.pathname, location.search]);
+
+  useEffect(() => {
+    const activeMenu = menuItems.find((item) =>
+      item.submenu?.some((subitem) => isActive(subitem.path))
+    );
+
+    if (activeMenu) {
+      setExpandedMenu(activeMenu.id);
+    }
+  }, [isActive, menuItems]);
 
   const toggleSubmenu = (itemId, e) => {
     e.preventDefault();
