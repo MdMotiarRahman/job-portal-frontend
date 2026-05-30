@@ -42,6 +42,18 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
       ],
     },
     {
+      id: 'employers',
+      label: 'Employer Verification',
+      icon: Building2,
+      path: '/admin/employers',
+      submenu: [
+        { label: 'All Employers', path: '/admin/employers' },
+        { label: 'Pending Review', path: '/admin/employers?verificationStatus=pending' },
+        { label: 'Approved', path: '/admin/employers?verificationStatus=approved' },
+        { label: 'Rejected', path: '/admin/employers?verificationStatus=rejected' },
+      ],
+    },
+    {
       id: 'jobs',
       label: 'Job Management',
       icon: Briefcase,

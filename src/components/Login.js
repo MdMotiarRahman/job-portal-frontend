@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Briefcase, Mail, Lock, AlertCircle, ArrowRight, Loader2 } from 'lucide-react';
+import { Briefcase, Mail, Lock, AlertCircle, ArrowRight, Loader2, Clock, XCircle } from 'lucide-react';
 import authService from '../services/auth.service';
 import '../styles/auth.css';
 
@@ -9,6 +9,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
   const [apiError, setApiError] = useState('');
+  const [verificationWarning, setVerificationWarning] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const firstErrorRef = useRef(null);
@@ -31,6 +32,7 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setApiError('');
+    setVerificationWarning('');
     
     const newErrors = validateForm();
     setErrors(newErrors);
@@ -43,9 +45,28 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      await authService.login(email, password);
+      const response = await authService.login(email, password);
       const role = authService.getCurrentUserRole();
       
+      // Check for employer verification status
+      if (role === 'employer') {
+        const verificationStatus = response?.verificationStatus;
+        
+        if (verificationStatus === 'pending') {
+          setVerificationWarning(
+            'Your employer account is pending verification. Our team will review your profile and contact you soon. You can update your company details once approved.'
+          );
+          // Don't navigate yet, keep them on login page with warning
+          return;
+        } else if (verificationStatus === 'rejected') {
+          const rejectionReason = response?.rejectionReason || 'Please contact support for more information.';
+          setApiError(`Your employer account was rejected. Reason: ${rejectionReason}`);
+          return;
+        }
+        // If 'approved', proceed with navigation
+      }
+
+      // Navigate based on role
       if (role === 'admin') navigate('/admin');
       else if (role === 'employer') navigate('/employer');
       else navigate('/seeker');
@@ -73,6 +94,13 @@ const Login = () => {
           <div className="alert alert-error" role="alert" ref={firstErrorRef} tabIndex="-1">
             <AlertCircle size={18} className="alert-icon" />
             <div className="alert-content">{apiError}</div>
+          </div>
+        )}
+
+        {verificationWarning && (
+          <div className="alert alert-warning" role="alert" ref={firstErrorRef} tabIndex="-1">
+            <Clock size={18} className="alert-icon" />
+            <div className="alert-content">{verificationWarning}</div>
           </div>
         )}
 

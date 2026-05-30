@@ -32,6 +32,7 @@ import Register from './components/Register';
 import AdminDashboard from './components/AdminDashboard';
 import AdminJobManagement from './components/AdminJobManagement';
 import AdminApplicationManagement from './components/AdminApplicationManagement';
+import AdminEmployerManagement from './components/AdminEmployerManagement';
 import EmployerDashboard from './components/EmployerDashboard';
 import SeekerDashboard from './components/SeekerDashboard';
 
@@ -649,6 +650,15 @@ const AppContent = () => {
             element={
               <ProtectedRoute allowedRoles={['admin']}>
                 <AdminApplicationManagement />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/employers"
+            element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AdminEmployerManagement />
               </ProtectedRoute>
             }
           />

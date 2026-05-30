@@ -63,3 +63,19 @@ export const updateApplicationStatus = (applicationId, status) =>
     { status },
     authHeader()
   );
+
+// ============= EMPLOYER MANAGEMENT =============
+export const getAllEmployers = (params = {}) =>
+  axios.get(`${API_URL}/employers`, { ...authHeader(), params });
+
+export const getEmployerById = (employerId) =>
+  axios.get(`${API_URL}/employers/${employerId}`, authHeader());
+
+export const getPendingEmployers = (params = {}) =>
+  axios.get(`${API_URL}/employers/pending`, { ...authHeader(), params });
+
+export const approveEmployer = (employerId, payload = {}) =>
+  axios.put(`${API_URL}/employers/${employerId}/approve`, payload, authHeader());
+
+export const rejectEmployer = (employerId, payload = {}) =>
+  axios.put(`${API_URL}/employers/${employerId}/reject`, payload, authHeader());
