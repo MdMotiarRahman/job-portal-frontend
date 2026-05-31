@@ -678,9 +678,50 @@ const AppContent = () => {
 
           <Route
             path="/employer"
+            element={<Navigate to="/employer/dashboard" replace />}
+          />
+
+          <Route
+            path="/employer/dashboard"
             element={
               <ProtectedRoute allowedRoles={['employer']}>
-                <EmployerDashboard />
+                <EmployerDashboard page="overview" />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/employer/jobs"
+            element={
+              <ProtectedRoute allowedRoles={['employer']}>
+                <EmployerDashboard page="jobs" />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/employer/jobs/new"
+            element={
+              <ProtectedRoute allowedRoles={['employer']}>
+                <EmployerDashboard page="new-job" />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/employer/jobs/:jobId/edit"
+            element={
+              <ProtectedRoute allowedRoles={['employer']}>
+                <EmployerDashboard page="edit-job" />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/employer/applications"
+            element={
+              <ProtectedRoute allowedRoles={['employer']}>
+                <EmployerDashboard page="applications" />
               </ProtectedRoute>
             }
           />

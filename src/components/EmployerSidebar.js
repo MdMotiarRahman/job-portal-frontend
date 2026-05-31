@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   BarChart3,
   Briefcase,
@@ -14,21 +14,26 @@ import authService from '../services/auth.service';
 import '../styles/adminSidebar.css';
 
 const menuItems = [
-  { id: 'overview', label: 'Overview', icon: BarChart3 },
-  { id: 'employer-job-form', label: 'Create Job', icon: FilePlus2 },
-  { id: 'employer-jobs', label: 'My Jobs', icon: Briefcase },
-  { id: 'employer-applications', label: 'Applications', icon: ClipboardList },
+  { path: '/employer/dashboard', label: 'Overview', icon: BarChart3 },
+  { path: '/employer/jobs/new', label: 'Create Job', icon: FilePlus2 },
+  { path: '/employer/jobs', label: 'My Jobs', icon: Briefcase },
+  { path: '/employer/applications', label: 'Applications', icon: ClipboardList },
 ];
 
 const EmployerSidebar = ({ isOpen, setIsOpen }) => {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const scrollToSection = (sectionId) => {
-    document.getElementById(sectionId)?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start',
-    });
+  const isActive = (path) => {
+    if (path === '/employer/jobs') {
+      return location.pathname === path || /^\/employer\/jobs\/[^/]+\/edit$/.test(location.pathname);
+    }
 
+    return location.pathname === path;
+  };
+
+  const handleNavigation = (path) => {
+    navigate(path);
     if (window.innerWidth < 768) {
       setIsOpen(false);
     }
@@ -54,7 +59,7 @@ const EmployerSidebar = ({ isOpen, setIsOpen }) => {
           <button
             type="button"
             className="admin-sidebar-logo employer-sidebar-logo"
-            onClick={() => scrollToSection('overview')}
+            onClick={() => handleNavigation('/employer/dashboard')}
           >
             <Building2 className="admin-logo-icon" size={24} strokeWidth={1.5} />
             <span className="admin-logo-text">Employer Portal</span>
@@ -77,10 +82,11 @@ const EmployerSidebar = ({ isOpen, setIsOpen }) => {
 
               return (
                 <button
-                  key={item.id}
-                  className="admin-nav-item"
-                  onClick={() => scrollToSection(item.id)}
+                  key={item.path}
+                  className={`admin-nav-item ${isActive(item.path) ? 'active' : ''}`}
+                  onClick={() => handleNavigation(item.path)}
                   type="button"
+                  aria-current={isActive(item.path) ? 'page' : undefined}
                 >
                   <span className="admin-nav-icon">
                     <IconComponent size={18} strokeWidth={1.5} />
