@@ -32,9 +32,9 @@ export const getMyApplications = () => {
   });
 };
 
-export const applyJob = (jobId, formData) => {
+export const applyJob = (formData) => {
   return axios.post(
-    `${API_URL}/apply/${jobId}`,
+    `${API_URL}/apply`,
     formData,
     {
       headers: {
