@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import {
   BadgeDollarSign,
   Briefcase,
-  Building2,
   CheckCircle2,
   Clock3,
   Edit3,
@@ -14,7 +13,9 @@ import {
   Trash2,
   X,
 } from 'lucide-react';
+import EmployerLayout from './EmployerLayout';
 import employerService from '../services/employer.service';
+import '../styles/adminDashboard.css';
 import '../styles/dashboard.css';
 
 const emptyForm = {
@@ -54,20 +55,20 @@ const formatSalary = (salary) => {
   return `${currency} ${min} - ${max}`;
 };
 
-const getApprovalClass = (job) => {
-  if (job.isApproved) return 'status-pill status-approved';
-  if (job.status === 'closed') return 'status-pill status-neutral';
-  return 'status-pill status-pending';
+const getApprovalBadge = (job) => {
+  if (job.isApproved) return 'admin-badge-success';
+  if (job.status === 'closed') return 'admin-badge-status';
+  return 'admin-badge-warning';
 };
 
-const getApplicationStatusClass = (status) => {
+const getApplicationBadge = (status) => {
   const value = String(status || '').toLowerCase();
   if (['accepted', 'shortlisted', 'interview scheduled'].includes(value)) {
-    return 'status-pill status-approved';
+    return 'admin-badge-success';
   }
-  if (value === 'rejected') return 'status-pill status-rejected';
-  if (value === 'reviewing') return 'status-pill status-neutral';
-  return 'status-pill status-pending';
+  if (value === 'rejected') return 'admin-badge-error';
+  if (value === 'reviewing') return 'admin-badge-status';
+  return 'admin-badge-warning';
 };
 
 const EmployerDashboard = () => {
@@ -263,374 +264,307 @@ const EmployerDashboard = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <EmployerLayout>
+        <div className="admin-page admin-loading">Loading employer dashboard...</div>
+      </EmployerLayout>
+    );
+  }
+
   return (
-    <div className="dashboard-page employer-dashboard-page">
-      <div className="dashboard-container">
-        <div className="dashboard-hero">
-          <div className="hero-card employer-hero-card">
-            <div className="hero-badge">
-              <Briefcase size={16} />
-              Employer Workspace
+    <EmployerLayout>
+      <div className="admin-page employer-admin-page" id="overview">
+        <div className="admin-header-card">
+          <div className="admin-header">
+            <div>
+              <p className="admin-subtitle" style={{ marginBottom: 6 }}>Employer workspace</p>
+              <h1>Employer Dashboard</h1>
+              <p className="admin-subtitle">
+                Manage job posts, review applications, and move candidates through your hiring pipeline.
+              </p>
             </div>
-            <h1 className="hero-title">Run hiring from one calm cockpit.</h1>
-            <p className="hero-subtitle">
-              Create and manage job posts, track approval status, and move candidates through
-              review without leaving your dashboard.
-            </p>
-            <div className="hero-actions">
-              <button
-                type="button"
-                className="hero-action primary"
-                onClick={() =>
-                  document.getElementById('employer-job-form')?.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start',
-                  })
-                }
-              >
-                <PlusCircle size={18} />
-                Create Job
-              </button>
-              <button type="button" className="hero-action secondary" onClick={loadDashboard}>
-                <RefreshCcw size={18} />
+            <div className="admin-toolbar">
+              <span className="admin-badge admin-badge-status">
+                {summary?.profile?.verificationStatus || 'pending'}
+              </span>
+              <button className="admin-refresh-btn" onClick={loadDashboard} type="button">
+                <RefreshCcw size={16} strokeWidth={2} />
                 Refresh
               </button>
-            </div>
-
-            {summary?.profile ? (
-              <div className="employer-verification-strip">
-                <Building2 size={18} />
-                <span>
-                  Verification status:{' '}
-                  <strong>{summary.profile.verificationStatus || 'pending'}</strong>
-                </span>
-              </div>
-            ) : null}
-          </div>
-
-          <div className="summary-grid">
-            <div className="summary-card">
-              <div className="summary-label">
-                <Briefcase size={16} />
-                Total Jobs
-              </div>
-              <div className="summary-value">{stats.total}</div>
-            </div>
-            <div className="summary-card">
-              <div className="summary-label">
-                <Clock3 size={16} />
-                Pending Approval
-              </div>
-              <div className="summary-value">{stats.pending}</div>
-            </div>
-            <div className="summary-card">
-              <div className="summary-label">
-                <CheckCircle2 size={16} />
-                Approved
-              </div>
-              <div className="summary-value">{stats.approved}</div>
-            </div>
-            <div className="summary-card">
-              <div className="summary-label">
-                <FileText size={16} />
-                Applications
-              </div>
-              <div className="summary-value">{stats.applications}</div>
             </div>
           </div>
         </div>
 
-        {error ? <div className="dashboard-alert dashboard-alert-error">{error}</div> : null}
-        {message ? <div className="dashboard-alert dashboard-alert-success">{message}</div> : null}
+        {error ? <div className="admin-alert admin-alert-error">{error}</div> : null}
+        {message ? <div className="admin-alert admin-alert-success">{message}</div> : null}
 
-        <section className="panel-card" id="employer-job-form">
-          <div className="section-head">
-            <h2 className="section-title">{editingJob ? 'Edit Job' : 'Create Job'}</h2>
+        <section className="admin-stats-grid">
+          <div className="admin-stat-card">
+            <h3>
+              <Briefcase size={18} /> Total Jobs
+            </h3>
+            <p className="admin-stat-value">{stats.total}</p>
+          </div>
+          <div className="admin-stat-card">
+            <h3>
+              <Clock3 size={18} /> Pending Approval
+            </h3>
+            <p className="admin-stat-value">{stats.pending}</p>
+          </div>
+          <div className="admin-stat-card">
+            <h3>
+              <CheckCircle2 size={18} /> Approved Jobs
+            </h3>
+            <p className="admin-stat-value">{stats.approved}</p>
+          </div>
+          <div className="admin-stat-card">
+            <h3>
+              <FileText size={18} /> Applications
+            </h3>
+            <p className="admin-stat-value">{stats.applications}</p>
+          </div>
+        </section>
+
+        <section className="admin-section" id="employer-job-form">
+          <div className="admin-section-heading-row">
+            <h2 className="admin-section-title">
+              <PlusCircle size={18} />
+              {editingJob ? 'Edit Job' : 'Create Job'}
+            </h2>
             {editingJob ? (
-              <button type="button" className="section-action" onClick={resetForm}>
-                <X size={16} />
+              <button type="button" className="admin-action-btn admin-action-neutral" onClick={resetForm}>
+                <X size={13} />
                 Cancel Edit
               </button>
             ) : null}
           </div>
 
-          <form onSubmit={handleSubmit}>
-            <div className="form-grid">
-              <label className="dashboard-field">
-                <span>Job Title</span>
-                <input
-                  type="text"
-                  name="title"
-                  className="form-control"
-                  value={formData.title}
-                  onChange={handleChange}
-                  required
-                />
-              </label>
+          <form className="admin-form-grid employer-admin-form" onSubmit={handleSubmit}>
+            <label className="admin-form-field">
+              <span>Job Title</span>
+              <input name="title" value={formData.title} onChange={handleChange} required />
+            </label>
 
-              <label className="dashboard-field">
-                <span>Location</span>
-                <input
-                  type="text"
-                  name="location"
-                  className="form-control"
-                  value={formData.location}
-                  onChange={handleChange}
-                  required
-                />
-              </label>
+            <label className="admin-form-field">
+              <span>Location</span>
+              <input name="location" value={formData.location} onChange={handleChange} required />
+            </label>
 
-              <label className="dashboard-field">
-                <span>Job Type</span>
-                <select
-                  name="jobType"
-                  className="form-select"
-                  value={formData.jobType}
-                  onChange={handleChange}
-                >
-                  <option>Full-time</option>
-                  <option>Part-time</option>
-                  <option>Contract</option>
-                  <option>Internship</option>
-                </select>
-              </label>
+            <label className="admin-form-field">
+              <span>Job Type</span>
+              <select name="jobType" value={formData.jobType} onChange={handleChange}>
+                <option>Full-time</option>
+                <option>Part-time</option>
+                <option>Contract</option>
+                <option>Internship</option>
+              </select>
+            </label>
 
-              <label className="dashboard-field">
-                <span>Experience Level</span>
-                <select
-                  name="experienceLevel"
-                  className="form-select"
-                  value={formData.experienceLevel}
-                  onChange={handleChange}
-                >
-                  <option>Entry</option>
-                  <option>Mid</option>
-                  <option>Senior</option>
-                </select>
-              </label>
+            <label className="admin-form-field">
+              <span>Experience Level</span>
+              <select name="experienceLevel" value={formData.experienceLevel} onChange={handleChange}>
+                <option>Entry</option>
+                <option>Mid</option>
+                <option>Senior</option>
+              </select>
+            </label>
 
-              <label className="dashboard-field">
-                <span>Status</span>
-                <select
-                  name="status"
-                  className="form-select"
-                  value={formData.status}
-                  onChange={handleChange}
-                >
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
-                  <option value="closed">Closed</option>
-                </select>
-              </label>
+            <label className="admin-form-field">
+              <span>Status</span>
+              <select name="status" value={formData.status} onChange={handleChange}>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+                <option value="closed">Closed</option>
+              </select>
+            </label>
 
-              <label className="dashboard-field">
-                <span>Currency</span>
-                <input
-                  type="text"
-                  name="salaryCurrency"
-                  className="form-control"
-                  value={formData.salaryCurrency}
-                  onChange={handleChange}
-                />
-              </label>
+            <label className="admin-form-field">
+              <span>Currency</span>
+              <input name="salaryCurrency" value={formData.salaryCurrency} onChange={handleChange} />
+            </label>
 
-              <label className="dashboard-field">
-                <span>Minimum Salary</span>
-                <input
-                  type="number"
-                  min="0"
-                  name="salaryMin"
-                  className="form-control"
-                  value={formData.salaryMin}
-                  onChange={handleChange}
-                />
-              </label>
+            <label className="admin-form-field">
+              <span>Minimum Salary</span>
+              <input
+                name="salaryMin"
+                type="number"
+                min="0"
+                value={formData.salaryMin}
+                onChange={handleChange}
+              />
+            </label>
 
-              <label className="dashboard-field">
-                <span>Maximum Salary</span>
-                <input
-                  type="number"
-                  min="0"
-                  name="salaryMax"
-                  className="form-control"
-                  value={formData.salaryMax}
-                  onChange={handleChange}
-                />
-              </label>
+            <label className="admin-form-field">
+              <span>Maximum Salary</span>
+              <input
+                name="salaryMax"
+                type="number"
+                min="0"
+                value={formData.salaryMax}
+                onChange={handleChange}
+              />
+            </label>
 
-              <label className="dashboard-field full">
-                <span>Skills (comma separated)</span>
-                <input
-                  type="text"
-                  name="skills"
-                  className="form-control"
-                  placeholder="React, Node.js, MongoDB"
-                  value={formData.skills}
-                  onChange={handleChange}
-                  required
-                />
-              </label>
+            <label className="admin-form-field admin-form-field-wide">
+              <span>Skills (comma separated)</span>
+              <input
+                name="skills"
+                placeholder="React, Node.js, MongoDB"
+                value={formData.skills}
+                onChange={handleChange}
+                required
+              />
+            </label>
 
-              <label className="dashboard-field full">
-                <span>Requirements (one per line)</span>
-                <textarea
-                  name="requirements"
-                  className="form-control"
-                  rows="3"
-                  value={formData.requirements}
-                  onChange={handleChange}
-                />
-              </label>
+            <label className="admin-form-field admin-form-field-wide">
+              <span>Requirements (one per line)</span>
+              <textarea
+                name="requirements"
+                rows="3"
+                value={formData.requirements}
+                onChange={handleChange}
+              />
+            </label>
 
-              <label className="dashboard-field full">
-                <span>Description</span>
-                <textarea
-                  name="description"
-                  className="form-control"
-                  rows="5"
-                  value={formData.description}
-                  onChange={handleChange}
-                  required
-                />
-              </label>
-            </div>
+            <label className="admin-form-field admin-form-field-wide">
+              <span>Description</span>
+              <textarea
+                name="description"
+                rows="4"
+                value={formData.description}
+                onChange={handleChange}
+                required
+              />
+            </label>
 
-            <div className="dashboard-form-actions">
-              <button type="submit" className="primary-btn" disabled={saving}>
+            <div className="admin-form-actions">
+              <button className="admin-primary-btn" type="submit" disabled={saving}>
                 {saving ? 'Saving...' : editingJob ? 'Update Job' : 'Create Job'}
               </button>
-              {editingJob ? (
-                <span className="muted-text">
-                  Editing a job sends it back to admin approval before it appears publicly.
-                </span>
-              ) : null}
             </div>
           </form>
         </section>
 
-        <section className="panel-card">
-          <div className="section-head">
-            <h2 className="section-title">My Jobs</h2>
-            <button type="button" className="section-action" onClick={loadDashboard}>
-              <RefreshCcw size={16} />
-              Reload
-            </button>
+        <section className="admin-section" id="employer-jobs">
+          <div className="admin-section-heading-row">
+            <h2 className="admin-section-title">
+              <Briefcase size={18} />
+              My Jobs
+            </h2>
           </div>
 
-          {loading ? (
-            <div className="loading-row">Loading dashboard...</div>
-          ) : jobs.length === 0 ? (
-            <div className="empty-state">No jobs yet. Create your first job above.</div>
-          ) : (
-            <div className="jobs-grid">
-              {jobs.map((job) => (
-                <article key={job._id} className="job-card">
-                  <div className="job-top">
-                    <div>
-                      <h3 className="job-title">{job.title}</h3>
-                      <div className="job-company">{job.company?.name || summary?.user?.name}</div>
-                    </div>
-                    <span className={getApprovalClass(job)}>
-                      {job.isApproved ? 'Approved' : job.status === 'closed' ? 'Closed' : 'Pending'}
-                    </span>
-                  </div>
-
-                  <div className="job-meta">
-                    <span>
-                      <MapPin size={14} />
-                      {job.location}
-                    </span>
-                    <span>
-                      <Briefcase size={14} />
-                      {job.jobType}
-                    </span>
-                    <span>
-                      <BadgeDollarSign size={14} />
-                      {formatSalary(job.salary)}
-                    </span>
-                  </div>
-
-                  <p className="muted-text job-description">{job.description}</p>
-
-                  {job.skills?.length ? (
-                    <div className="chip-list">
-                      {job.skills.slice(0, 5).map((skill) => (
-                        <span className="chip" key={skill}>
-                          {skill}
+          <div className="admin-table-wrap">
+            <table className="admin-table employer-admin-table">
+              <thead>
+                <tr>
+                  <th>Job</th>
+                  <th>Type</th>
+                  <th>Salary</th>
+                  <th>Status</th>
+                  <th>Approval</th>
+                  <th>Applications</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {jobs.length === 0 ? (
+                  <tr>
+                    <td colSpan="7">No jobs yet. Create your first job above.</td>
+                  </tr>
+                ) : (
+                  jobs.map((job) => (
+                    <tr key={job._id}>
+                      <td>
+                        <strong>{job.title}</strong>
+                        <div className="admin-muted-text">
+                          <MapPin size={12} /> {job.location} · Posted {formatDate(job.createdAt)}
+                        </div>
+                      </td>
+                      <td>
+                        <span className="admin-badge admin-badge-status">{job.jobType}</span>
+                      </td>
+                      <td>
+                        <BadgeDollarSign size={13} /> {formatSalary(job.salary)}
+                      </td>
+                      <td>
+                        <span className="admin-badge admin-badge-status">{job.status}</span>
+                      </td>
+                      <td>
+                        <span className={`admin-badge ${getApprovalBadge(job)}`}>
+                          {job.isApproved ? 'Approved' : job.status === 'closed' ? 'Closed' : 'Pending'}
                         </span>
-                      ))}
-                    </div>
-                  ) : null}
-
-                  <div className="card-divider" />
-
-                  <div className="job-footer">
-                    <small className="muted-text">Posted {formatDate(job.createdAt)}</small>
-                    <small className="muted-text">
-                      {Array.isArray(job.applications) ? job.applications.length : 0} applications
-                    </small>
-                  </div>
-
-                  <div className="job-actions">
-                    <button
-                      type="button"
-                      className="secondary-btn"
-                      onClick={() => viewJobApplications(job._id)}
-                    >
-                      <Eye size={15} />
-                      Applicants
-                    </button>
-                    <button type="button" className="secondary-btn" onClick={() => openEditJob(job)}>
-                      <Edit3 size={15} />
-                      Edit
-                    </button>
-                    {job.status === 'closed' ? (
-                      <button
-                        type="button"
-                        className="secondary-btn"
-                        onClick={() =>
-                          runJobAction(
-                            () => employerService.reopenJob(job._id),
-                            'Job reopened successfully.'
-                          )
-                        }
-                      >
-                        Reopen
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        className="secondary-btn"
-                        onClick={() =>
-                          runJobAction(
-                            () => employerService.closeJob(job._id),
-                            'Job closed successfully.'
-                          )
-                        }
-                      >
-                        Close
-                      </button>
-                    )}
-                    <button
-                      type="button"
-                      className="danger-btn"
-                      onClick={() => handleDeleteJob(job)}
-                    >
-                      <Trash2 size={15} />
-                      Delete
-                    </button>
-                  </div>
-                </article>
-              ))}
-            </div>
-          )}
+                      </td>
+                      <td>{Array.isArray(job.applications) ? job.applications.length : 0}</td>
+                      <td className="admin-actions-cell">
+                        <button
+                          type="button"
+                          className="admin-action-btn admin-action-neutral"
+                          onClick={() => viewJobApplications(job._id)}
+                        >
+                          <Eye size={13} />
+                          Apps
+                        </button>
+                        <button
+                          type="button"
+                          className="admin-action-btn admin-action-neutral"
+                          onClick={() => openEditJob(job)}
+                        >
+                          <Edit3 size={13} />
+                          Edit
+                        </button>
+                        {job.status === 'closed' ? (
+                          <button
+                            type="button"
+                            className="admin-action-btn admin-action-success"
+                            onClick={() =>
+                              runJobAction(
+                                () => employerService.reopenJob(job._id),
+                                'Job reopened successfully.'
+                              )
+                            }
+                          >
+                            Reopen
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            className="admin-action-btn admin-action-warning"
+                            onClick={() =>
+                              runJobAction(
+                                () => employerService.closeJob(job._id),
+                                'Job closed successfully.'
+                              )
+                            }
+                          >
+                            Close
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          className="admin-action-btn admin-action-danger"
+                          onClick={() => handleDeleteJob(job)}
+                        >
+                          <Trash2 size={13} />
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </section>
 
-        <section className="panel-card" id="employer-applications">
-          <div className="section-head">
-            <h2 className="section-title">Applications</h2>
+        <section className="admin-section" id="employer-applications">
+          <div className="admin-section-heading-row">
+            <h2 className="admin-section-title">
+              <FileText size={18} />
+              Applications
+            </h2>
             <select
-              className="form-select employer-filter-select"
+              className="admin-select employer-admin-filter"
               value={selectedJobId}
               onChange={(event) => setSelectedJobId(event.target.value)}
             >
@@ -644,41 +578,37 @@ const EmployerDashboard = () => {
           </div>
 
           {visibleApplications.length === 0 ? (
-            <div className="empty-state">No applications found for this view.</div>
+            <div className="admin-empty-state">No applications found for this view.</div>
           ) : (
-            <div className="application-list">
+            <div className="employer-application-grid">
               {visibleApplications.map((application) => {
                 const draft = getApplicationDraft(application);
                 const isRejected = draft.status === 'Rejected';
 
                 return (
-                  <article className="applicant-card" key={application._id}>
-                    <div className="applicant-head">
+                  <article className="employer-application-card" key={application._id}>
+                    <div className="employer-application-head">
                       <div>
-                        <h4 className="applicant-name">
-                          {application.seeker?.name || 'Unknown candidate'}
-                        </h4>
-                        <div className="applicant-email">{application.seeker?.email}</div>
-                        <div className="muted-text">
-                          Applied for {application.job?.title || application.jobTitle} on{' '}
+                        <h3>{application.seeker?.name || 'Unknown candidate'}</h3>
+                        <p>{application.seeker?.email || 'No email available'}</p>
+                        <span>
+                          {application.job?.title || application.jobTitle} · Applied{' '}
                           {formatDate(application.createdAt)}
-                        </div>
+                        </span>
                       </div>
-                      <span className={getApplicationStatusClass(application.status)}>
+                      <span className={`admin-badge ${getApplicationBadge(application.status)}`}>
                         {application.status}
                       </span>
                     </div>
 
-                    <div className="card-divider" />
-
-                    <p className="muted-text">
+                    <p className="employer-cover-letter">
                       <strong>Cover Letter:</strong>{' '}
                       {application.coverLetter || 'No cover letter provided.'}
                     </p>
 
                     {application.resume ? (
                       <a
-                        className="resume-link"
+                        className="employer-resume-link"
                         href={
                           application.resume.startsWith('http')
                             ? application.resume
@@ -690,14 +620,13 @@ const EmployerDashboard = () => {
                         Open Resume
                       </a>
                     ) : (
-                      <p className="muted-text">No resume uploaded.</p>
+                      <p className="admin-muted-text">No resume uploaded.</p>
                     )}
 
-                    <div className="application-action-grid">
-                      <label className="dashboard-field">
+                    <div className="employer-application-actions">
+                      <label className="admin-form-field">
                         <span>Status</span>
                         <select
-                          className="form-select"
                           value={draft.status}
                           onChange={(event) =>
                             updateApplicationDraft(application._id, 'status', event.target.value)
@@ -711,11 +640,10 @@ const EmployerDashboard = () => {
 
                       {!isRejected ? (
                         <>
-                          <label className="dashboard-field">
+                          <label className="admin-form-field">
                             <span>Interview Date</span>
                             <input
                               type="date"
-                              className="form-control"
                               value={draft.interviewDate}
                               onChange={(event) =>
                                 updateApplicationDraft(
@@ -727,11 +655,10 @@ const EmployerDashboard = () => {
                             />
                           </label>
 
-                          <label className="dashboard-field">
+                          <label className="admin-form-field">
                             <span>Interview Time</span>
                             <input
                               type="text"
-                              className="form-control"
                               placeholder="10:30 AM"
                               value={draft.interviewTime}
                               onChange={(event) =>
@@ -744,11 +671,10 @@ const EmployerDashboard = () => {
                             />
                           </label>
 
-                          <label className="dashboard-field">
+                          <label className="admin-form-field">
                             <span>Mode / Location</span>
                             <input
                               type="text"
-                              className="form-control"
                               placeholder="Google Meet or office address"
                               value={draft.interviewMode}
                               onChange={(event) =>
@@ -763,10 +689,9 @@ const EmployerDashboard = () => {
                         </>
                       ) : null}
 
-                      <label className="dashboard-field application-message-field">
+                      <label className="admin-form-field employer-message-field">
                         <span>Message to Candidate</span>
                         <textarea
-                          className="form-control"
                           rows="3"
                           value={draft.employerMessage}
                           placeholder={
@@ -785,10 +710,10 @@ const EmployerDashboard = () => {
                       </label>
                     </div>
 
-                    <div className="dashboard-form-actions">
+                    <div className="employer-application-footer">
                       <button
                         type="button"
-                        className="primary-btn"
+                        className="admin-primary-btn"
                         onClick={() => saveApplication(application)}
                       >
                         Save Application
@@ -801,7 +726,7 @@ const EmployerDashboard = () => {
           )}
         </section>
       </div>
-    </div>
+    </EmployerLayout>
   );
 };
 

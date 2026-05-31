@@ -590,15 +590,17 @@ const Footer = () => {
 const AppContent = () => {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
+  const isEmployerRoute = location.pathname.startsWith('/employer');
+  const isPortalRoute = isAdminRoute || isEmployerRoute;
 
 
   return (
 
-    <div className={`app-wrapper ${isAdminRoute ? 'admin-app-wrapper' : ''}`}>
+    <div className={`app-wrapper ${isPortalRoute ? 'admin-app-wrapper' : ''}`}>
 
-      {!isAdminRoute && <Navigation />}
+      {!isPortalRoute && <Navigation />}
 
-      <main className={`main-content ${isAdminRoute ? 'admin-main-content' : ''}`}>
+      <main className={`main-content ${isPortalRoute ? 'admin-main-content' : ''}`}>
 
         <Routes>
 
@@ -725,7 +727,7 @@ const AppContent = () => {
 
       </main>
 
-      {!isAdminRoute && <Footer />}
+      {!isPortalRoute && <Footer />}
 
     </div>
   );

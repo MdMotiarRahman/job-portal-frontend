@@ -541,3 +541,207 @@ textarea.form-control:focus {
     max-width: none;
   }
 }
+
+/* ADMIN-STYLE EMPLOYER PORTAL */
+.employer-sidebar-logo {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  text-align: left;
+}
+
+.employer-admin-page .admin-header-card,
+.employer-admin-page .admin-section,
+.employer-admin-page .admin-stat-card {
+  background: #ffffff;
+  border: 1px solid #d7dde5;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.employer-admin-page .admin-header-card,
+.employer-admin-page .admin-section {
+  border-radius: 14px;
+}
+
+.employer-admin-page .admin-header h1 {
+  color: #111827;
+  font-size: 2rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+.employer-admin-page .admin-stat-value {
+  color: #111827;
+  -webkit-text-fill-color: currentColor;
+  background: none;
+}
+
+.employer-admin-page .admin-stat-card h3 {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #111827;
+}
+
+.employer-admin-page .admin-refresh-btn,
+.employer-admin-page .admin-action-btn,
+.employer-admin-page .admin-primary-btn,
+.employer-admin-page .admin-select,
+.employer-admin-page .admin-form-field input,
+.employer-admin-page .admin-form-field select,
+.employer-admin-page .admin-form-field textarea {
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+.employer-admin-page .admin-refresh-btn,
+.employer-admin-page .admin-action-btn {
+  background: #ffffff;
+  border: 1px solid #cfd6df;
+  color: #1f2937;
+}
+
+.employer-admin-page .admin-refresh-btn:hover,
+.employer-admin-page .admin-action-btn:hover {
+  background: #f8fafc;
+  box-shadow: none;
+  transform: none;
+}
+
+.employer-admin-page .admin-primary-btn {
+  background: #1f2937;
+  color: #ffffff;
+  border: 1px solid #1f2937;
+}
+
+.employer-admin-page .admin-primary-btn:hover {
+  background: #111827;
+  box-shadow: none;
+  transform: none;
+}
+
+.employer-admin-page .admin-table th {
+  background: #f8fafc;
+  color: #111827;
+  border-bottom: 1px solid #d7dde5;
+}
+
+.employer-admin-page .admin-table td {
+  color: #374151;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.employer-admin-table .admin-muted-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.employer-admin-filter {
+  min-width: 240px;
+}
+
+.admin-empty-state {
+  display: grid;
+  place-items: center;
+  min-height: 180px;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.employer-application-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.employer-application-card {
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.employer-application-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.employer-application-head h3 {
+  margin: 0;
+  color: #111827;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.employer-application-head p {
+  margin: 4px 0;
+  color: #4b5563;
+  font-size: 0.9rem;
+}
+
+.employer-application-head span {
+  color: #6b7280;
+  font-size: 0.82rem;
+}
+
+.employer-cover-letter {
+  margin: 14px 0 8px;
+  color: #374151;
+  line-height: 1.6;
+}
+
+.employer-resume-link {
+  display: inline-flex;
+  margin-bottom: 12px;
+  color: #1d4ed8;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.employer-resume-link:hover {
+  color: #1e40af;
+  text-decoration: underline;
+}
+
+.employer-application-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.employer-message-field {
+  grid-column: 1 / -1;
+}
+
+.employer-application-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid #e5e7eb;
+}
+
+@media (max-width: 768px) {
+  .employer-admin-page .admin-header h1 {
+    font-size: 1.6rem;
+  }
+
+  .employer-admin-filter {
+    width: 100%;
+  }
+
+  .employer-application-head,
+  .employer-application-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .employer-application-actions {
+    grid-template-columns: 1fr;
+  }
+}
