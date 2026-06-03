@@ -28,6 +28,8 @@ import './App.css';
 import HomePage from './components/Home';
 import Login from './components/Login';
 import Register from './components/Register';
+import SessionWarningModal from './components/SessionWarningModal';
+import { SessionProvider } from './context/SessionContext';
 
 import AdminDashboard from './components/AdminDashboard';
 import AdminJobManagement from './components/AdminJobManagement';
@@ -598,6 +600,8 @@ const AppContent = () => {
 
     <div className={`app-wrapper ${isPortalRoute ? 'admin-app-wrapper' : ''}`}>
 
+      <SessionWarningModal />
+
       {!isPortalRoute && <Navigation />}
 
       <main className={`main-content ${isPortalRoute ? 'admin-main-content' : ''}`}>
@@ -777,12 +781,11 @@ const AppContent = () => {
 const App = () => {
   return (
     <Router>
-      <AppContent />
-
+      <SessionProvider>
+        <AppContent />
+      </SessionProvider>
     </Router>
-
   );
-
 };
 
 export default App;

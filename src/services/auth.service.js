@@ -126,6 +126,11 @@ const logout = () => {
     'user'
   );
 
+  // Clear session tracking data
+  localStorage.removeItem('sessionLastActivity');
+  localStorage.removeItem('sessionExpired');
+  sessionStorage.removeItem('sessionExpired');
+
   window.dispatchEvent(
     new Event(
       AUTH_EVENT_LOGOUT

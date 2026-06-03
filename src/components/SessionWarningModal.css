@@ -1,0 +1,164 @@
+.session-warning-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.session-warning-modal {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  max-width: 450px;
+  width: 90%;
+  padding: 32px;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.warning-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.warning-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.warning-icon {
+  color: #e74c3c;
+  flex-shrink: 0;
+}
+
+.warning-content {
+  margin-bottom: 24px;
+}
+
+.warning-content p {
+  margin: 0 0 16px 0;
+  color: #555;
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.warning-content p:last-child {
+  margin-bottom: 0;
+}
+
+.remaining-time {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 16px 0;
+  color: #856404;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.remaining-time svg {
+  color: #ff9800;
+  flex-shrink: 0;
+}
+
+.warning-message {
+  font-size: 13px;
+  color: #666;
+  background-color: #f8f9fa;
+  padding: 12px;
+  border-left: 3px solid #e74c3c;
+  border-radius: 4px;
+}
+
+.warning-actions {
+  display: flex;
+  gap: 12px;
+  flex-direction: row-reverse;
+}
+
+.btn-stay-logged-in,
+.btn-logout {
+  flex: 1;
+  padding: 11px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-stay-logged-in {
+  background-color: #27ae60;
+  color: white;
+}
+
+.btn-stay-logged-in:hover {
+  background-color: #229954;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+}
+
+.btn-logout {
+  background-color: #ecf0f1;
+  color: #2c3e50;
+}
+
+.btn-logout:hover {
+  background-color: #d5dbdb;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 576px) {
+  .session-warning-modal {
+    width: 95%;
+    padding: 24px;
+  }
+
+  .warning-header h2 {
+    font-size: 18px;
+  }
+
+  .warning-actions {
+    flex-direction: column;
+  }
+
+  .btn-stay-logged-in,
+  .btn-logout {
+    width: 100%;
+  }
+}

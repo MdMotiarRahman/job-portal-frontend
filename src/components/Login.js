@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Briefcase, Mail, Lock, AlertCircle, ArrowRight, Loader2, Clock, XCircle } from 'lucide-react';
 import authService from '../services/auth.service';
 import '../styles/auth.css';
@@ -9,10 +9,21 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
   const [apiError, setApiError] = useState('');
+  const [sessionExpiredMessage, setSessionExpiredMessage] = useState('');
   const [verificationWarning, setVerificationWarning] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const firstErrorRef = useRef(null);
+
+  useEffect(() => {
+    // Check if user was redirected due to session expiry
+    const sessionExpired = sessionStorage.getItem('sessionExpired');
+    if (sessionExpired) {
+      setSessionExpiredMessage('Your session has expired. Please login again.');
+      sessionStorage.removeItem('sessionExpired');
+    }
+  }, []);
 
   const validateForm = () => {
     const newErrors = {};
@@ -47,6 +58,10 @@ const Login = () => {
     try {
       const response = await authService.login(email, password);
       const role = authService.getCurrentUserRole();
+      
+      // Clear session expired flag on successful login
+      sessionStorage.removeItem('sessionExpired');
+      localStorage.removeItem('sessionExpired');
       
       // Check for employer verification status
       if (role === 'employer') {
@@ -94,6 +109,13 @@ const Login = () => {
           <div className="alert alert-error" role="alert" ref={firstErrorRef} tabIndex="-1">
             <AlertCircle size={18} className="alert-icon" />
             <div className="alert-content">{apiError}</div>
+          </div>
+        )}
+
+        {sessionExpiredMessage && (
+          <div className="alert alert-warning" role="alert">
+            <Clock size={18} className="alert-icon" />
+            <div className="alert-content">{sessionExpiredMessage}</div>
           </div>
         )}
 
