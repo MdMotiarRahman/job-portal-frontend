@@ -11,6 +11,7 @@ import {
   X,
 } from 'lucide-react';
 import authService from '../services/auth.service';
+import ReminderBell from './ReminderBell';
 import '../styles/adminSidebar.css';
 
 const menuItems = [
@@ -64,14 +65,17 @@ const EmployerSidebar = ({ isOpen, setIsOpen }) => {
             <Building2 className="admin-logo-icon" size={24} strokeWidth={1.5} />
             <span className="admin-logo-text">Employer Portal</span>
           </button>
-          <button
-            className="admin-sidebar-close"
-            onClick={() => setIsOpen(false)}
-            aria-label="Close sidebar"
-            type="button"
-          >
-            <X size={20} />
-          </button>
+          <div className="admin-sidebar-header-actions">
+            <ReminderBell />
+            <button
+              className="admin-sidebar-close"
+              onClick={() => setIsOpen(false)}
+              aria-label="Close sidebar"
+              type="button"
+            >
+              <X size={20} />
+            </button>
+          </div>
         </div>
 
         <nav className="admin-sidebar-nav" role="navigation">

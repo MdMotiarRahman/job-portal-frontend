@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 
 import AdminLayout from './AdminLayout';
+import ReminderWidget from './ReminderWidget';
 import {
   approveJob,
   closeJob,
@@ -219,6 +220,15 @@ const AdminDashboard = () => {
               <FileText size={18} /> Total Applications
             </h3>
             <p className="admin-stat-value">{stats?.applications?.total ?? 0}</p>
+          </div>
+        </section>
+
+        <section className="admin-section">
+          <div className="dashboard-card">
+            <ReminderWidget 
+              title="System Reminders" 
+              limit={5}
+            />
           </div>
         </section>
 

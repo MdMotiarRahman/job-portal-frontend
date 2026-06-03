@@ -15,6 +15,7 @@ import {
   X,
 } from 'lucide-react';
 import EmployerLayout from './EmployerLayout';
+import ReminderWidget from './ReminderWidget';
 import employerService from '../services/employer.service';
 import '../styles/adminDashboard.css';
 import '../styles/dashboard.css';
@@ -752,6 +753,15 @@ const EmployerDashboard = ({ page = 'overview' }) => {
       content: (
         <>
           {renderStats()}
+          <section className="admin-section">
+            <div className="section-card">
+              <ReminderWidget 
+                title="New Applications" 
+                filterType="new-application"
+                limit={3}
+              />
+            </div>
+          </section>
           {renderJobsTable(5)}
           {renderApplications(3)}
         </>

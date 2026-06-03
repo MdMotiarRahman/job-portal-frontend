@@ -14,6 +14,7 @@ import {
   Building2,
   X,
 } from 'lucide-react';
+import ReminderBell from './ReminderBell';
 import '../styles/adminSidebar.css';
 
 const AdminSidebar = ({ isOpen, setIsOpen }) => {
@@ -178,13 +179,16 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
             <Building2 className="admin-logo-icon" size={24} strokeWidth={1.5} />
             <span className="admin-logo-text">JobPortal</span>
           </div>
-          <button
-            className="admin-sidebar-close"
-            onClick={() => setIsOpen(false)}
-            aria-label="Close sidebar"
-          >
-            <X size={20} />
-          </button>
+          <div className="admin-sidebar-header-actions">
+            <ReminderBell />
+            <button
+              className="admin-sidebar-close"
+              onClick={() => setIsOpen(false)}
+              aria-label="Close sidebar"
+            >
+              <X size={20} />
+            </button>
+          </div>
         </div>
 
         {/* Main Navigation */}

@@ -42,6 +42,7 @@ import SeekerProfile from './pages/SeekerProfile';
 import ApplyJob from './pages/ApplyJob';
 import Jobs from './pages/Jobs';
 import MyApplications from './pages/MyApplications';
+import ReminderCenter from './components/ReminderCenter';
 
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -633,6 +634,17 @@ const AppContent = () => {
           <Route
             path="/jobs"
             element={<Jobs />}
+          />
+
+          {/* REMINDERS - ACCESSIBLE TO ALL AUTHENTICATED USERS */}
+
+          <Route
+            path="/reminders"
+            element={
+              <ProtectedRoute allowedRoles={['admin', 'employer', 'seeker']}>
+                <ReminderCenter />
+              </ProtectedRoute>
+            }
           />
 
           {/* ADMIN */}

@@ -19,6 +19,8 @@ import {
   getMyApplications,
 } from '../services/seekerService';
 
+import ReminderWidget from './ReminderWidget';
+
 import '../styles/seekerDashboard.css';
 
 const SeekerDashboard = () => {
@@ -229,6 +231,16 @@ const SeekerDashboard = () => {
         </div>
 
       )}
+
+      {/* IMPORTANT UPDATES WIDGET */}
+      <div className="dashboard-section" style={{ marginTop: '24px' }}>
+        <div className="section-card">
+          <ReminderWidget 
+            title="Important Updates" 
+            limit={4}
+          />
+        </div>
+      </div>
 
       {/* AVAILABLE JOBS */}
       <div className="applications-section">

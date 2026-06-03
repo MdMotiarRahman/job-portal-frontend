@@ -84,6 +84,12 @@
   flex-shrink: 0;
 }
 
+.admin-sidebar-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .admin-sidebar-logo {
   display: flex;
   align-items: center;
