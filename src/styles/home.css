@@ -259,6 +259,23 @@
   white-space: nowrap;
 }
 
+.snapshot-state {
+  padding: 18px 12px;
+  color: #647084;
+  background: #f5f7fb;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.snapshot-state.error {
+  color: #9f1239;
+  background: #fff1f2;
+  border-color: #fecdd3;
+}
+
 .home-section {
   padding: 58px 0;
 }

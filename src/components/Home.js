@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight,
@@ -12,31 +12,8 @@ import {
   ShieldCheck,
   Users,
 } from 'lucide-react';
+import { getPublicJobSnapshot } from '../services/jobService';
 import '../styles/home.css';
-
-const featuredJobs = [
-  {
-    title: 'Frontend Engineer',
-    company: 'Product Studio',
-    location: 'Remote',
-    meta: 'Full time',
-    salary: '$85k - $120k',
-  },
-  {
-    title: 'Talent Acquisition Lead',
-    company: 'GrowthWorks',
-    location: 'Hybrid',
-    meta: 'People Ops',
-    salary: '$70k - $96k',
-  },
-  {
-    title: 'Financial Analyst',
-    company: 'Northline Capital',
-    location: 'On-site',
-    meta: 'Finance',
-    salary: '$62k - $88k',
-  },
-];
 
 const categories = [
   ['Engineering', '1,240 open roles'],
@@ -47,7 +24,89 @@ const categories = [
   ['Customer Success', '390 open roles'],
 ];
 
+const formatCompactNumber = (value) => {
+  const number = Number(value) || 0;
+
+  if (number >= 1000) {
+    return `${(number / 1000).toFixed(number >= 10000 ? 0 : 1)}k`;
+  }
+
+  return number.toLocaleString();
+};
+
+const formatSalary = (salary) => {
+  if (!salary?.min && !salary?.max) {
+    return 'Salary open';
+  }
+
+  const currency = salary.currency || 'USD';
+  const min = salary.min ? Number(salary.min).toLocaleString() : 'Open';
+  const max = salary.max ? Number(salary.max).toLocaleString() : 'Open';
+
+  return `${currency} ${min} - ${max}`;
+};
+
+const getCompanyName = (company) => {
+  if (!company) return 'Verified employer';
+  return company.name || company.email || 'Verified employer';
+};
+
 const Home = () => {
+  const [snapshot, setSnapshot] = useState({
+    metrics: {
+      openJobs: 0,
+      employers: 0,
+      recentApplications: 0,
+    },
+    featuredJobs: [],
+  });
+  const [snapshotLoading, setSnapshotLoading] = useState(true);
+  const [snapshotError, setSnapshotError] = useState('');
+
+  useEffect(() => {
+    const loadSnapshot = async () => {
+      setSnapshotLoading(true);
+      setSnapshotError('');
+
+      try {
+        const response = await getPublicJobSnapshot();
+        setSnapshot({
+          metrics: response.data.metrics || {
+            openJobs: 0,
+            employers: 0,
+            recentApplications: 0,
+          },
+          featuredJobs: response.data.featuredJobs || [],
+        });
+      } catch (error) {
+        setSnapshotError(
+          error.response?.data?.message || 'Live snapshot unavailable'
+        );
+      } finally {
+        setSnapshotLoading(false);
+      }
+    };
+
+    loadSnapshot();
+  }, []);
+
+  const metrics = useMemo(() => {
+    return [
+      {
+        value: formatCompactNumber(snapshot.metrics.openJobs),
+        label: 'Open jobs',
+      },
+      {
+        value: formatCompactNumber(snapshot.metrics.employers),
+        label: 'Employers',
+      },
+      {
+        value: formatCompactNumber(snapshot.metrics.recentApplications),
+        label: 'Applications / 30d',
+      },
+    ];
+  }, [snapshot.metrics]);
+
   return (
     <div className="home-page">
       <section className="home-hero">
@@ -102,31 +161,37 @@ const Home = () => {
               </div>
 
               <div className="snapshot-metrics">
-                <div>
-                  <strong>10.4k</strong>
-                  <span>Open jobs</span>
-                </div>
-                <div>
-                  <strong>3.8k</strong>
-                  <span>Employers</span>
-                </div>
-                <div>
-                  <strong>24h</strong>
-                  <span>Avg response</span>
-                </div>
+                {metrics.map((metric) => (
+                  <div key={metric.label}>
+                    <strong>{snapshotLoading ? '-' : metric.value}</strong>
+                    <span>{metric.label}</span>
+                  </div>
+                ))}
               </div>
 
               <div className="snapshot-list">
-                {featuredJobs.map((job) => (
-                  <Link to="/jobs" className="snapshot-job" key={job.title}>
+                {snapshotLoading && (
+                  <div className="snapshot-state">Loading live jobs...</div>
+                )}
+
+                {!snapshotLoading && snapshotError && (
+                  <div className="snapshot-state error">{snapshotError}</div>
+                )}
+
+                {!snapshotLoading && !snapshotError && snapshot.featuredJobs.length === 0 && (
+                  <div className="snapshot-state">No active jobs found yet.</div>
+                )}
+
+                {!snapshotLoading && !snapshotError && snapshot.featuredJobs.map((job) => (
+                  <Link to="/jobs" className="snapshot-job" key={job._id || job.title}>
                     <div className="job-icon">
                       <BriefcaseBusiness size={18} />
                     </div>
                     <div>
                       <h3>{job.title}</h3>
-                      <p>{job.company} · {job.location}</p>
+                      <p>{getCompanyName(job.company)} - {job.location}</p>
                     </div>
-                    <span>{job.salary}</span>
+                    <span>{formatSalary(job.salary)}</span>
                   </Link>
                 ))}
               </div>
