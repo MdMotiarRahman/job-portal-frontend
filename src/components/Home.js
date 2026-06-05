@@ -1,180 +1,205 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import {
+  ArrowRight,
+  BriefcaseBusiness,
+  Building2,
+  CheckCircle2,
+  Clock3,
+  LineChart,
+  MapPin,
+  Search,
+  ShieldCheck,
+  Users,
+} from 'lucide-react';
 import '../styles/home.css';
+
+const featuredJobs = [
+  {
+    title: 'Frontend Engineer',
+    company: 'Product Studio',
+    location: 'Remote',
+    meta: 'Full time',
+    salary: '$85k - $120k',
+  },
+  {
+    title: 'Talent Acquisition Lead',
+    company: 'GrowthWorks',
+    location: 'Hybrid',
+    meta: 'People Ops',
+    salary: '$70k - $96k',
+  },
+  {
+    title: 'Financial Analyst',
+    company: 'Northline Capital',
+    location: 'On-site',
+    meta: 'Finance',
+    salary: '$62k - $88k',
+  },
+];
+
+const categories = [
+  ['Engineering', '1,240 open roles'],
+  ['Operations', '680 open roles'],
+  ['Design', '410 open roles'],
+  ['Marketing', '735 open roles'],
+  ['Finance', '520 open roles'],
+  ['Customer Success', '390 open roles'],
+];
 
 const Home = () => {
   return (
     <div className="home-page">
+      <section className="home-hero">
+        <div className="home-hero-overlay">
+          <div className="home-container hero-grid">
+            <div className="hero-copy">
+              <div className="hero-kicker">
+                <ShieldCheck size={16} />
+                Verified companies, cleaner applications
+              </div>
 
-      {/* HERO SECTION */}
-      <section className="hero-section">
+              <h1>JobPortal</h1>
 
-        <div className="hero-content">
+              <p className="hero-lead">
+                A focused hiring workspace for candidates who want relevant roles
+                and employers who want organized pipelines.
+              </p>
 
-          <p className="hero-subtitle">
-            #1 Smart Hiring Platform
-          </p>
+              <div className="job-search-panel" aria-label="Job search">
+                <div className="search-field">
+                  <Search size={18} />
+                  <span>Role, skill, or company</span>
+                </div>
+                <div className="search-field">
+                  <MapPin size={18} />
+                  <span>Remote, hybrid, or city</span>
+                </div>
+                <Link to="/jobs" className="search-submit">
+                  Search
+                  <ArrowRight size={16} />
+                </Link>
+              </div>
 
-          <h1 className="hero-title">
-            Find Your <span>Dream</span> Job Today
-          </h1>
+              <div className="hero-actions">
+                <Link to="/jobs" className="home-btn home-btn-primary">
+                  Browse jobs
+                  <ArrowRight size={16} />
+                </Link>
+                <Link to="/register" className="home-btn home-btn-secondary">
+                  Create account
+                </Link>
+              </div>
+            </div>
 
-          <p className="hero-description">
-            Connect with top companies and discover opportunities
-            that match your skills, passion, and career goals.
-          </p>
+            <div className="market-snapshot" aria-label="Hiring market snapshot">
+              <div className="snapshot-header">
+                <div>
+                  <span className="eyebrow">Today</span>
+                  <h2>Active pipeline</h2>
+                </div>
+                <LineChart size={22} />
+              </div>
 
-          <div className="hero-buttons">
+              <div className="snapshot-metrics">
+                <div>
+                  <strong>10.4k</strong>
+                  <span>Open jobs</span>
+                </div>
+                <div>
+                  <strong>3.8k</strong>
+                  <span>Employers</span>
+                </div>
+                <div>
+                  <strong>24h</strong>
+                  <span>Avg response</span>
+                </div>
+              </div>
 
-            <Link to="/register" className="hero-btn primary">
-              Get Started
+              <div className="snapshot-list">
+                {featuredJobs.map((job) => (
+                  <Link to="/jobs" className="snapshot-job" key={job.title}>
+                    <div className="job-icon">
+                      <BriefcaseBusiness size={18} />
+                    </div>
+                    <div>
+                      <h3>{job.title}</h3>
+                      <p>{job.company} · {job.location}</p>
+                    </div>
+                    <span>{job.salary}</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="home-section compact-band">
+        <div className="home-container trust-row">
+          <div>
+            <span className="eyebrow">Built for signal</span>
+            <h2>Less scrolling, better decisions.</h2>
+          </div>
+          <div className="trust-points">
+            <span><CheckCircle2 size={16} /> Verified job posts</span>
+            <span><Clock3 size={16} /> Application tracking</span>
+            <span><Users size={16} /> Role-based dashboards</span>
+          </div>
+        </div>
+      </section>
+
+      <section className="home-section">
+        <div className="home-container split-section">
+          <div className="section-heading">
+            <span className="eyebrow">Explore roles</span>
+            <h2>Popular categories</h2>
+            <p>
+              Jump into the areas candidates search most often, with job counts
+              kept visible for quick scanning.
+            </p>
+          </div>
+
+          <div className="category-grid">
+            {categories.map(([name, count]) => (
+              <Link to="/jobs" className="category-tile" key={name}>
+                <span>{name}</span>
+                <small>{count}</small>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="home-section muted-section">
+        <div className="home-container audience-grid">
+          <div className="audience-panel">
+            <Building2 size={24} />
+            <h2>For employers</h2>
+            <p>
+              Post roles, review applications, and keep candidate movement clear
+              from a dedicated employer dashboard.
+            </p>
+            <Link to="/register">
+              Start hiring
+              <ArrowRight size={16} />
             </Link>
+          </div>
 
-            <Link to="/jobs" className="hero-btn secondary">
-              Explore Jobs
+          <div className="audience-panel">
+            <Users size={24} />
+            <h2>For candidates</h2>
+            <p>
+              Find relevant jobs, manage applications, and keep your profile ready
+              for the next opportunity.
+            </p>
+            <Link to="/jobs">
+              Find roles
+              <ArrowRight size={16} />
             </Link>
-
           </div>
-
         </div>
-
-        {/* RIGHT SIDE JOB CARDS */}
-        <div className="hero-right">
-
-          <div className="jobs-preview">
-
-            <div className="job-card-preview">
-              <h3>Software Engineer</h3>
-              <p>Google • Remote</p>
-              <span className="job-tag">Full Time</span>
-            </div>
-
-            <div className="job-card-preview">
-              <h3>Marketing Manager</h3>
-              <p>Spotify • Hybrid</p>
-              <span className="job-tag">Marketing</span>
-            </div>
-
-            <div className="job-card-preview">
-              <h3>Financial Analyst</h3>
-              <p>JP Morgan • Onsite</p>
-              <span className="job-tag">Finance</span>
-            </div>
-
-          </div>
-
-        </div>
-
       </section>
-
-      {/* COMPANIES */}
-      <section className="companies-section">
-
-        <p className="section-small-title">
-          Trusted by innovative companies
-        </p>
-
-        <div className="companies-grid">
-
-          <div className="company-box">Google</div>
-          <div className="company-box">Microsoft</div>
-          <div className="company-box">Amazon</div>
-          <div className="company-box">Spotify</div>
-          <div className="company-box">Netflix</div>
-
-        </div>
-
-      </section>
-
-      {/* STATS */}
-      <section className="stats-section">
-
-        <div className="stats-grid">
-
-          <div className="stat-card">
-            <h2>10K+</h2>
-            <p>Active Jobs</p>
-          </div>
-
-          <div className="stat-card">
-            <h2>5K+</h2>
-            <p>Companies</p>
-          </div>
-
-          <div className="stat-card">
-            <h2>20K+</h2>
-            <p>Candidates</p>
-          </div>
-
-          <div className="stat-card">
-            <h2>95%</h2>
-            <p>Success Rate</p>
-          </div>
-
-        </div>
-
-      </section>
-
-      {/* CATEGORIES */}
-      <section className="categories-section">
-
-        <h2 className="categories-title">
-          Popular Categories
-        </h2>
-
-        <div className="categories-grid">
-
-          <div className="category-card">
-            <h3>Technology</h3>
-            <p>1200+ Jobs</p>
-          </div>
-
-          <div className="category-card">
-            <h3>Marketing</h3>
-            <p>850+ Jobs</p>
-          </div>
-
-          <div className="category-card">
-            <h3>Finance</h3>
-            <p>620+ Jobs</p>
-          </div>
-
-          <div className="category-card">
-            <h3>Healthcare</h3>
-            <p>930+ Jobs</p>
-          </div>
-
-          <div className="category-card">
-            <h3>Design</h3>
-            <p>430+ Jobs</p>
-          </div>
-
-          <div className="category-card">
-            <h3>Sales</h3>
-            <p>700+ Jobs</p>
-          </div>
-
-        </div>
-
-      </section>
-
-      {/* CTA */}
-      <section className="cta-section">
-
-        <h2>
-          Start Building Your Career Today
-        </h2>
-
-        <p>
-          Join thousands of professionals and companies using JobPortal.
-        </p>
-
-        <Link to="/register" className="cta-btn">
-          Join Now
-        </Link>
-
-      </section>
-
     </div>
   );
 };
