@@ -659,8 +659,9 @@ const AppContent = () => {
             element={<Navigate to="/admin/dashboard" replace />}
           />
 
+          <Route path="/admin/jobs" element={<Navigate to="/admin/jobs/all" replace />} />
           <Route
-            path="/admin/jobs"
+            path="/admin/jobs/:filter"
             element={
               <ProtectedRoute allowedRoles={['admin']}>
                 <AdminJobManagement />
@@ -668,8 +669,9 @@ const AppContent = () => {
             }
           />
 
+          <Route path="/admin/applications" element={<Navigate to="/admin/applications/all" replace />} />
           <Route
-            path="/admin/applications"
+            path="/admin/applications/:filter"
             element={
               <ProtectedRoute allowedRoles={['admin']}>
                 <AdminApplicationManagement />
@@ -677,8 +679,9 @@ const AppContent = () => {
             }
           />
 
+          <Route path="/admin/employers" element={<Navigate to="/admin/employers/all" replace />} />
           <Route
-            path="/admin/employers"
+            path="/admin/employers/:filter"
             element={
               <ProtectedRoute allowedRoles={['admin']}>
                 <AdminEmployerManagement />
@@ -686,8 +689,9 @@ const AppContent = () => {
             }
           />
 
+          <Route path="/admin/users" element={<Navigate to="/admin/users/all" replace />} />
           <Route
-            path="/admin/users"
+            path="/admin/users/:filter"
             element={
               <ProtectedRoute allowedRoles={['admin']}>
                 <AdminUserManagement />

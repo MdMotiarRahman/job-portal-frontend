@@ -2,9 +2,10 @@
 
 .ats-board-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: #f9fafb;
   padding: 20px;
 }
+
 
 .ats-board-header {
   display: flex;
@@ -49,9 +50,10 @@
 }
 
 .ats-btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--gradient-secondary);
   color: white;
 }
+
 
 .ats-btn-primary:hover {
   transform: translateY(-2px);

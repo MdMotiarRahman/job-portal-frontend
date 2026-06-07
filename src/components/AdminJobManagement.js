@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Briefcase, Edit3, Plus, RefreshCw, Search, Trash2, X } from 'lucide-react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Briefcase, Edit3, Plus, RefreshCw, Search, Trash2, X, Clock, CheckCircle2, Ban, Lock, PauseCircle } from 'lucide-react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import AdminLayout from './AdminLayout';
 import {
   approveJob,
@@ -33,20 +33,6 @@ const emptyForm = {
   approvalNotes: '',
 };
 
-const statusOptions = [
-  { value: '', label: 'All Jobs' },
-  { value: 'pending', label: 'Pending Approval' },
-  { value: 'approved', label: 'Approved Jobs' },
-  { value: 'rejected', label: 'Rejected Jobs' },
-  { value: 'inactive', label: 'Inactive Jobs' },
-  { value: 'closed', label: 'Closed Jobs' },
-];
-
-const getInitialFilter = (search) => {
-  const params = new URLSearchParams(search);
-  return params.get('status') || '';
-};
-
 const formatSalary = (salary) => {
   if (!salary?.min && !salary?.max) {
     return 'Not listed';
@@ -59,18 +45,19 @@ const formatSalary = (salary) => {
 };
 
 const AdminJobManagement = () => {
-  const location = useLocation();
   const navigate = useNavigate();
+  const { filter } = useParams();
+  const currentTab = filter || 'all';
+
   const [jobs, setJobs] = useState([]);
   const [employers, setEmployers] = useState([]);
   const [pagination, setPagination] = useState({ total: 0, page: 1, pages: 1 });
-  const [filterStatus, setFilterStatus] = useState(getInitialFilter(location.search));
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [isFormOpen, setIsFormOpen] = useState(true);
+  const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingJob, setEditingJob] = useState(null);
   const [form, setForm] = useState(emptyForm);
 
@@ -82,19 +69,21 @@ const AdminJobManagement = () => {
 
     if (searchTerm.trim()) params.search = searchTerm.trim();
 
-    if (filterStatus === 'pending') {
+    if (currentTab === 'pending') {
       params.isApproved = false;
-    } else if (filterStatus === 'approved') {
+    } else if (currentTab === 'approved') {
       params.isApproved = true;
-    } else if (filterStatus === 'rejected') {
+    } else if (currentTab === 'rejected') {
       params.status = 'inactive';
       params.isApproved = false;
-    } else if (filterStatus) {
-      params.status = filterStatus;
+    } else if (currentTab === 'inactive') {
+      params.status = 'inactive';
+    } else if (currentTab === 'closed') {
+      params.status = 'closed';
     }
 
     return params;
-  }, [filterStatus, pagination.page, searchTerm]);
+  }, [currentTab, pagination.page, searchTerm]);
 
   const loadEmployers = useCallback(async () => {
     const response = await getUsers({ role: 'employer', limit: 100, page: 1 });
@@ -115,10 +104,6 @@ const AdminJobManagement = () => {
       setLoading(false);
     }
   }, [queryParams]);
-
-  useEffect(() => {
-    setFilterStatus(getInitialFilter(location.search));
-  }, [location.search]);
 
   useEffect(() => {
     loadEmployers().catch((err) => {
@@ -185,13 +170,6 @@ const AdminJobManagement = () => {
       ...currentForm,
       [name]: type === 'checkbox' ? checked : value,
     }));
-  };
-
-  const handleFilterChange = (event) => {
-    const nextStatus = event.target.value;
-    setPagination((currentPagination) => ({ ...currentPagination, page: 1 }));
-    setFilterStatus(nextStatus);
-    navigate(nextStatus ? `/admin/jobs?status=${nextStatus}` : '/admin/jobs', { replace: true });
   };
 
   const handleSearchSubmit = (event) => {
@@ -281,6 +259,15 @@ const AdminJobManagement = () => {
     setSuccess('Job deleted successfully.');
     await loadJobs();
   };
+
+  const tabs = [
+    { id: 'all', label: 'All Jobs', icon: <Briefcase size={16} /> },
+    { id: 'pending', label: 'Pending Approval', icon: <Clock size={16} /> },
+    { id: 'approved', label: 'Approved', icon: <CheckCircle2 size={16} /> },
+    { id: 'rejected', label: 'Rejected', icon: <Ban size={16} /> },
+    { id: 'inactive', label: 'Inactive', icon: <PauseCircle size={16} /> },
+    { id: 'closed', label: 'Closed', icon: <Lock size={16} /> },
+  ];
 
   return (
     <AdminLayout>
@@ -449,9 +436,28 @@ const AdminJobManagement = () => {
           </section>
         ) : null}
 
+        <div className="admin-tabs">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              className={`admin-tab ${currentTab === tab.id ? 'active' : ''}`}
+              onClick={() => {
+                setPagination((curr) => ({ ...curr, page: 1 }));
+                navigate(`/admin/jobs/${tab.id}`);
+              }}
+            >
+              <span className="admin-tab-icon">{tab.icon}</span>
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
         <section className="admin-section">
           <div className="admin-section-heading-row">
-            <h2 className="admin-section-title">All Jobs</h2>
+            <h2 className="admin-section-title">
+              <Briefcase size={18} />
+              {tabs.find((t) => t.id === currentTab)?.label || 'All Jobs'}
+            </h2>
             <form className="admin-filter-row" onSubmit={handleSearchSubmit}>
               <div className="admin-search-field">
                 <Search size={16} />
@@ -461,13 +467,6 @@ const AdminJobManagement = () => {
                   placeholder="Search title, location, description"
                 />
               </div>
-              <select className="admin-select" value={filterStatus} onChange={handleFilterChange}>
-                {statusOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
               <button className="admin-refresh-btn" type="submit">
                 Search
               </button>

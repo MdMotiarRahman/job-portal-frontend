@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   AlertCircle,
   CheckCircle2,
@@ -8,18 +9,11 @@ import {
   ShieldX,
   UserRound,
   X,
+  Users
 } from 'lucide-react';
 import AdminLayout from './AdminLayout';
 import { deleteUser, getUsers, updateUserStatus, verifyUser } from '../services/adminService';
 import '../styles/adminDashboard.css';
-
-const statusFilterOptions = [
-  { value: '', label: 'All statuses' },
-  { value: 'active', label: 'Active' },
-  { value: 'inactive', label: 'Inactive' },
-  { value: 'banned', label: 'Banned' },
-  { value: 'pending', label: 'Pending Verification' },
-];
 
 const roleOptions = [
   { value: '', label: 'All roles' },
@@ -29,12 +23,15 @@ const roleOptions = [
 ];
 
 const AdminUserManagement = () => {
+  const navigate = useNavigate();
+  const { filter } = useParams();
+  const currentTab = filter || 'all';
+
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState([]);
   const [pagination, setPagination] = useState({ total: 0, page: 1, pages: 1 });
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [status, setStatus] = useState('');
   const [role, setRole] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -66,9 +63,10 @@ const AdminUserManagement = () => {
         limit,
       };
 
-      // Backend only supports active/inactive/banned in filter; pending verification is handled client-side.
       if (role) query.role = role;
-      if (status && status !== 'pending') query.status = status;
+      if (currentTab === 'active') query.status = 'active';
+      if (currentTab === 'inactive') query.status = 'inactive';
+      if (currentTab === 'banned') query.status = 'banned';
       if (searchTerm.trim()) query.search = searchTerm.trim();
 
       const res = await getUsers(query);
@@ -78,7 +76,7 @@ const AdminUserManagement = () => {
 
       // client-side pending verification filter
       const enrichedUsers =
-        status === 'pending'
+        currentTab === 'pending'
           ? nextUsers.filter((u) => u && u.isVerified === false)
           : nextUsers;
 
@@ -89,12 +87,12 @@ const AdminUserManagement = () => {
     } finally {
       setLoading(false);
     }
-  }, [page, limit, role, status, searchTerm]);
+  }, [page, limit, role, currentTab, searchTerm]);
 
   useEffect(() => {
     // reset to first page when filters change
     setPage(1);
-  }, [role, status, searchTerm]);
+  }, [role, currentTab, searchTerm]);
 
   useEffect(() => {
     loadUsers();
@@ -167,6 +165,13 @@ const AdminUserManagement = () => {
 
   const pages = Math.max(pagination.pages || 1, 1);
 
+  const tabs = [
+    { id: 'all', label: 'All Users', icon: <Users size={16} /> },
+    { id: 'active', label: 'Active', icon: <CheckCircle2 size={16} /> },
+    { id: 'banned', label: 'Banned', icon: <ShieldX size={16} /> },
+    { id: 'pending', label: 'Pending', icon: <AlertCircle size={16} /> },
+  ];
+
   return (
     <AdminLayout>
       <div className="admin-page">
@@ -196,10 +201,23 @@ const AdminUserManagement = () => {
           </div>
         ) : null}
 
+        <div className="admin-tabs">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              className={`admin-tab ${currentTab === tab.id ? 'active' : ''}`}
+              onClick={() => navigate(`/admin/users/${tab.id}`)}
+            >
+              <span className="admin-tab-icon">{tab.icon}</span>
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
         <section className="admin-section">
           <div className="admin-section-heading-row">
             <h2 className="admin-section-title">
-              <UserRound size={18} /> All Users
+              <UserRound size={18} /> {tabs.find(t => t.id === currentTab)?.label || 'All Users'}
             </h2>
 
             <div className="admin-filter-row">
@@ -215,14 +233,6 @@ const AdminUserManagement = () => {
 
               <select className="admin-select" value={role} onChange={(e) => setRole(e.target.value)}>
                 {roleOptions.map((opt) => (
-                  <option key={opt.value || 'all'} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-
-              <select className="admin-select" value={status} onChange={(e) => setStatus(e.target.value)}>
-                {statusFilterOptions.map((opt) => (
                   <option key={opt.value || 'all'} value={opt.value}>
                     {opt.label}
                   </option>

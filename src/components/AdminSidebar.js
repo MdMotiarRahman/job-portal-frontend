@@ -37,10 +37,10 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
       icon: Users,
       path: '/admin/users',
       submenu: [
-        { label: 'All Users', path: '/admin/users' },
-        { label: 'Active Users', path: '/admin/users?status=active' },
-        { label: 'Banned Users', path: '/admin/users?status=banned' },
-        { label: 'Pending Verification', path: '/admin/users?status=pending' },
+        { label: 'All Users', path: '/admin/users/all' },
+        { label: 'Active Users', path: '/admin/users/active' },
+        { label: 'Banned Users', path: '/admin/users/banned' },
+        { label: 'Pending Verification', path: '/admin/users/pending' },
       ],
     },
     {
@@ -49,10 +49,10 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
       icon: Building2,
       path: '/admin/employers',
       submenu: [
-        { label: 'All Employers', path: '/admin/employers' },
-        { label: 'Pending Review', path: '/admin/employers?verificationStatus=pending' },
-        { label: 'Approved', path: '/admin/employers?verificationStatus=approved' },
-        { label: 'Rejected', path: '/admin/employers?verificationStatus=rejected' },
+        { label: 'All Employers', path: '/admin/employers/all' },
+        { label: 'Pending Review', path: '/admin/employers/pending' },
+        { label: 'Approved', path: '/admin/employers/approved' },
+        { label: 'Rejected', path: '/admin/employers/rejected' },
       ],
     },
     {
@@ -61,11 +61,11 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
       icon: Briefcase,
       path: '/admin/jobs',
       submenu: [
-        { label: 'All Jobs', path: '/admin/jobs' },
-        { label: 'Pending Approval', path: '/admin/jobs?status=pending' },
-        { label: 'Approved Jobs', path: '/admin/jobs?status=approved' },
-        { label: 'Rejected Jobs', path: '/admin/jobs?status=rejected' },
-        { label: 'Closed Jobs', path: '/admin/jobs?status=closed' },
+        { label: 'All Jobs', path: '/admin/jobs/all' },
+        { label: 'Pending Approval', path: '/admin/jobs/pending' },
+        { label: 'Approved Jobs', path: '/admin/jobs/approved' },
+        { label: 'Rejected Jobs', path: '/admin/jobs/rejected' },
+        { label: 'Closed Jobs', path: '/admin/jobs/closed' },
       ],
     },
     {
@@ -74,11 +74,11 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
       icon: ClipboardList,
       path: '/admin/applications',
       submenu: [
-        { label: 'All Applications', path: '/admin/applications' },
-        { label: 'Pending', path: '/admin/applications?status=Pending' },
-        { label: 'Approved', path: '/admin/applications?status=Approved' },
-        { label: 'Rejected', path: '/admin/applications?status=Rejected' },
-        { label: 'Hired', path: '/admin/applications?status=Hired' },
+        { label: 'All Applications', path: '/admin/applications/all' },
+        { label: 'Pending', path: '/admin/applications/pending' },
+        { label: 'Approved', path: '/admin/applications/approved' },
+        { label: 'Rejected', path: '/admin/applications/rejected' },
+        { label: 'Hired', path: '/admin/applications/hired' },
       ],
     },
     {

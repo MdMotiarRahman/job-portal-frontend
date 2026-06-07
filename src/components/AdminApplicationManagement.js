@@ -1,25 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { FileText, RefreshCw, Search, X } from 'lucide-react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { FileText, RefreshCw, Search, X, CheckCircle2, Clock, Ban, Award } from 'lucide-react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import AdminLayout from './AdminLayout';
 import { getApplications, updateApplicationStatus } from '../services/adminService';
 import '../styles/adminDashboard.css';
 import '../styles/adminApplicationManagement.css';
 
 const appStatuses = ['Pending', 'Approved', 'Rejected', 'Hired'];
-
-const statusOptions = [
-  { value: '', label: 'All Applications' },
-  { value: 'Pending', label: 'Pending' },
-  { value: 'Approved', label: 'Approved' },
-  { value: 'Rejected', label: 'Rejected' },
-  { value: 'Hired', label: 'Hired' },
-];
-
-const getInitialStatus = (search) => {
-  const params = new URLSearchParams(search);
-  return params.get('status') || '';
-};
 
 const getStatusBadgeClass = (status) => {
   if (status === 'Approved' || status === 'Hired') return 'admin-badge-success';
@@ -28,11 +15,12 @@ const getStatusBadgeClass = (status) => {
 };
 
 const AdminApplicationManagement = () => {
-  const location = useLocation();
   const navigate = useNavigate();
+  const { filter } = useParams();
+  const currentTab = filter || 'all';
+
   const [applications, setApplications] = useState([]);
   const [pagination, setPagination] = useState({ total: 0, page: 1, pages: 1 });
-  const [filterStatus, setFilterStatus] = useState(getInitialStatus(location.search));
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState('');
@@ -47,11 +35,15 @@ const AdminApplicationManagement = () => {
       limit: 10,
     };
 
-    if (filterStatus) params.status = filterStatus;
+    if (currentTab === 'pending') params.status = 'Pending';
+    if (currentTab === 'approved') params.status = 'Approved';
+    if (currentTab === 'rejected') params.status = 'Rejected';
+    if (currentTab === 'hired') params.status = 'Hired';
+
     if (searchTerm.trim()) params.search = searchTerm.trim();
 
     return params;
-  }, [filterStatus, pagination.page, searchTerm]);
+  }, [currentTab, pagination.page, searchTerm]);
 
   const loadApplications = useCallback(async () => {
     setLoading(true);
@@ -69,10 +61,6 @@ const AdminApplicationManagement = () => {
   }, [queryParams]);
 
   useEffect(() => {
-    setFilterStatus(getInitialStatus(location.search));
-  }, [location.search]);
-
-  useEffect(() => {
     loadApplications();
   }, [loadApplications]);
 
@@ -86,13 +74,6 @@ const AdminApplicationManagement = () => {
       { total: 0, Pending: 0, Approved: 0, Rejected: 0, Hired: 0 }
     );
   }, [applications]);
-
-  const handleFilterChange = (event) => {
-    const nextStatus = event.target.value;
-    setPagination((currentPagination) => ({ ...currentPagination, page: 1 }));
-    setFilterStatus(nextStatus);
-    navigate(nextStatus ? `/admin/applications?status=${nextStatus}` : '/admin/applications', { replace: true });
-  };
 
   const handleSearchSubmit = (event) => {
     event.preventDefault();
@@ -135,6 +116,14 @@ const AdminApplicationManagement = () => {
     }
   };
 
+  const tabs = [
+    { id: 'all', label: 'All Applications', icon: <FileText size={16} /> },
+    { id: 'pending', label: 'Pending', icon: <Clock size={16} /> },
+    { id: 'approved', label: 'Approved', icon: <CheckCircle2 size={16} /> },
+    { id: 'rejected', label: 'Rejected', icon: <Ban size={16} /> },
+    { id: 'hired', label: 'Hired', icon: <Award size={16} /> },
+  ];
+
   return (
     <AdminLayout>
       <div className="admin-page admin-application-management">
@@ -176,11 +165,27 @@ const AdminApplicationManagement = () => {
           </div>
         </section>
 
+        <div className="admin-tabs">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              className={`admin-tab ${currentTab === tab.id ? 'active' : ''}`}
+              onClick={() => {
+                setPagination((curr) => ({ ...curr, page: 1 }));
+                navigate(`/admin/applications/${tab.id}`);
+              }}
+            >
+              <span className="admin-tab-icon">{tab.icon}</span>
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
         <section className="admin-section">
           <div className="admin-section-heading-row">
             <h2 className="admin-section-title">
               <FileText size={18} />
-              All Applications
+              {tabs.find(t => t.id === currentTab)?.label || 'All Applications'}
             </h2>
             <form className="admin-filter-row" onSubmit={handleSearchSubmit}>
               <div className="admin-search-field">
@@ -191,13 +196,6 @@ const AdminApplicationManagement = () => {
                   placeholder="Search job title or cover letter"
                 />
               </div>
-              <select className="admin-select" value={filterStatus} onChange={handleFilterChange}>
-                {statusOptions.map((option) => (
-                  <option key={option.value || 'all'} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
               <button className="admin-refresh-btn" type="submit">
                 Search
               </button>

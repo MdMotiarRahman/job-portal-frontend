@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   AlertCircle,
   Building2,
@@ -8,6 +9,8 @@ import {
   RefreshCw,
   Search,
   XCircle,
+  Clock,
+  Ban
 } from 'lucide-react';
 import AdminLayout from './AdminLayout';
 import {
@@ -20,13 +23,16 @@ import '../styles/adminDashboard.css';
 import '../styles/adminEmployerManagement.css';
 
 const AdminEmployerManagement = () => {
+  const navigate = useNavigate();
+  const { filter } = useParams();
+  const currentTab = filter || 'all';
+
   const [loading, setLoading] = useState(true);
   const [employers, setEmployers] = useState([]);
   const [filteredEmployers, setFilteredEmployers] = useState([]);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [search, setSearch] = useState('');
-  const [verificationFilter, setVerificationFilter] = useState('all');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [selectedEmployer, setSelectedEmployer] = useState(null);
@@ -45,11 +51,11 @@ const AdminEmployerManagement = () => {
     try {
       let response;
 
-      if (verificationFilter === 'pending') {
+      if (currentTab === 'pending') {
         response = await getPendingEmployers({ page, limit });
       } else {
         response = await getAllEmployers({
-          verificationStatus: verificationFilter === 'all' ? null : verificationFilter,
+          verificationStatus: currentTab === 'all' ? null : currentTab,
           page,
           limit,
           search: search || null,
@@ -66,11 +72,11 @@ const AdminEmployerManagement = () => {
     } finally {
       setLoading(false);
     }
-  }, [page, search, verificationFilter]);
+  }, [page, search, currentTab]);
 
   useEffect(() => {
     setPage(1);
-  }, [search, verificationFilter]);
+  }, [search, currentTab]);
 
   useEffect(() => {
     loadEmployers();
@@ -157,15 +163,12 @@ const AdminEmployerManagement = () => {
     }
   };
 
-  const pendingCount = employers.filter(
-    (employer) => employer.profile?.verificationStatus === 'pending'
-  ).length;
-  const approvedCount = employers.filter(
-    (employer) => employer.profile?.verificationStatus === 'approved'
-  ).length;
-  const rejectedCount = employers.filter(
-    (employer) => employer.profile?.verificationStatus === 'rejected'
-  ).length;
+  const tabs = [
+    { id: 'all', label: 'All Employers', icon: <Building2 size={16} /> },
+    { id: 'pending', label: 'Pending Review', icon: <Clock size={16} /> },
+    { id: 'approved', label: 'Approved', icon: <CheckCircle2 size={16} /> },
+    { id: 'rejected', label: 'Rejected', icon: <Ban size={16} /> },
+  ];
 
   return (
     <AdminLayout>
@@ -206,26 +209,24 @@ const AdminEmployerManagement = () => {
           </div>
         ) : null}
 
-        <section className="admin-stats-grid">
-          <div className="admin-stat-card">
-            <h3>Pending Review</h3>
-            <p className="admin-stat-value">{pendingCount}</p>
-          </div>
-          <div className="admin-stat-card">
-            <h3>Approved</h3>
-            <p className="admin-stat-value">{approvedCount}</p>
-          </div>
-          <div className="admin-stat-card">
-            <h3>Rejected</h3>
-            <p className="admin-stat-value">{rejectedCount}</p>
-          </div>
-        </section>
+        <div className="admin-tabs">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              className={`admin-tab ${currentTab === tab.id ? 'active' : ''}`}
+              onClick={() => navigate(`/admin/employers/${tab.id}`)}
+            >
+              <span className="admin-tab-icon">{tab.icon}</span>
+              {tab.label}
+            </button>
+          ))}
+        </div>
 
         <section className="admin-section">
           <div className="admin-section-heading-row">
             <h2 className="admin-section-title">
               <Building2 size={18} />
-              All Employers
+              {tabs.find(t => t.id === currentTab)?.label || 'All Employers'}
             </h2>
             <div className="admin-filter-row">
               <div className="admin-search-field">
@@ -237,16 +238,6 @@ const AdminEmployerManagement = () => {
                   onChange={(event) => setSearch(event.target.value)}
                 />
               </div>
-              <select
-                className="admin-select"
-                value={verificationFilter}
-                onChange={(event) => setVerificationFilter(event.target.value)}
-              >
-                <option value="all">All Employers</option>
-                <option value="pending">Pending ({pendingCount})</option>
-                <option value="approved">Approved</option>
-                <option value="rejected">Rejected</option>
-              </select>
             </div>
           </div>
 
