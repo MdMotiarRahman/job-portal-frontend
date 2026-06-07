@@ -1,0 +1,186 @@
+/* Candidate Card Styles */
+
+.candidate-card {
+  background: white;
+  border-radius: 8px;
+  border-left: 4px solid;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.candidate-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.candidate-card-header {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.candidate-avatar-mini {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.candidate-avatar-mini img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-placeholder {
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.candidate-info-mini {
+  flex: 1;
+  min-width: 0;
+}
+
+.candidate-name {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #2d3748;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.candidate-email {
+  margin: 4px 0 0 0;
+  font-size: 11px;
+  color: #718096;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Job Info */
+.candidate-card-job {
+  margin-bottom: 10px;
+  padding: 8px;
+  background: #f7fafc;
+  border-radius: 6px;
+}
+
+.candidate-position {
+  margin: 0 0 4px 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #2d3748;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.candidate-location {
+  margin: 0;
+  font-size: 11px;
+  color: #718096;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Card Footer */
+.candidate-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.candidate-stage-badge {
+  display: inline-block;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.candidate-card-move-btn {
+  background: none;
+  border: none;
+  color: #a0aec0;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  opacity: 0;
+}
+
+.candidate-card:hover .candidate-card-move-btn {
+  opacity: 1;
+  color: #667eea;
+}
+
+.candidate-card-move-btn:hover {
+  transform: scale(1.1);
+}
+
+/* Hover Overlay */
+.candidate-card-hover-overlay {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(102, 126, 234, 0.95);
+  border-radius: 8px;
+  padding: 12px;
+  color: white;
+  font-size: 12px;
+  z-index: 10;
+}
+
+.candidate-card:hover .candidate-card-hover-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.candidate-card-hover-content {
+  width: 100%;
+}
+
+.candidate-card-hover-content p {
+  margin: 4px 0;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.candidate-card-hover-content strong {
+  font-weight: 600;
+}
