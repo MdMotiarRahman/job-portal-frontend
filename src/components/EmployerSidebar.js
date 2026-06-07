@@ -9,6 +9,7 @@ import {
   LogOut,
   Search,
   X,
+  Activity,
 } from 'lucide-react';
 import authService from '../services/auth.service';
 import ReminderBell from './ReminderBell';
@@ -19,6 +20,7 @@ const menuItems = [
   { path: '/employer/jobs/new', label: 'Create Job', icon: FilePlus2 },
   { path: '/employer/jobs', label: 'My Jobs', icon: Briefcase },
   { path: '/employer/applications', label: 'Applications', icon: ClipboardList },
+  { path: '/employer/ats', label: 'ATS Pipeline', icon: Activity },
 ];
 
 const EmployerSidebar = ({ isOpen, setIsOpen }) => {
@@ -30,7 +32,7 @@ const EmployerSidebar = ({ isOpen, setIsOpen }) => {
       return location.pathname === path || /^\/employer\/jobs\/[^/]+\/edit$/.test(location.pathname);
     }
 
-    return location.pathname === path;
+    return location.pathname === path || location.pathname.startsWith(`${path}/`);
   };
 
   const handleNavigation = (path) => {

@@ -32,10 +32,14 @@ import SessionWarningModal from './components/SessionWarningModal';
 import { SessionProvider } from './context/SessionContext';
 
 import AdminDashboard from './components/AdminDashboard';
+import AdminLayout from './components/AdminLayout';
 import AdminJobManagement from './components/AdminJobManagement';
 import AdminApplicationManagement from './components/AdminApplicationManagement';
 import AdminEmployerManagement from './components/AdminEmployerManagement';
 import AdminUserManagement from './components/AdminUserManagement';
+import AdminWorkspacePage from './components/AdminWorkspacePage';
+import ATSPage from './components/ATSPage';
+import EmployerLayout from './components/EmployerLayout';
 import EmployerDashboard from './components/EmployerDashboard';
 import SeekerDashboard from './components/SeekerDashboard';
 
@@ -692,6 +696,53 @@ const AppContent = () => {
           />
 
           <Route
+            path="/admin/ats/*"
+            element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AdminLayout>
+                  <ATSPage />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/analytics/*"
+            element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AdminWorkspacePage page="analytics" />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/reports"
+            element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AdminWorkspacePage page="reports" />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/settings"
+            element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AdminWorkspacePage page="settings" />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/profile"
+            element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AdminWorkspacePage page="profile" />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
             path="/admin/*"
             element={
               <ProtectedRoute allowedRoles={['admin']}>
@@ -749,6 +800,17 @@ const AppContent = () => {
             element={
               <ProtectedRoute allowedRoles={['employer']}>
                 <EmployerDashboard page="applications" />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/employer/ats/*"
+            element={
+              <ProtectedRoute allowedRoles={['employer']}>
+                <EmployerLayout>
+                  <ATSPage />
+                </EmployerLayout>
               </ProtectedRoute>
             }
           />

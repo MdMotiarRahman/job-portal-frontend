@@ -163,6 +163,34 @@
   transform: scale(1.05);
 }
 
+.admin-user-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.admin-user-meta strong,
+.admin-user-meta span {
+  display: block;
+  max-width: 190px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-user-meta strong {
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.admin-user-meta span {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
 /* CONTENT AREA */
 .admin-layout-content {
   flex: 1;
@@ -217,6 +245,10 @@
   .admin-topbar-user {
     gap: var(--space-sm);
     padding-left: var(--space-md);
+  }
+
+  .admin-user-meta {
+    display: none;
   }
 }
 

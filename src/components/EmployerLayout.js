@@ -1,10 +1,25 @@
-import React, { useState } from 'react';
-import { Bell, ChevronLeft, ChevronRight, MessageCircle, User } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { ChevronLeft, ChevronRight, User } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 import EmployerSidebar from './EmployerSidebar';
+import ReminderBell from './ReminderBell';
+import authService from '../services/auth.service';
 import '../styles/adminLayout.css';
 
 const EmployerLayout = ({ children }) => {
+  const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const currentUser = authService.getCurrentUser()?.user;
+
+  const pageTitle = useMemo(() => {
+    const path = location.pathname;
+    if (path.startsWith('/employer/jobs/new')) return 'Create Job';
+    if (/^\/employer\/jobs\/[^/]+\/edit$/.test(path)) return 'Edit Job';
+    if (path.startsWith('/employer/jobs')) return 'My Jobs';
+    if (path.startsWith('/employer/applications')) return 'Applications';
+    if (path.startsWith('/employer/ats')) return 'ATS Pipeline';
+    return 'Employer Dashboard';
+  }, [location.pathname]);
 
   return (
     <div className="admin-layout employer-layout">
@@ -22,19 +37,18 @@ const EmployerLayout = ({ children }) => {
             >
               {sidebarOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
             </button>
-            <h1 className="admin-page-title">Employer Dashboard</h1>
+            <h1 className="admin-page-title">{pageTitle}</h1>
           </div>
 
           <div className="admin-topbar-right">
-            <button className="admin-topbar-icon" title="Notifications" type="button">
-              <Bell size={18} strokeWidth={1.5} />
-            </button>
-            <button className="admin-topbar-icon" title="Messages" type="button">
-              <MessageCircle size={18} strokeWidth={1.5} />
-            </button>
+            <ReminderBell />
             <div className="admin-topbar-user">
               <div className="admin-user-avatar">
                 <User size={20} strokeWidth={1.5} />
+              </div>
+              <div className="admin-user-meta">
+                <strong>{currentUser?.name || 'Employer'}</strong>
+                <span>{currentUser?.email || 'Hiring workspace'}</span>
               </div>
             </div>
           </div>

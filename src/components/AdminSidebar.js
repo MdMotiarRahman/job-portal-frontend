@@ -13,6 +13,7 @@ import {
   ChevronRight,
   Building2,
   X,
+  Activity,
 } from 'lucide-react';
 import ReminderBell from './ReminderBell';
 import '../styles/adminSidebar.css';
@@ -81,15 +82,25 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
       ],
     },
     {
+      id: 'ats',
+      label: 'ATS Pipeline',
+      icon: Activity,
+      path: '/admin/ats',
+      submenu: [
+        { label: 'Pipeline Board', path: '/admin/ats' },
+        { label: 'Hiring Analytics', path: '/admin/ats/analytics' },
+      ],
+    },
+    {
       id: 'analytics',
       label: 'Analytics',
       icon: TrendingUp,
       path: '/admin/analytics',
       submenu: [
-        { label: 'Overview', path: '/admin/analytics' },
-        { label: 'User Analytics', path: '/admin/analytics/users' },
-        { label: 'Job Analytics', path: '/admin/analytics/jobs' },
-        { label: 'Application Analytics', path: '/admin/analytics/applications' },
+        { label: 'Platform Overview', path: '/admin/analytics' },
+        { label: 'Users by Role', path: '/admin/analytics/users' },
+        { label: 'Jobs by Status', path: '/admin/analytics/jobs' },
+        { label: 'Applications by Status', path: '/admin/analytics/applications' },
       ],
     },
     {
@@ -156,6 +167,7 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
   };
 
   const handleLogout = () => {
+    localStorage.removeItem('user');
     localStorage.removeItem('token');
     navigate('/login');
   };

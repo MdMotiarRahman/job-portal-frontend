@@ -1,0 +1,185 @@
+/* ATS Page Styles */
+
+.ats-page-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #f9fafb;
+  min-height: 100vh;
+}
+
+.ats-page-header {
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.ats-page-title {
+  flex: 1;
+}
+
+.ats-page-title h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #1f2937;
+  line-height: 1.2;
+}
+
+.ats-page-title p {
+  margin: 4px 0 0 0;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.ats-page-refresh-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  transition: all 0.2s ease;
+}
+
+.ats-page-refresh-btn:hover {
+  background: #e5e7eb;
+  border-color: #9ca3af;
+}
+
+.ats-page-refresh-btn:active {
+  transform: scale(0.98);
+}
+
+/* Tabs */
+
+.ats-page-tabs {
+  display: flex;
+  gap: 0;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0 24px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.ats-page-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.ats-page-tab {
+  flex: 0 0 auto;
+  padding: 16px 24px;
+  background: white;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+  color: #6b7280;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.ats-page-tab:hover {
+  color: #374151;
+  background: #f9fafb;
+}
+
+.ats-page-tab.active {
+  color: #3b82f6;
+  border-bottom-color: #3b82f6;
+}
+
+/* Content */
+
+.ats-page-content {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.ats-page-section {
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+  .ats-page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px;
+  }
+
+  .ats-page-title h1 {
+    font-size: 24px;
+  }
+
+  .ats-page-title p {
+    font-size: 13px;
+  }
+
+  .ats-page-tabs {
+    padding: 0 16px;
+  }
+
+  .ats-page-tab {
+    padding: 14px 16px;
+    font-size: 14px;
+  }
+
+  .ats-page-content {
+    padding: 16px;
+  }
+
+  .ats-page-refresh-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .ats-page-header {
+    padding: 12px;
+  }
+
+  .ats-page-title h1 {
+    font-size: 20px;
+  }
+
+  .ats-page-tabs {
+    padding: 0 12px;
+  }
+
+  .ats-page-tab {
+    padding: 12px 12px;
+    font-size: 13px;
+  }
+
+  .ats-page-content {
+    padding: 12px;
+  }
+}

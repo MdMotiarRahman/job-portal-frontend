@@ -194,6 +194,14 @@ const getAuthToken = () => {
 
 };
 
+const getMe = () => {
+  return axios.get(`${API_URL}/me`, {
+    headers: {
+      Authorization: `Bearer ${getAuthToken()}`,
+    },
+  });
+};
+
 
 // ============================
 // EXPORT
@@ -212,6 +220,8 @@ const authService = {
   getCurrentUserRole,
 
   getAuthToken,
+
+  getMe,
 
 };
 
