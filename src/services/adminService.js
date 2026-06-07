@@ -18,6 +18,9 @@ export const getAnalytics = (period = 'month') =>
 export const getUsers = (params = {}) =>
   axios.get(`${API_URL}/users`, { ...authHeader(), params });
 
+export const updateUser = (userId, payload) =>
+  axios.put(`${API_URL}/users/${userId}`, payload, authHeader());
+
 export const updateUserStatus = (userId, action, payload = {}) =>
   axios.put(`${API_URL}/users/${userId}/${action}`, payload, authHeader());
 

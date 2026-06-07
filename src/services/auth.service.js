@@ -202,6 +202,14 @@ const getMe = () => {
   });
 };
 
+const updateMe = (data) => {
+  return axios.put(`${API_URL}/me`, data, {
+    headers: {
+      Authorization: `Bearer ${getAuthToken()}`,
+    },
+  });
+};
+
 
 // ============================
 // EXPORT
@@ -222,6 +230,8 @@ const authService = {
   getAuthToken,
 
   getMe,
+
+  updateMe,
 
 };
 

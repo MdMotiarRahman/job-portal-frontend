@@ -9,10 +9,11 @@ import {
   ShieldX,
   UserRound,
   X,
-  Users
+  Users,
+  ShieldAlert
 } from 'lucide-react';
 import AdminLayout from './AdminLayout';
-import { deleteUser, getUsers, updateUserStatus, verifyUser } from '../services/adminService';
+import { deleteUser, getUsers, updateUserStatus, verifyUser, updateUser } from '../services/adminService';
 import '../styles/adminDashboard.css';
 
 const roleOptions = [
@@ -20,6 +21,14 @@ const roleOptions = [
   { value: 'admin', label: 'Admin' },
   { value: 'employer', label: 'Employer' },
   { value: 'seeker', label: 'Seeker' },
+];
+
+const availablePermissions = [
+  'manage_users',
+  'manage_jobs',
+  'manage_employers',
+  'manage_settings',
+  'view_reports'
 ];
 
 const AdminUserManagement = () => {
@@ -45,6 +54,9 @@ const AdminUserManagement = () => {
   const [modalMode, setModalMode] = useState('details');
   const [banReason, setBanReason] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
+  
+  // RBAC Form
+  const [rbacForm, setRbacForm] = useState({ role: '', permissions: [] });
 
   const authSummary = useMemo(() => {
     return {
@@ -102,6 +114,7 @@ const AdminUserManagement = () => {
     setSelectedUser(u);
     setModalMode('details');
     setBanReason('');
+    setRbacForm({ role: u.role || 'seeker', permissions: u.permissions || [] });
     setActionLoading(false);
     setShowModal(true);
   };
@@ -146,15 +159,35 @@ const AdminUserManagement = () => {
         await deleteUser(selectedUser._id);
         setSuccess('User deleted successfully.');
         closeModal();
+      } else if (action === 'update_rbac') {
+        await updateUser(selectedUser._id, { role: rbacForm.role, permissions: rbacForm.permissions });
+        setSuccess('Role and permissions updated successfully.');
+        setModalMode('details');
       }
 
       await loadUsers();
-      closeModal();
+      if (action !== 'update_rbac') {
+        closeModal();
+      } else {
+        const updatedUser = users.find(u => u._id === selectedUser._id);
+        if(updatedUser) {
+           setSelectedUser({...updatedUser, role: rbacForm.role, permissions: rbacForm.permissions});
+        }
+      }
     } catch (err) {
       setError(err.response?.data?.message || 'User action failed.');
     } finally {
       setActionLoading(false);
     }
+  };
+
+  const togglePermission = (perm) => {
+    setRbacForm(prev => {
+      const perms = prev.permissions.includes(perm)
+        ? prev.permissions.filter(p => p !== perm)
+        : [...prev.permissions, perm];
+      return { ...prev, permissions: perms };
+    });
   };
 
   const statusBadgeClass = (u) => {
@@ -182,7 +215,7 @@ const AdminUserManagement = () => {
                 {authSummary.icon} User management
               </p>
               <h1>Users</h1>
-              <p className="admin-subtitle">Manage accounts: status, bans, verification, and deletion.</p>
+              <p className="admin-subtitle">Manage accounts: status, bans, verification, roles and permissions.</p>
             </div>
           </div>
         </div>
@@ -340,138 +373,203 @@ const AdminUserManagement = () => {
                   <h2>{selectedUser.name}</h2>
                 </div>
                 <button className="admin-icon-btn employer-modal-close" type="button" onClick={closeModal} aria-label="Close">
-                  x
+                  <X size={16} />
                 </button>
               </div>
 
-              <div className="employer-detail-grid">
-                <div>
-                  <span>Email</span>
-                  <strong>{selectedUser.email}</strong>
-                </div>
-                <div>
-                  <span>Role</span>
-                  <strong>{selectedUser.role}</strong>
-                </div>
-                <div>
-                  <span>Verification</span>
-                  <strong>{selectedUser.isVerified ? 'Verified' : 'Pending'}</strong>
-                </div>
-                <div>
-                  <span>Account</span>
-                  <strong>
-                    {selectedUser.isBanned ? 'Banned' : selectedUser.isActive ? 'Active' : 'Inactive'}
-                  </strong>
-                </div>
-                {selectedUser.bannedReason ? (
-                  <div className="employer-detail-wide employer-rejection-reason">
-                    <span>Ban reason</span>
-                    <p>{selectedUser.bannedReason}</p>
+              {modalMode === 'details' || modalMode === 'ban' ? (
+                <>
+                  <div className="employer-detail-grid">
+                    <div>
+                      <span>Email</span>
+                      <strong>{selectedUser.email}</strong>
+                    </div>
+                    <div>
+                      <span>Role</span>
+                      <strong>{selectedUser.role}</strong>
+                    </div>
+                    <div>
+                      <span>Verification</span>
+                      <strong>{selectedUser.isVerified ? 'Verified' : 'Pending'}</strong>
+                    </div>
+                    <div>
+                      <span>Account</span>
+                      <strong>
+                        {selectedUser.isBanned ? 'Banned' : selectedUser.isActive ? 'Active' : 'Inactive'}
+                      </strong>
+                    </div>
+                    {selectedUser.bannedReason ? (
+                      <div className="employer-detail-wide employer-rejection-reason">
+                        <span>Ban reason</span>
+                        <p>{selectedUser.bannedReason}</p>
+                      </div>
+                    ) : null}
+                    {selectedUser.adminNotes ? (
+                      <div className="employer-detail-wide">
+                        <span>Admin notes</span>
+                        <p>{selectedUser.adminNotes}</p>
+                      </div>
+                    ) : null}
                   </div>
-                ) : null}
-                {selectedUser.adminNotes ? (
-                  <div className="employer-detail-wide">
-                    <span>Admin notes</span>
-                    <p>{selectedUser.adminNotes}</p>
-                  </div>
-                ) : null}
-              </div>
 
-              <div className="employer-modal-actions" style={{ flexWrap: 'wrap' }}>
-                {!selectedUser.isVerified ? (
-                  <button
-                    type="button"
-                    className="admin-action-btn admin-action-success"
-                    disabled={actionLoading}
-                    onClick={() => handleAction('verify')}
-                  >
-                    Verify
-                  </button>
-                ) : null}
+                  <div className="employer-modal-actions" style={{ flexWrap: 'wrap' }}>
+                    <button
+                      type="button"
+                      className="admin-action-btn admin-action-neutral"
+                      disabled={actionLoading}
+                      onClick={() => setModalMode('rbac')}
+                    >
+                      <ShieldAlert size={14} />
+                      Manage RBAC
+                    </button>
 
-                {selectedUser.isActive ? (
-                  <button
-                    type="button"
-                    className="admin-action-btn admin-action-neutral"
-                    disabled={actionLoading}
-                    onClick={() => handleAction('deactivate')}
-                  >
-                    Deactivate
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    className="admin-action-btn admin-action-neutral"
-                    disabled={actionLoading}
-                    onClick={() => handleAction('activate')}
-                  >
-                    Activate
-                  </button>
-                )}
+                    {!selectedUser.isVerified ? (
+                      <button
+                        type="button"
+                        className="admin-action-btn admin-action-success"
+                        disabled={actionLoading}
+                        onClick={() => handleAction('verify')}
+                      >
+                        Verify
+                      </button>
+                    ) : null}
 
-                {selectedUser.isBanned ? (
-                  <button
-                    type="button"
-                    className="admin-action-btn admin-action-warning"
-                    disabled={actionLoading}
-                    onClick={() => handleAction('unban')}
-                  >
-                    Unban
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    className="admin-action-btn admin-action-warning"
-                    disabled={actionLoading}
-                    onClick={() => setModalMode('ban')}
-                  >
-                    Ban
-                  </button>
-                )}
-
-                <button
-                  type="button"
-                  className="admin-action-btn admin-action-danger"
-                  disabled={actionLoading}
-                  onClick={() => handleAction('delete')}
-                >
-                  Delete
-                </button>
-
-                {modalMode === 'ban' ? (
-                  <div style={{ width: '100%', marginTop: 10 }}>
-                    <label className="admin-form-field" style={{ width: '100%' }}>
-                      <span>Ban reason *</span>
-                      <textarea
-                        rows={3}
-                        value={banReason}
-                        onChange={(e) => setBanReason(e.target.value)}
-                      />
-                    </label>
-
-                    <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+                    {selectedUser.isActive ? (
                       <button
                         type="button"
                         className="admin-action-btn admin-action-neutral"
                         disabled={actionLoading}
-                        onClick={() => setModalMode('details')}
+                        onClick={() => handleAction('deactivate')}
                       >
-                        <X size={14} />
-                        Cancel
+                        Deactivate
                       </button>
+                    ) : (
+                      <button
+                        type="button"
+                        className="admin-action-btn admin-action-neutral"
+                        disabled={actionLoading}
+                        onClick={() => handleAction('activate')}
+                      >
+                        Activate
+                      </button>
+                    )}
+
+                    {selectedUser.isBanned ? (
                       <button
                         type="button"
                         className="admin-action-btn admin-action-warning"
-                        disabled={actionLoading || !banReason.trim()}
-                        onClick={() => handleAction('ban')}
+                        disabled={actionLoading}
+                        onClick={() => handleAction('unban')}
                       >
-                        {actionLoading ? <Loader2 size={14} className="animate-spin" /> : null}
-                        Confirm Ban
+                        Unban
                       </button>
+                    ) : (
+                      <button
+                        type="button"
+                        className="admin-action-btn admin-action-warning"
+                        disabled={actionLoading}
+                        onClick={() => setModalMode('ban')}
+                      >
+                        Ban
+                      </button>
+                    )}
+
+                    <button
+                      type="button"
+                      className="admin-action-btn admin-action-danger"
+                      disabled={actionLoading}
+                      onClick={() => handleAction('delete')}
+                    >
+                      Delete
+                    </button>
+
+                    {modalMode === 'ban' ? (
+                      <div style={{ width: '100%', marginTop: 10 }}>
+                        <label className="admin-form-field" style={{ width: '100%' }}>
+                          <span>Ban reason *</span>
+                          <textarea
+                            rows={3}
+                            value={banReason}
+                            onChange={(e) => setBanReason(e.target.value)}
+                          />
+                        </label>
+
+                        <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+                          <button
+                            type="button"
+                            className="admin-action-btn admin-action-neutral"
+                            disabled={actionLoading}
+                            onClick={() => setModalMode('details')}
+                          >
+                            <X size={14} />
+                            Cancel
+                          </button>
+                          <button
+                            type="button"
+                            className="admin-action-btn admin-action-warning"
+                            disabled={actionLoading || !banReason.trim()}
+                            onClick={() => handleAction('ban')}
+                          >
+                            {actionLoading ? <Loader2 size={14} className="animate-spin" /> : null}
+                            Confirm Ban
+                          </button>
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
+                </>
+              ) : modalMode === 'rbac' ? (
+                <div style={{ marginTop: 20 }}>
+                  <label className="admin-form-field">
+                    <span>Role Assignment</span>
+                    <select
+                      className="admin-select"
+                      value={rbacForm.role}
+                      onChange={(e) => setRbacForm({ ...rbacForm, role: e.target.value })}
+                    >
+                      <option value="seeker">Seeker</option>
+                      <option value="employer">Employer</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                  </label>
+
+                  <div className="admin-form-field" style={{ marginTop: 20 }}>
+                    <span>Granular Permissions</span>
+                    <div style={{ display: 'grid', gap: 10, marginTop: 10 }}>
+                      {availablePermissions.map(perm => (
+                        <label key={perm} className="admin-checkbox-field" style={{ cursor: 'pointer' }}>
+                          <input
+                            type="checkbox"
+                            checked={rbacForm.permissions.includes(perm)}
+                            onChange={() => togglePermission(perm)}
+                          />
+                          <span style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>{perm.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
+                        </label>
+                      ))}
                     </div>
                   </div>
-                ) : null}
-              </div>
+
+                  <div className="employer-modal-actions" style={{ marginTop: 24, paddingTop: 16, borderTop: '1px solid var(--bg-tertiary)' }}>
+                    <button
+                      type="button"
+                      className="admin-action-btn admin-action-neutral"
+                      disabled={actionLoading}
+                      onClick={() => setModalMode('details')}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      className="admin-primary-btn"
+                      disabled={actionLoading}
+                      onClick={() => handleAction('update_rbac')}
+                    >
+                      {actionLoading ? <Loader2 size={14} className="animate-spin" /> : null}
+                      Save RBAC Changes
+                    </button>
+                  </div>
+                </div>
+              ) : null}
             </section>
           </div>
         ) : null}

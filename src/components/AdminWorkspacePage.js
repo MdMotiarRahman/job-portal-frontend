@@ -77,6 +77,18 @@ const AdminWorkspacePage = ({ page = 'analytics' }) => {
   const [user, setUser] = useState(null);
   const [reportRows, setReportRows] = useState({ users: [], jobs: [], applications: [] });
   const [error, setError] = useState('');
+  
+  // Settings Form State
+  const [settingsForm, setSettingsForm] = useState({
+    name: '',
+    phone: '',
+    location: '',
+    currentPassword: '',
+    newPassword: '',
+  });
+  const [settingsLoading, setSettingsLoading] = useState(false);
+  const [settingsSuccess, setSettingsSuccess] = useState('');
+  const [settingsError, setSettingsError] = useState('');
 
   const loadPage = useCallback(async () => {
     setLoading(true);
@@ -101,6 +113,13 @@ const AdminWorkspacePage = ({ page = 'analytics' }) => {
       setStats(statsRes.data);
       setAnalytics(analyticsRes.data);
       setUser(meRes.data.user);
+      
+      setSettingsForm(prev => ({
+        ...prev,
+        name: meRes.data.user?.name || '',
+        phone: meRes.data.user?.phone || '',
+        location: meRes.data.user?.location || '',
+      }));
 
       if (page === 'reports') {
         setReportRows({
@@ -148,6 +167,42 @@ const AdminWorkspacePage = ({ page = 'analytics' }) => {
     link.download = `jobportal-admin-report-${period}.csv`;
     link.click();
     URL.revokeObjectURL(url);
+  };
+
+  const handleSettingsSubmit = async (e) => {
+    e.preventDefault();
+    setSettingsLoading(true);
+    setSettingsError('');
+    setSettingsSuccess('');
+    
+    try {
+      const payload = {
+        name: settingsForm.name,
+        phone: settingsForm.phone,
+        location: settingsForm.location,
+      };
+      
+      if (settingsForm.newPassword) {
+        if (!settingsForm.currentPassword) {
+          throw new Error('Current password is required to set a new password');
+        }
+        payload.currentPassword = settingsForm.currentPassword;
+        payload.newPassword = settingsForm.newPassword;
+      }
+      
+      const res = await authService.updateMe(payload);
+      setUser(res.data.user);
+      setSettingsSuccess('Profile settings updated successfully!');
+      setSettingsForm(prev => ({ ...prev, currentPassword: '', newPassword: '' }));
+    } catch (err) {
+      setSettingsError(err.response?.data?.message || err.message || 'Failed to update settings');
+    } finally {
+      setSettingsLoading(false);
+    }
+  };
+
+  const handleSettingsChange = (e) => {
+    setSettingsForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const renderHeader = () => (
@@ -293,47 +348,96 @@ const AdminWorkspacePage = ({ page = 'analytics' }) => {
   );
 
   const renderSettings = () => (
-    <>
-      {renderMetricGrid()}
-      <section className="admin-section">
-        <h2 className="admin-section-title"><Settings size={18} /> Workspace Settings</h2>
-        <div className="admin-workspace-settings">
-          <div>
-            <span>Authenticated role</span>
-            <strong>{user?.role || 'admin'}</strong>
-          </div>
-          <div>
-            <span>Account status</span>
-            <strong>{user?.isActive ? 'Active' : 'Inactive'}</strong>
-          </div>
-          <div>
-            <span>Verification</span>
-            <strong>{user?.isVerified ? 'Verified' : 'Pending'}</strong>
-          </div>
-          <div>
-            <span>Session source</span>
-            <strong>/api/auth/me</strong>
-          </div>
+    <div className="admin-workspace-settings-container">
+      <div className="admin-settings-layout">
+        <section className="admin-section admin-settings-form-section">
+          <h2 className="admin-section-title"><User size={18} /> Profile Configuration</h2>
+          
+          {settingsError && <div className="admin-alert admin-alert-error">{settingsError}</div>}
+          {settingsSuccess && <div className="admin-alert admin-alert-success">{settingsSuccess}</div>}
+          
+          <form className="admin-form-grid" onSubmit={handleSettingsSubmit}>
+            <label className="admin-form-field">
+              <span>Full Name</span>
+              <input type="text" name="name" value={settingsForm.name} onChange={handleSettingsChange} required />
+            </label>
+            <label className="admin-form-field">
+              <span>Email Address (Read-only)</span>
+              <input type="email" value={user?.email || ''} readOnly disabled className="admin-input-disabled" />
+            </label>
+            <label className="admin-form-field">
+              <span>Phone Number</span>
+              <input type="text" name="phone" value={settingsForm.phone} onChange={handleSettingsChange} />
+            </label>
+            <label className="admin-form-field">
+              <span>Location</span>
+              <input type="text" name="location" value={settingsForm.location} onChange={handleSettingsChange} />
+            </label>
+            
+            <div className="admin-form-divider" style={{ gridColumn: '1 / -1', margin: '10px 0', borderBottom: '1px solid var(--bg-tertiary)' }}></div>
+            
+            <h3 style={{ gridColumn: '1 / -1', fontSize: '15px', color: 'var(--text-primary)', margin: 0 }}>Security</h3>
+            
+            <label className="admin-form-field">
+              <span>Current Password</span>
+              <input type="password" name="currentPassword" value={settingsForm.currentPassword} onChange={handleSettingsChange} placeholder="Required if changing password" />
+            </label>
+            <label className="admin-form-field">
+              <span>New Password</span>
+              <input type="password" name="newPassword" value={settingsForm.newPassword} onChange={handleSettingsChange} placeholder="Leave blank to keep current" />
+            </label>
+
+            <div className="admin-form-actions" style={{ gridColumn: '1 / -1', marginTop: '10px' }}>
+              <button className="admin-primary-btn" type="submit" disabled={settingsLoading}>
+                {settingsLoading ? 'Saving...' : 'Save Settings'}
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <div className="admin-settings-sidebar">
+          <section className="admin-section">
+            <h2 className="admin-section-title"><Settings size={18} /> System Status</h2>
+            <div className="admin-workspace-settings">
+              <div>
+                <span>Role privileges</span>
+                <strong>{user?.role || 'admin'}</strong>
+              </div>
+              <div>
+                <span>Account state</span>
+                <strong>{user?.isActive ? 'Active' : 'Inactive'}</strong>
+              </div>
+              <div>
+                <span>Identity verification</span>
+                <strong>{user?.isVerified ? 'Verified' : 'Pending'}</strong>
+              </div>
+              <div>
+                <span>API connection</span>
+                <strong>/api/auth/me</strong>
+              </div>
+            </div>
+          </section>
+          
+          <section className="admin-section">
+            <h2 className="admin-section-title">Operational Queues</h2>
+            <div className="admin-workspace-settings">
+              <div>
+                <span>Jobs awaiting review</span>
+                <strong>{stats?.jobs?.pending ?? 0}</strong>
+              </div>
+              <div>
+                <span>Pending applications</span>
+                <strong>{stats?.applications?.pending ?? 0}</strong>
+              </div>
+              <div>
+                <span>Restricted accounts</span>
+                <strong>{stats?.users?.banned ?? 0}</strong>
+              </div>
+            </div>
+          </section>
         </div>
-      </section>
-      <section className="admin-section">
-        <h2 className="admin-section-title">Review Queues</h2>
-        <div className="admin-workspace-settings">
-          <div>
-            <span>Pending jobs</span>
-            <strong>{stats?.jobs?.pending ?? 0}</strong>
-          </div>
-          <div>
-            <span>Pending applications</span>
-            <strong>{stats?.applications?.pending ?? 0}</strong>
-          </div>
-          <div>
-            <span>Banned users</span>
-            <strong>{stats?.users?.banned ?? 0}</strong>
-          </div>
-        </div>
-      </section>
-    </>
+      </div>
+    </div>
   );
 
   const renderProfile = () => (
