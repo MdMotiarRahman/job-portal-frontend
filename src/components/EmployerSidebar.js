@@ -10,6 +10,7 @@ import {
   Search,
   X,
   Activity,
+  MessageSquare,
 } from 'lucide-react';
 import authService from '../services/auth.service';
 import ReminderBell from './ReminderBell';
@@ -21,6 +22,7 @@ const menuItems = [
   { path: '/employer/jobs', label: 'My Jobs', icon: Briefcase },
   { path: '/employer/applications', label: 'Applications', icon: ClipboardList },
   { path: '/employer/ats', label: 'ATS Pipeline', icon: Activity },
+  { path: '/employer/messages', label: 'Messages', icon: MessageSquare },
 ];
 
 const EmployerSidebar = ({ isOpen, setIsOpen }) => {

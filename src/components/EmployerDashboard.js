@@ -13,10 +13,12 @@ import {
   RefreshCcw,
   Trash2,
   X,
+  MessageSquare,
 } from 'lucide-react';
 import EmployerLayout from './EmployerLayout';
 import ReminderWidget from './ReminderWidget';
 import employerService from '../services/employer.service';
+import messageService from '../services/messageService';
 import '../styles/adminDashboard.css';
 import '../styles/dashboard.css';
 
@@ -735,6 +737,24 @@ const EmployerDashboard = ({ page = 'overview' }) => {
                       onClick={() => saveApplication(application)}
                     >
                       Save Application
+                    </button>
+                    <button
+                      type="button"
+                      className="admin-action-btn admin-action-neutral"
+                      onClick={async () => {
+                        try {
+                          const conv = await messageService.createConversation(
+                            application.seeker?._id,
+                            application.job?._id
+                          );
+                          navigate(`/employer/messages?conversation=${conv._id}`);
+                        } catch (err) {
+                          console.error('Failed to start conversation', err);
+                        }
+                      }}
+                    >
+                      <MessageSquare size={13} />
+                      Message
                     </button>
                   </div>
                 </article>

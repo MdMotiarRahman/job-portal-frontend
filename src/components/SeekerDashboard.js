@@ -12,6 +12,7 @@ import {
   GraduationCap,
   Code,
   Building2,
+  MessageSquare,
 } from 'lucide-react';
 
 import {
@@ -129,6 +130,14 @@ const SeekerDashboard = () => {
             className="dashboard-btn primary"
           >
             My Applications
+          </Link>
+
+          <Link
+            to="/seeker/messages"
+            className="dashboard-btn"
+          >
+            <MessageSquare size={16} style={{ marginRight: 6 }} />
+            Messages
           </Link>
 
         </div>

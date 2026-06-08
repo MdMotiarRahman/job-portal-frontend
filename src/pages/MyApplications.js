@@ -1,20 +1,27 @@
 import React, { useEffect, useState } from "react";
 
+import { useNavigate } from "react-router-dom";
+
 import {
   Briefcase,
   FileText,
   CheckCircle2,
   XCircle,
   Clock3,
+  MessageSquare,
 } from "lucide-react";
 
 import {
   getMyApplications,
 } from "../services/seekerService";
 
+import messageService from "../services/messageService";
+
 import "../styles/seekerDashboard.css";
 
 const MyApplications = () => {
+
+  const navigate = useNavigate();
 
   const [applications, setApplications] = useState([]);
 
@@ -143,6 +150,26 @@ const MyApplications = () => {
                 View Resume
               </a>
 
+            )}
+
+            {/* MESSAGE EMPLOYER */}
+            {app.job?.company && (
+              <button
+                className="resume-btn"
+                style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', gap: 6, cursor: 'pointer', border: 'none', background: 'var(--brand-primary)', color: '#fff', padding: '8px 16px', borderRadius: 8, fontSize: 13, fontWeight: 600 }}
+                onClick={async () => {
+                  try {
+                    const employerId = typeof app.job.company === 'object' ? app.job.company._id : app.job.company;
+                    const conv = await messageService.createConversation(employerId, app.job?._id);
+                    navigate(`/seeker/messages?conversation=${conv._id}`);
+                  } catch (err) {
+                    console.error('Failed to start conversation', err);
+                  }
+                }}
+              >
+                <MessageSquare size={14} />
+                Message Employer
+              </button>
             )}
 
             {/* REJECTED MESSAGE */}

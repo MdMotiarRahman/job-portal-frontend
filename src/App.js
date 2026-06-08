@@ -17,7 +17,8 @@ import {
   User,
   Menu,
   X,
-  ArrowRight
+  ArrowRight,
+  MessageSquare,
 } from 'lucide-react';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -48,6 +49,7 @@ import ApplyJob from './pages/ApplyJob';
 import Jobs from './pages/Jobs';
 import MyApplications from './pages/MyApplications';
 import ReminderCenter from './components/ReminderCenter';
+import MessagingPage from './components/MessagingPage';
 
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -207,6 +209,14 @@ const Navigation = () => {
               >
                 Jobs
               </Link>
+
+              <Link
+                to="/employer/messages"
+                className={`nav-link ${isActive('/employer/messages') ? 'active' : ''}`}
+              >
+                <MessageSquare size={16} style={{ marginRight: 4 }} />
+                Messages
+              </Link>
             </>
 
           ) : (
@@ -269,6 +279,14 @@ const Navigation = () => {
                     className={`nav-link ${isActive('/seeker/applications') ? 'active' : ''}`}
                   >
                     My Applications
+                  </Link>
+
+                  <Link
+                    to="/seeker/messages"
+                    className={`nav-link ${isActive('/seeker/messages') ? 'active' : ''}`}
+                  >
+                    <MessageSquare size={16} style={{ marginRight: 4 }} />
+                    Messages
                   </Link>
                 </>
 
@@ -396,6 +414,15 @@ const Navigation = () => {
                 <Briefcase size={18} />
                 Jobs
               </Link>
+
+              <Link
+                to="/employer/messages"
+                className="mobile-link"
+                onClick={() => setIsOpen(false)}
+              >
+                <MessageSquare size={18} />
+                Messages
+              </Link>
             </>
 
           ) : (
@@ -465,6 +492,15 @@ const Navigation = () => {
                     onClick={() => setIsOpen(false)}
                   >
                     My Applications
+                  </Link>
+
+                  <Link
+                    to="/seeker/messages"
+                    className="mobile-link"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <MessageSquare size={18} />
+                    Messages
                   </Link>
                 </>
 
@@ -648,6 +684,26 @@ const AppContent = () => {
             element={
               <ProtectedRoute allowedRoles={['admin', 'employer', 'seeker']}>
                 <ReminderCenter />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* MESSAGING - EMPLOYER & SEEKER */}
+
+          <Route
+            path="/employer/messages"
+            element={
+              <ProtectedRoute allowedRoles={['employer']}>
+                <MessagingPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/seeker/messages"
+            element={
+              <ProtectedRoute allowedRoles={['seeker']}>
+                <MessagingPage />
               </ProtectedRoute>
             }
           />

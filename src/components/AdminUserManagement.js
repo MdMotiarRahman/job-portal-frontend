@@ -160,19 +160,15 @@ const AdminUserManagement = () => {
         setSuccess('User deleted successfully.');
         closeModal();
       } else if (action === 'update_rbac') {
-        await updateUser(selectedUser._id, { role: rbacForm.role, permissions: rbacForm.permissions });
+        const res = await updateUser(selectedUser._id, { role: rbacForm.role, permissions: rbacForm.permissions });
         setSuccess('Role and permissions updated successfully.');
         setModalMode('details');
+        setSelectedUser(res.data.user);
       }
 
       await loadUsers();
-      if (action !== 'update_rbac') {
+      if (action !== 'update_rbac' && action !== 'delete') {
         closeModal();
-      } else {
-        const updatedUser = users.find(u => u._id === selectedUser._id);
-        if(updatedUser) {
-           setSelectedUser({...updatedUser, role: rbacForm.role, permissions: rbacForm.permissions});
-        }
       }
     } catch (err) {
       setError(err.response?.data?.message || 'User action failed.');
