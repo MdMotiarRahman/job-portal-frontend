@@ -76,9 +76,11 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
       submenu: [
         { label: 'All Applications', path: '/admin/applications/all' },
         { label: 'Pending', path: '/admin/applications/pending' },
-        { label: 'Approved', path: '/admin/applications/approved' },
+        { label: 'Reviewing', path: '/admin/applications/reviewing' },
+        { label: 'Shortlisted', path: '/admin/applications/shortlisted' },
+        { label: 'Interview Scheduled', path: '/admin/applications/interview' },
+        { label: 'Accepted', path: '/admin/applications/accepted' },
         { label: 'Rejected', path: '/admin/applications/rejected' },
-        { label: 'Hired', path: '/admin/applications/hired' },
       ],
     },
     {

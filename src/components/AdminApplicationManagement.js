@@ -6,11 +6,12 @@ import { getApplications, updateApplicationStatus } from '../services/adminServi
 import '../styles/adminDashboard.css';
 import '../styles/adminApplicationManagement.css';
 
-const appStatuses = ['Pending', 'Approved', 'Rejected', 'Hired'];
+const appStatuses = ['Pending', 'Reviewing', 'Shortlisted', 'Interview Scheduled', 'Accepted', 'Rejected'];
 
 const getStatusBadgeClass = (status) => {
-  if (status === 'Approved' || status === 'Hired') return 'admin-badge-success';
+  if (['Accepted', 'Shortlisted', 'Interview Scheduled'].includes(status)) return 'admin-badge-success';
   if (status === 'Rejected') return 'admin-badge-error';
+  if (status === 'Reviewing') return 'admin-badge-status';
   return 'admin-badge-warning';
 };
 
@@ -36,9 +37,11 @@ const AdminApplicationManagement = () => {
     };
 
     if (currentTab === 'pending') params.status = 'Pending';
-    if (currentTab === 'approved') params.status = 'Approved';
+    if (currentTab === 'reviewing') params.status = 'Reviewing';
+    if (currentTab === 'shortlisted') params.status = 'Shortlisted';
+    if (currentTab === 'interview') params.status = 'Interview Scheduled';
+    if (currentTab === 'accepted') params.status = 'Accepted';
     if (currentTab === 'rejected') params.status = 'Rejected';
-    if (currentTab === 'hired') params.status = 'Hired';
 
     if (searchTerm.trim()) params.search = searchTerm.trim();
 
@@ -71,7 +74,7 @@ const AdminApplicationManagement = () => {
         summary[application.status] = (summary[application.status] || 0) + 1;
         return summary;
       },
-      { total: 0, Pending: 0, Approved: 0, Rejected: 0, Hired: 0 }
+      { total: 0, Pending: 0, Reviewing: 0, Shortlisted: 0, 'Interview Scheduled': 0, Accepted: 0, Rejected: 0 }
     );
   }, [applications]);
 
@@ -119,9 +122,11 @@ const AdminApplicationManagement = () => {
   const tabs = [
     { id: 'all', label: 'All Applications', icon: <FileText size={16} /> },
     { id: 'pending', label: 'Pending', icon: <Clock size={16} /> },
-    { id: 'approved', label: 'Approved', icon: <CheckCircle2 size={16} /> },
+    { id: 'reviewing', label: 'Reviewing', icon: <CheckCircle2 size={16} /> },
+    { id: 'shortlisted', label: 'Shortlisted', icon: <Award size={16} /> },
+    { id: 'interview', label: 'Interview', icon: <Clock size={16} /> },
+    { id: 'accepted', label: 'Accepted', icon: <CheckCircle2 size={16} /> },
     { id: 'rejected', label: 'Rejected', icon: <Ban size={16} /> },
-    { id: 'hired', label: 'Hired', icon: <Award size={16} /> },
   ];
 
   return (
@@ -156,12 +161,20 @@ const AdminApplicationManagement = () => {
             <p className="admin-stat-value">{stats.Pending}</p>
           </div>
           <div className="admin-stat-card">
-            <h3>Approved</h3>
-            <p className="admin-stat-value">{stats.Approved}</p>
+            <h3>Reviewing</h3>
+            <p className="admin-stat-value">{stats.Reviewing}</p>
           </div>
           <div className="admin-stat-card">
-            <h3>Hired</h3>
-            <p className="admin-stat-value">{stats.Hired}</p>
+            <h3>Shortlisted</h3>
+            <p className="admin-stat-value">{stats.Shortlisted}</p>
+          </div>
+          <div className="admin-stat-card">
+            <h3>Interview</h3>
+            <p className="admin-stat-value">{stats['Interview Scheduled']}</p>
+          </div>
+          <div className="admin-stat-card">
+            <h3>Accepted</h3>
+            <p className="admin-stat-value">{stats.Accepted}</p>
           </div>
         </section>
 

@@ -26,7 +26,14 @@ import {
 import '../styles/adminDashboard.css';
 
 const statusActions = ['activate', 'deactivate', 'ban', 'unban'];
-const appStatuses = ['Pending', 'Approved', 'Rejected', 'Hired'];
+const appStatuses = ['Pending', 'Reviewing', 'Shortlisted', 'Interview Scheduled', 'Accepted', 'Rejected'];
+
+const getStatusBadgeClass = (status) => {
+  if (['Accepted', 'Shortlisted', 'Interview Scheduled'].includes(status)) return 'admin-badge-success';
+  if (status === 'Rejected') return 'admin-badge-error';
+  if (status === 'Reviewing') return 'admin-badge-status';
+  return 'admin-badge-warning';
+};
 
 const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
@@ -387,7 +394,7 @@ const AdminDashboard = () => {
                       <td>{app.jobTitle}</td>
                       <td>{app.seeker?.name || 'N/A'}</td>
                       <td>
-                        <span className={`admin-badge admin-badge-${app.status.toLowerCase()}`}>
+                        <span className={`admin-badge ${getStatusBadgeClass(app.status)}`}>
                           {app.status}
                         </span>
                       </td>

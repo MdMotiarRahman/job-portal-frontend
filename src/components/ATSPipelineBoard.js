@@ -1,37 +1,48 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Search, Filter, ChevronDown, AlertCircle, Loader, ChevronRight } from 'lucide-react';
+import { Search, Filter, ChevronDown, AlertCircle, Loader, RefreshCw, Eye, ArrowRightLeft, Clock } from 'lucide-react';
 import atsService from '../services/atsService';
 import '../styles/atsPipelineBoard.css';
-import CandidateCard from './CandidateCard';
 import MoveApplicationModal from './MoveApplicationModal';
+import CandidateDetailModal from './CandidateDetailModal';
 
-const CORE_STAGES = [
+const ALL_STAGES = [
   'Applied',
   'Screening',
   'Reviewing',
   'Shortlisted',
   'Interview Scheduled',
+  'Assessment',
   'Offer Extended',
+  'Accepted',
+  'Rejected',
+  'Withdrawn',
 ];
 
-const OUTCOME_STAGES = ['Accepted', 'Rejected', 'Withdrawn'];
-
-const ALL_STAGES = [...CORE_STAGES, ...OUTCOME_STAGES];
+const STAGE_COLORS = {
+  Applied: '#6B7280',
+  Screening: '#3B82F6',
+  Reviewing: '#8B5CF6',
+  Shortlisted: '#F59E0B',
+  'Interview Scheduled': '#EC4899',
+  Assessment: '#14B8A6',
+  'Offer Extended': '#10B981',
+  Accepted: '#22C55E',
+  Rejected: '#EF4444',
+  Withdrawn: '#9CA3AF',
+};
 
 const ATSPipelineBoard = () => {
-  const [board, setBoard] = useState({});
-  const [stageColors, setStageColors] = useState({});
+  const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStageFilter, setSelectedStageFilter] = useState('');
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [moveModalOpen, setMoveModalOpen] = useState(false);
-  const [draggedCard, setDraggedCard] = useState(null);
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
-  const [expandedOutcomes, setExpandedOutcomes] = useState(false);
 
-  const fetchBoard = useCallback(async () => {
+  const fetchApplications = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -40,113 +51,64 @@ const ATSPipelineBoard = () => {
       if (searchTerm.trim()) filters.search = searchTerm.trim();
       const response = await atsService.getBoard(filters);
       if (response.success) {
-        setBoard(response.data.board || {});
-        setStageColors(response.data.stageColors || {});
+        const board = response.data.board || {};
+        const allApps = [];
+        Object.entries(board).forEach(([stage, apps]) => {
+          if (Array.isArray(apps)) {
+            apps.forEach((app) => {
+              allApps.push({ ...app, stage });
+            });
+          }
+        });
+        allApps.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+        setApplications(allApps);
       }
     } catch (err) {
-      setError(err.message || 'Failed to load pipeline board');
+      console.error('ATS Board Error:', err);
+      setError(err.message || err.response?.data?.message || 'Failed to load applications');
     } finally {
       setLoading(false);
     }
   }, [selectedStageFilter, searchTerm]);
 
-  useEffect(() => { fetchBoard(); }, [fetchBoard]);
+  useEffect(() => { fetchApplications(); }, [fetchApplications]);
 
-  const handleDragStart = (e, application, fromStage) => {
-    setDraggedCard({ application, fromStage });
-    e.dataTransfer.effectAllowed = 'move';
-  };
+  useEffect(() => {
+    const interval = setInterval(fetchApplications, 30000);
+    return () => clearInterval(interval);
+  }, [fetchApplications]);
 
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-  };
-
-  const handleDropOnStage = async (e, toStage) => {
-    e.preventDefault();
-    if (!draggedCard || draggedCard.fromStage === toStage) {
-      setDraggedCard(null);
-      return;
-    }
-    try {
-      const response = await atsService.moveApplication(
-        draggedCard.application._id,
-        { stage: toStage }
-      );
-      if (response.success) {
-        setBoard((prev) => {
-          const updated = { ...prev };
-          updated[draggedCard.fromStage] = (updated[draggedCard.fromStage] || []).filter(
-            (app) => app._id !== draggedCard.application._id
-          );
-          updated[toStage] = [
-            ...(updated[toStage] || []),
-            { ...draggedCard.application, stage: toStage },
-          ];
-          return updated;
-        });
-      }
-    } catch (err) {
-      setError(`Failed to move: ${err.message || 'Unknown error'}`);
-    } finally {
-      setDraggedCard(null);
-    }
-  };
-
-  const handleCardClick = (application) => setSelectedApplication(application);
-  const handleMoveClick = (application) => {
+  const handleMoveStage = (application) => {
     setSelectedApplication(application);
     setMoveModalOpen(true);
   };
+
+  const handleViewDetail = (application) => {
+    setSelectedApplication(application);
+    setDetailModalOpen(true);
+  };
+
   const closeModals = () => {
     setSelectedApplication(null);
     setMoveModalOpen(false);
+    setDetailModalOpen(false);
   };
 
-  const filteredBoard = useMemo(() => {
-    if (!searchTerm.trim() && !selectedStageFilter) return board;
-    const filtered = {};
-    ALL_STAGES.forEach((stage) => {
-      filtered[stage] = (board[stage] || []).filter((app) => {
-        if (selectedStageFilter && app.stage !== selectedStageFilter) return false;
-        if (searchTerm.trim()) {
-          const s = searchTerm.toLowerCase();
-          return (
-            app.seeker?.name?.toLowerCase().includes(s) ||
-            app.seeker?.email?.toLowerCase().includes(s) ||
-            app.job?.title?.toLowerCase().includes(s)
-          );
-        }
-        return true;
-      });
-    });
-    return filtered;
-  }, [board, searchTerm, selectedStageFilter]);
-
-  const totalApplications = useMemo(
-    () => Object.values(filteredBoard).reduce((sum, apps) => sum + apps.length, 0),
-    [filteredBoard]
-  );
-
-  const outcomeCounts = useMemo(() => {
+  const stageCounts = useMemo(() => {
     const counts = {};
-    OUTCOME_STAGES.forEach((stage) => {
-      counts[stage] = (filteredBoard[stage] || []).length;
+    ALL_STAGES.forEach((s) => (counts[s] = 0));
+    applications.forEach((app) => {
+      if (counts[app.stage] !== undefined) counts[app.stage]++;
     });
     return counts;
-  }, [filteredBoard]);
+  }, [applications]);
 
-  const totalOutcomes = useMemo(
-    () => Object.values(outcomeCounts).reduce((a, b) => a + b, 0),
-    [outcomeCounts]
-  );
-
-  if (loading && !Object.keys(board).length) {
+  if (loading && applications.length === 0) {
     return (
       <div className="ats-board-container">
         <div className="ats-loading">
           <Loader size={32} className="spinner" />
-          <p>Loading pipeline...</p>
+          <p>Loading applications...</p>
         </div>
       </div>
     );
@@ -165,13 +127,12 @@ const ATSPipelineBoard = () => {
         </div>
       )}
 
-      {/* Controls */}
       <div className="ats-board-controls">
         <div className="ats-search-box">
           <Search size={16} />
           <input
             type="text"
-            placeholder="Search candidates..."
+            placeholder="Search by name, email, or job title..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="ats-search-input"
@@ -201,138 +162,109 @@ const ATSPipelineBoard = () => {
                   className={`ats-filter-option ${selectedStageFilter === stage ? 'active' : ''}`}
                   onClick={() => { setSelectedStageFilter(stage); setFilterOpen(false); }}
                 >
-                  <span className="ats-filter-color" style={{ backgroundColor: stageColors[stage] }} />
-                  {stage}
+                  <span className="ats-filter-color" style={{ backgroundColor: STAGE_COLORS[stage] }} />
+                  {stage} ({stageCounts[stage]})
                 </button>
               ))}
             </div>
           )}
         </div>
 
+        <button className="ats-refresh-btn" onClick={fetchApplications} type="button">
+          <RefreshCw size={14} />
+          Refresh
+        </button>
+
         <div className="ats-stats-summary">
           <span className="ats-stat">
-            <strong>{totalApplications}</strong> total
+            <strong>{applications.length}</strong> applications
           </span>
         </div>
       </div>
 
-      {/* Core Pipeline */}
-      <div className="ats-kanban-board">
-        {CORE_STAGES.map((stage) => {
-          const apps = filteredBoard[stage] || [];
-          return (
-            <div
-              key={stage}
-              className="ats-stage-column"
-              onDragOver={handleDragOver}
-              onDrop={(e) => handleDropOnStage(e, stage)}
-            >
-              <div className="ats-stage-header">
-                <div className="ats-stage-info">
-                  <div className="ats-stage-color" style={{ backgroundColor: stageColors[stage] }} />
-                  <h3 className="ats-stage-title">{stage}</h3>
-                </div>
-                <span className="ats-stage-count">{apps.length}</span>
-              </div>
-              <div className="ats-stage-content">
-                {apps.length > 0 ? (
-                  apps.map((application) => (
-                    <div
-                      key={application._id}
-                      draggable
-                      onDragStart={(e) => handleDragStart(e, application, stage)}
-                      className={`ats-card-wrapper ${draggedCard?.application._id === application._id ? 'dragging' : ''}`}
-                    >
-                      <CandidateCard
-                        application={application}
-                        stageColor={stageColors[stage]}
-                        onClick={() => handleCardClick(application)}
-                        onMoveClick={() => handleMoveClick(application)}
-                      />
+      <div className="ats-table-wrap">
+        <table className="ats-table">
+          <thead>
+            <tr>
+              <th>Candidate</th>
+              <th>Job</th>
+              <th>Stage</th>
+              <th>Applied</th>
+              <th>Updated</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {applications.length === 0 ? (
+              <tr>
+                <td colSpan="6" className="ats-empty-state">
+                  {searchTerm || selectedStageFilter
+                    ? 'No applications match your filters.'
+                    : 'No applications in the pipeline yet.'}
+                </td>
+              </tr>
+            ) : (
+              applications.map((app) => (
+                <tr key={app._id}>
+                  <td>
+                    <div className="ats-candidate-cell">
+                      <div
+                        className="ats-candidate-avatar"
+                        style={{ backgroundColor: STAGE_COLORS[app.stage] || '#6B7280' }}
+                      >
+                        {app.seeker?.name?.charAt(0).toUpperCase() || '?'}
+                      </div>
+                      <div>
+                        <strong>{app.seeker?.name || 'Unknown'}</strong>
+                        <div className="ats-muted-text">{app.seeker?.email || ''}</div>
+                      </div>
                     </div>
-                  ))
-                ) : (
-                  <div className="ats-empty-stage">Drop here</div>
-                )}
-              </div>
-            </div>
-          );
-        })}
+                  </td>
+                  <td>
+                    <strong>{app.job?.title || 'N/A'}</strong>
+                    <div className="ats-muted-text">{app.job?.location || ''}</div>
+                  </td>
+                  <td>
+                    <span
+                      className="ats-stage-badge"
+                      style={{ backgroundColor: STAGE_COLORS[app.stage] || '#6B7280' }}
+                    >
+                      {app.stage}
+                    </span>
+                  </td>
+                  <td>{new Date(app.createdAt).toLocaleDateString()}</td>
+                  <td>{new Date(app.updatedAt).toLocaleDateString()}</td>
+                  <td>
+                    <div className="ats-actions-cell">
+                      <button
+                        className="ats-action-btn"
+                        onClick={() => handleViewDetail(app)}
+                      >
+                        <Eye size={13} />
+                        View
+                      </button>
+                      <button
+                        className="ats-action-btn ats-action-primary"
+                        onClick={() => handleMoveStage(app)}
+                      >
+                        <ArrowRightLeft size={13} />
+                        Move
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
 
-      {/* Outcomes Summary Bar */}
-      <div className="ats-outcomes-bar">
-        <button
-          className="ats-outcomes-toggle"
-          onClick={() => setExpandedOutcomes(!expandedOutcomes)}
-        >
-          <div className="ats-outcomes-left">
-            <ChevronRight size={16} className={`ats-outcomes-chevron ${expandedOutcomes ? 'open' : ''}`} />
-            <span className="ats-outcomes-label">Outcomes</span>
-            <div className="ats-outcomes-chips">
-              {OUTCOME_STAGES.map((stage) => (
-                <span key={stage} className="ats-outcome-chip" style={{ borderColor: stageColors[stage] }}>
-                  <span className="ats-outcome-dot" style={{ backgroundColor: stageColors[stage] }} />
-                  {stage}
-                  <strong>{outcomeCounts[stage]}</strong>
-                </span>
-              ))}
-            </div>
-          </div>
-          <span className="ats-outcomes-total">{totalOutcomes} candidates</span>
-        </button>
-
-        {expandedOutcomes && (
-          <div className="ats-outcomes-grid">
-            {OUTCOME_STAGES.map((stage) => {
-              const apps = filteredBoard[stage] || [];
-              return (
-                <div
-                  key={stage}
-                  className="ats-outcome-column"
-                  onDragOver={handleDragOver}
-                  onDrop={(e) => handleDropOnStage(e, stage)}
-                >
-                  <div className="ats-outcome-col-header">
-                    <div className="ats-stage-color" style={{ backgroundColor: stageColors[stage] }} />
-                    <h4>{stage}</h4>
-                    <span className="ats-stage-count">{apps.length}</span>
-                  </div>
-                  <div className="ats-outcome-col-body">
-                    {apps.length > 0 ? (
-                      apps.map((application) => (
-                        <div
-                          key={application._id}
-                          draggable
-                          onDragStart={(e) => handleDragStart(e, application, stage)}
-                          className={`ats-card-wrapper ${draggedCard?.application._id === application._id ? 'dragging' : ''}`}
-                        >
-                          <CandidateCard
-                            application={application}
-                            stageColor={stageColors[stage]}
-                            onClick={() => handleCardClick(application)}
-                            onMoveClick={() => handleMoveClick(application)}
-                          />
-                        </div>
-                      ))
-                    ) : (
-                      <div className="ats-empty-stage">None</div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
-      {selectedApplication && !moveModalOpen && (
+      {detailModalOpen && selectedApplication && (
         <CandidateDetailModal
           application={selectedApplication}
-          stageColor={stageColors[selectedApplication.stage]}
+          stageColor={STAGE_COLORS[selectedApplication.stage]}
           onClose={closeModals}
-          onMoveClick={() => setMoveModalOpen(true)}
-          onRefresh={fetchBoard}
+          onMoveClick={() => { setDetailModalOpen(false); setMoveModalOpen(true); }}
         />
       )}
 
@@ -341,124 +273,9 @@ const ATSPipelineBoard = () => {
           application={selectedApplication}
           stages={ALL_STAGES}
           onClose={closeModals}
-          onSuccess={() => { fetchBoard(); closeModals(); }}
+          onSuccess={() => { fetchApplications(); closeModals(); }}
         />
       )}
-    </div>
-  );
-};
-
-const CandidateDetailModal = ({ application, stageColor, onClose, onMoveClick }) => {
-  const [stageHistory, setStageHistory] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchHistory = async () => {
-      try {
-        const response = await atsService.getStageHistory(application._id);
-        if (response.success) setStageHistory(response.data || []);
-      } catch (err) {
-        console.error('Failed to fetch stage history:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchHistory();
-  }, [application._id]);
-
-  return (
-    <div className="ats-modal-overlay" onClick={onClose}>
-      <div className="ats-modal ats-candidate-detail-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="ats-modal-header">
-          <div className="ats-candidate-header">
-            <div className="ats-candidate-avatar" style={{ background: stageColor || 'var(--brand-primary)' }}>
-              {application.seeker?.avatar ? (
-                <img src={application.seeker.avatar} alt="" />
-              ) : (
-                <div className="ats-avatar-placeholder">
-                  {application.seeker?.name?.charAt(0).toUpperCase()}
-                </div>
-              )}
-            </div>
-            <div>
-              <h2>{application.seeker?.name || 'Unknown'}</h2>
-              <p>{application.job?.title || 'Position'}</p>
-            </div>
-          </div>
-          <button className="ats-modal-close" onClick={onClose}>×</button>
-        </div>
-
-        <div className="ats-modal-content">
-          <section className="ats-modal-section">
-            <h3>Details</h3>
-            <div className="ats-info-grid">
-              <div className="ats-info-item">
-                <label>Email</label>
-                <p>{application.seeker?.email || 'N/A'}</p>
-              </div>
-              <div className="ats-info-item">
-                <label>Stage</label>
-                <p>
-                  <span className="ats-stage-badge" style={{ backgroundColor: stageColor }}>
-                    {application.stage}
-                  </span>
-                </p>
-              </div>
-              <div className="ats-info-item">
-                <label>Applied</label>
-                <p>{new Date(application.createdAt).toLocaleDateString()}</p>
-              </div>
-              <div className="ats-info-item">
-                <label>Updated</label>
-                <p>{new Date(application.updatedAt).toLocaleDateString()}</p>
-              </div>
-            </div>
-          </section>
-
-          <section className="ats-modal-section">
-            <h3>Position</h3>
-            <div className="ats-info-grid">
-              <div className="ats-info-item">
-                <label>Title</label>
-                <p>{application.job?.title || 'N/A'}</p>
-              </div>
-              <div className="ats-info-item">
-                <label>Location</label>
-                <p>{application.job?.location || 'N/A'}</p>
-              </div>
-            </div>
-          </section>
-
-          <section className="ats-modal-section">
-            <h3>History</h3>
-            {loading ? (
-              <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>Loading...</p>
-            ) : stageHistory.length > 0 ? (
-              <div className="ats-timeline">
-                {stageHistory.map((record, idx) => (
-                  <div key={idx} className="ats-timeline-item">
-                    <div className="ats-timeline-marker" />
-                    <div className="ats-timeline-content">
-                      <p className="ats-timeline-stage">{record.stage}</p>
-                      <p className="ats-timeline-date">
-                        {new Date(record.createdAt).toLocaleString()}
-                      </p>
-                      {record.notes && <p className="ats-timeline-notes">{record.notes}</p>}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>No history</p>
-            )}
-          </section>
-        </div>
-
-        <div className="ats-modal-footer">
-          <button className="ats-btn ats-btn-secondary" onClick={onClose}>Close</button>
-          <button className="ats-btn ats-btn-primary" onClick={onMoveClick}>Move Stage</button>
-        </div>
-      </div>
     </div>
   );
 };

@@ -24,6 +24,10 @@ const ATSDashboard = () => {
     };
 
     fetchDashboardData();
+
+    // Real-time polling: refresh stats every 30 seconds
+    const interval = setInterval(fetchDashboardData, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   if (loading) {
