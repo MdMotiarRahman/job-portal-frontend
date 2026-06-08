@@ -1,31 +1,30 @@
 import React, { useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, User } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
-import EmployerSidebar from './EmployerSidebar';
+import SeekerSidebar from './SeekerSidebar';
 import ReminderBell from './ReminderBell';
 import MessageBell from './MessageBell';
 import authService from '../services/auth.service';
 import '../styles/adminLayout.css';
 
-const EmployerLayout = ({ children }) => {
+const SeekerLayout = ({ children }) => {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const currentUser = authService.getCurrentUser()?.user;
 
   const pageTitle = useMemo(() => {
     const path = location.pathname;
-    if (path.startsWith('/employer/jobs/new')) return 'Create Job';
-    if (/^\/employer\/jobs\/[^/]+\/edit$/.test(path)) return 'Edit Job';
-    if (path.startsWith('/employer/jobs')) return 'My Jobs';
-    if (path.startsWith('/employer/applications')) return 'Applications';
-    if (path.startsWith('/employer/ats')) return 'ATS Pipeline';
-    if (path.startsWith('/employer/messages')) return 'Messages';
-    return 'Employer Dashboard';
+    if (path === '/seeker') return 'Dashboard';
+    if (path.startsWith('/seeker/profile')) return 'My Profile';
+    if (path.startsWith('/seeker/applications')) return 'Applications';
+    if (path.startsWith('/seeker/messages')) return 'Messages';
+    if (path.startsWith('/jobs')) return 'Browse Jobs';
+    return 'Job Seeker';
   }, [location.pathname]);
 
   return (
     <div className="admin-layout employer-layout">
-      <EmployerSidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
+      <SeekerSidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
 
       <main className={`admin-layout-main ${sidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
         <header className="admin-topbar">
@@ -50,8 +49,8 @@ const EmployerLayout = ({ children }) => {
                 <User size={20} strokeWidth={1.5} />
               </div>
               <div className="admin-user-meta">
-                <strong>{currentUser?.name || 'Employer'}</strong>
-                <span>{currentUser?.email || 'Hiring workspace'}</span>
+                <strong>{currentUser?.name || 'Job Seeker'}</strong>
+                <span>{currentUser?.email || 'Job portal account'}</span>
               </div>
             </div>
           </div>
@@ -63,4 +62,4 @@ const EmployerLayout = ({ children }) => {
   );
 };
 
-export default EmployerLayout;
+export default SeekerLayout;

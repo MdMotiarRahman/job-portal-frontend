@@ -1,213 +1,152 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Search, Filter, Plus, ChevronDown, AlertCircle, Loader } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Search, Filter, ChevronDown, AlertCircle, Loader, ChevronRight } from 'lucide-react';
 import atsService from '../services/atsService';
 import '../styles/atsPipelineBoard.css';
 import CandidateCard from './CandidateCard';
 import MoveApplicationModal from './MoveApplicationModal';
 
-const STAGES = [
+const CORE_STAGES = [
   'Applied',
   'Screening',
   'Reviewing',
   'Shortlisted',
   'Interview Scheduled',
-  'Assessment',
   'Offer Extended',
-  'Accepted',
-  'Rejected',
-  'Withdrawn',
 ];
 
+const OUTCOME_STAGES = ['Accepted', 'Rejected', 'Withdrawn'];
+
+const ALL_STAGES = [...CORE_STAGES, ...OUTCOME_STAGES];
+
 const ATSPipelineBoard = () => {
-  const navigate = useNavigate();
   const [board, setBoard] = useState({});
   const [stageColors, setStageColors] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStageFilter, setSelectedStageFilter] = useState('');
-  const [expandedStages, setExpandedStages] = useState({});
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [moveModalOpen, setMoveModalOpen] = useState(false);
   const [draggedCard, setDraggedCard] = useState(null);
-  const [stats, setStats] = useState(null);
   const [filterOpen, setFilterOpen] = useState(false);
+  const [expandedOutcomes, setExpandedOutcomes] = useState(false);
 
-  // Fetch pipeline data
   const fetchBoard = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      
       const filters = {};
       if (selectedStageFilter) filters.stage = selectedStageFilter;
       if (searchTerm.trim()) filters.search = searchTerm.trim();
-
       const response = await atsService.getBoard(filters);
-      
       if (response.success) {
         setBoard(response.data.board || {});
         setStageColors(response.data.stageColors || {});
       }
     } catch (err) {
-      console.error('Failed to fetch board:', err);
       setError(err.message || 'Failed to load pipeline board');
     } finally {
       setLoading(false);
     }
   }, [selectedStageFilter, searchTerm]);
 
-  // Fetch stats
-  const fetchStats = useCallback(async () => {
-    try {
-      const response = await atsService.getStats();
-      if (response.success) {
-        setStats(response.data);
-      }
-    } catch (err) {
-      console.error('Failed to fetch stats:', err);
-    }
-  }, []);
+  useEffect(() => { fetchBoard(); }, [fetchBoard]);
 
-  useEffect(() => {
-    fetchBoard();
-  }, [fetchBoard]);
-
-  useEffect(() => {
-    fetchStats();
-  }, [fetchStats]);
-
-  // Initialize expanded stages
-  useEffect(() => {
-    const initialExpanded = {};
-    STAGES.forEach((stage) => {
-      initialExpanded[stage] = true;
-    });
-    setExpandedStages(initialExpanded);
-  }, []);
-
-  // Handle drag start
   const handleDragStart = (e, application, fromStage) => {
     setDraggedCard({ application, fromStage });
     e.dataTransfer.effectAllowed = 'move';
   };
 
-  // Handle drag over
   const handleDragOver = (e) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
   };
 
-  // Handle drop on stage
   const handleDropOnStage = async (e, toStage) => {
     e.preventDefault();
-    
     if (!draggedCard || draggedCard.fromStage === toStage) {
       setDraggedCard(null);
       return;
     }
-
     try {
       const response = await atsService.moveApplication(
         draggedCard.application._id,
         { stage: toStage }
       );
-
       if (response.success) {
-        // Update local state
         setBoard((prev) => {
           const updated = { ...prev };
-          
-          // Remove from old stage
-          updated[draggedCard.fromStage] = updated[draggedCard.fromStage].filter(
+          updated[draggedCard.fromStage] = (updated[draggedCard.fromStage] || []).filter(
             (app) => app._id !== draggedCard.application._id
           );
-          
-          // Add to new stage
           updated[toStage] = [
-            ...updated[toStage],
+            ...(updated[toStage] || []),
             { ...draggedCard.application, stage: toStage },
           ];
-          
           return updated;
         });
-
-        // Refresh stats
-        fetchStats();
       }
     } catch (err) {
-      setError(`Failed to move application: ${err.message || 'Unknown error'}`);
+      setError(`Failed to move: ${err.message || 'Unknown error'}`);
     } finally {
       setDraggedCard(null);
     }
   };
 
-  // Handle click on card to view details
-  const handleCardClick = (application) => {
-    setSelectedApplication(application);
-  };
-
-  // Handle move to stage button
+  const handleCardClick = (application) => setSelectedApplication(application);
   const handleMoveClick = (application) => {
     setSelectedApplication(application);
     setMoveModalOpen(true);
   };
-
-  // Close modals
   const closeModals = () => {
     setSelectedApplication(null);
     setMoveModalOpen(false);
   };
 
-  // Toggle stage expansion
-  const toggleStageExpansion = (stage) => {
-    setExpandedStages((prev) => ({
-      ...prev,
-      [stage]: !prev[stage],
-    }));
-  };
-
-  // Calculate filtered applications
   const filteredBoard = useMemo(() => {
-    if (!searchTerm.trim() && !selectedStageFilter) {
-      return board;
-    }
-
+    if (!searchTerm.trim() && !selectedStageFilter) return board;
     const filtered = {};
-    STAGES.forEach((stage) => {
+    ALL_STAGES.forEach((stage) => {
       filtered[stage] = (board[stage] || []).filter((app) => {
-        if (selectedStageFilter && app.stage !== selectedStageFilter) {
-          return false;
-        }
-
+        if (selectedStageFilter && app.stage !== selectedStageFilter) return false;
         if (searchTerm.trim()) {
-          const search = searchTerm.toLowerCase();
-          const matchesName = app.seeker?.name?.toLowerCase().includes(search);
-          const matchesEmail = app.seeker?.email?.toLowerCase().includes(search);
-          const matchesJob = app.job?.title?.toLowerCase().includes(search);
-          
-          return matchesName || matchesEmail || matchesJob;
+          const s = searchTerm.toLowerCase();
+          return (
+            app.seeker?.name?.toLowerCase().includes(s) ||
+            app.seeker?.email?.toLowerCase().includes(s) ||
+            app.job?.title?.toLowerCase().includes(s)
+          );
         }
-
         return true;
       });
     });
-
     return filtered;
   }, [board, searchTerm, selectedStageFilter]);
 
-  // Get active application count
-  const totalApplications = useMemo(() => {
-    return Object.values(filteredBoard).reduce((sum, apps) => sum + apps.length, 0);
+  const totalApplications = useMemo(
+    () => Object.values(filteredBoard).reduce((sum, apps) => sum + apps.length, 0),
+    [filteredBoard]
+  );
+
+  const outcomeCounts = useMemo(() => {
+    const counts = {};
+    OUTCOME_STAGES.forEach((stage) => {
+      counts[stage] = (filteredBoard[stage] || []).length;
+    });
+    return counts;
   }, [filteredBoard]);
+
+  const totalOutcomes = useMemo(
+    () => Object.values(outcomeCounts).reduce((a, b) => a + b, 0),
+    [outcomeCounts]
+  );
 
   if (loading && !Object.keys(board).length) {
     return (
       <div className="ats-board-container">
         <div className="ats-loading">
-          <Loader size={40} className="spinner" />
-          <p>Loading pipeline board...</p>
+          <Loader size={32} className="spinner" />
+          <p>Loading pipeline...</p>
         </div>
       </div>
     );
@@ -215,27 +154,9 @@ const ATSPipelineBoard = () => {
 
   return (
     <div className="ats-board-container">
-      {/* Header */}
-      <div className="ats-board-header">
-        <div>
-          <h1>Hiring Pipeline</h1>
-          <p>Manage candidates through the hiring process</p>
-        </div>
-        <div className="ats-board-actions">
-          <button
-            className="ats-btn ats-btn-primary"
-            onClick={() => navigate('/admin/applications')}
-          >
-            <Plus size={16} />
-            View Table
-          </button>
-        </div>
-      </div>
-
-      {/* Error Alert */}
       {error && (
         <div className="ats-alert ats-alert-error">
-          <AlertCircle size={18} />
+          <AlertCircle size={16} />
           <div>
             <strong>Error</strong>
             <p>{error}</p>
@@ -247,58 +168,40 @@ const ATSPipelineBoard = () => {
       {/* Controls */}
       <div className="ats-board-controls">
         <div className="ats-search-box">
-          <Search size={18} />
+          <Search size={16} />
           <input
             type="text"
-            placeholder="Search by name, email, or job title..."
+            placeholder="Search candidates..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="ats-search-input"
           />
           {searchTerm && (
-            <button
-              className="ats-clear-search"
-              onClick={() => setSearchTerm('')}
-            >
-              ×
-            </button>
+            <button className="ats-clear-search" onClick={() => setSearchTerm('')}>×</button>
           )}
         </div>
 
         <div className="ats-filter-group">
-          <button
-            className="ats-filter-btn"
-            onClick={() => setFilterOpen(!filterOpen)}
-          >
-            <Filter size={16} />
-            Stage Filter
-            <ChevronDown size={14} />
+          <button className="ats-filter-btn" onClick={() => setFilterOpen(!filterOpen)}>
+            <Filter size={14} />
+            Stage
+            <ChevronDown size={12} />
           </button>
-
           {filterOpen && (
             <div className="ats-filter-dropdown">
               <button
                 className={`ats-filter-option ${!selectedStageFilter ? 'active' : ''}`}
-                onClick={() => {
-                  setSelectedStageFilter('');
-                  setFilterOpen(false);
-                }}
+                onClick={() => { setSelectedStageFilter(''); setFilterOpen(false); }}
               >
                 All Stages
               </button>
-              {STAGES.map((stage) => (
+              {ALL_STAGES.map((stage) => (
                 <button
                   key={stage}
                   className={`ats-filter-option ${selectedStageFilter === stage ? 'active' : ''}`}
-                  onClick={() => {
-                    setSelectedStageFilter(stage);
-                    setFilterOpen(false);
-                  }}
+                  onClick={() => { setSelectedStageFilter(stage); setFilterOpen(false); }}
                 >
-                  <span
-                    className="ats-filter-color"
-                    style={{ backgroundColor: stageColors[stage] }}
-                  />
+                  <span className="ats-filter-color" style={{ backgroundColor: stageColors[stage] }} />
                   {stage}
                 </button>
               ))}
@@ -308,55 +211,32 @@ const ATSPipelineBoard = () => {
 
         <div className="ats-stats-summary">
           <span className="ats-stat">
-            <strong>{totalApplications}</strong> applications
+            <strong>{totalApplications}</strong> total
           </span>
-          {stats?.data?.totalApplications && (
-            <span className="ats-stat">
-              Avg time to hire: <strong>{stats.data.avgTimeToHire || 'N/A'} days</strong>
-            </span>
-          )}
         </div>
       </div>
 
-      {/* Kanban Board */}
+      {/* Core Pipeline */}
       <div className="ats-kanban-board">
-        {STAGES.map((stage) => (
-          <div
-            key={stage}
-            className="ats-stage-column"
-            onDragOver={handleDragOver}
-            onDrop={(e) => handleDropOnStage(e, stage)}
-          >
-            {/* Column Header */}
-            <div className="ats-stage-header">
-              <div className="ats-stage-title-row">
-                <button
-                  className="ats-expand-btn"
-                  onClick={() => toggleStageExpansion(stage)}
-                >
-                  <ChevronDown
-                    size={16}
-                    className={`${expandedStages[stage] ? 'expanded' : 'collapsed'}`}
-                  />
-                </button>
+        {CORE_STAGES.map((stage) => {
+          const apps = filteredBoard[stage] || [];
+          return (
+            <div
+              key={stage}
+              className="ats-stage-column"
+              onDragOver={handleDragOver}
+              onDrop={(e) => handleDropOnStage(e, stage)}
+            >
+              <div className="ats-stage-header">
                 <div className="ats-stage-info">
-                  <div
-                    className="ats-stage-color"
-                    style={{ backgroundColor: stageColors[stage] }}
-                  />
+                  <div className="ats-stage-color" style={{ backgroundColor: stageColors[stage] }} />
                   <h3 className="ats-stage-title">{stage}</h3>
                 </div>
+                <span className="ats-stage-count">{apps.length}</span>
               </div>
-              <span className="ats-stage-count">
-                {(filteredBoard[stage] || []).length}
-              </span>
-            </div>
-
-            {/* Applications in Stage */}
-            {expandedStages[stage] && (
               <div className="ats-stage-content">
-                {(filteredBoard[stage] || []).length > 0 ? (
-                  (filteredBoard[stage] || []).map((application) => (
+                {apps.length > 0 ? (
+                  apps.map((application) => (
                     <div
                       key={application._id}
                       draggable
@@ -372,17 +252,80 @@ const ATSPipelineBoard = () => {
                     </div>
                   ))
                 ) : (
-                  <div className="ats-empty-stage">
-                    <p>No applications yet</p>
-                  </div>
+                  <div className="ats-empty-stage">Drop here</div>
                 )}
               </div>
-            )}
-          </div>
-        ))}
+            </div>
+          );
+        })}
       </div>
 
-      {/* Candidate Detail Modal */}
+      {/* Outcomes Summary Bar */}
+      <div className="ats-outcomes-bar">
+        <button
+          className="ats-outcomes-toggle"
+          onClick={() => setExpandedOutcomes(!expandedOutcomes)}
+        >
+          <div className="ats-outcomes-left">
+            <ChevronRight size={16} className={`ats-outcomes-chevron ${expandedOutcomes ? 'open' : ''}`} />
+            <span className="ats-outcomes-label">Outcomes</span>
+            <div className="ats-outcomes-chips">
+              {OUTCOME_STAGES.map((stage) => (
+                <span key={stage} className="ats-outcome-chip" style={{ borderColor: stageColors[stage] }}>
+                  <span className="ats-outcome-dot" style={{ backgroundColor: stageColors[stage] }} />
+                  {stage}
+                  <strong>{outcomeCounts[stage]}</strong>
+                </span>
+              ))}
+            </div>
+          </div>
+          <span className="ats-outcomes-total">{totalOutcomes} candidates</span>
+        </button>
+
+        {expandedOutcomes && (
+          <div className="ats-outcomes-grid">
+            {OUTCOME_STAGES.map((stage) => {
+              const apps = filteredBoard[stage] || [];
+              return (
+                <div
+                  key={stage}
+                  className="ats-outcome-column"
+                  onDragOver={handleDragOver}
+                  onDrop={(e) => handleDropOnStage(e, stage)}
+                >
+                  <div className="ats-outcome-col-header">
+                    <div className="ats-stage-color" style={{ backgroundColor: stageColors[stage] }} />
+                    <h4>{stage}</h4>
+                    <span className="ats-stage-count">{apps.length}</span>
+                  </div>
+                  <div className="ats-outcome-col-body">
+                    {apps.length > 0 ? (
+                      apps.map((application) => (
+                        <div
+                          key={application._id}
+                          draggable
+                          onDragStart={(e) => handleDragStart(e, application, stage)}
+                          className={`ats-card-wrapper ${draggedCard?.application._id === application._id ? 'dragging' : ''}`}
+                        >
+                          <CandidateCard
+                            application={application}
+                            stageColor={stageColors[stage]}
+                            onClick={() => handleCardClick(application)}
+                            onMoveClick={() => handleMoveClick(application)}
+                          />
+                        </div>
+                      ))
+                    ) : (
+                      <div className="ats-empty-stage">None</div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
       {selectedApplication && !moveModalOpen && (
         <CandidateDetailModal
           application={selectedApplication}
@@ -393,25 +336,19 @@ const ATSPipelineBoard = () => {
         />
       )}
 
-      {/* Move Application Modal */}
       {moveModalOpen && selectedApplication && (
         <MoveApplicationModal
           application={selectedApplication}
-          stages={STAGES}
+          stages={ALL_STAGES}
           onClose={closeModals}
-          onSuccess={() => {
-            fetchBoard();
-            fetchStats();
-            closeModals();
-          }}
+          onSuccess={() => { fetchBoard(); closeModals(); }}
         />
       )}
     </div>
   );
 };
 
-// ─── Candidate Detail Modal ───────────────────────────────────────
-const CandidateDetailModal = ({ application, stageColor, onClose, onMoveClick, onRefresh }) => {
+const CandidateDetailModal = ({ application, stageColor, onClose, onMoveClick }) => {
   const [stageHistory, setStageHistory] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -419,28 +356,24 @@ const CandidateDetailModal = ({ application, stageColor, onClose, onMoveClick, o
     const fetchHistory = async () => {
       try {
         const response = await atsService.getStageHistory(application._id);
-        if (response.success) {
-          setStageHistory(response.data || []);
-        }
+        if (response.success) setStageHistory(response.data || []);
       } catch (err) {
         console.error('Failed to fetch stage history:', err);
       } finally {
         setLoading(false);
       }
     };
-
     fetchHistory();
   }, [application._id]);
 
   return (
     <div className="ats-modal-overlay" onClick={onClose}>
       <div className="ats-modal ats-candidate-detail-modal" onClick={(e) => e.stopPropagation()}>
-        {/* Header */}
         <div className="ats-modal-header">
           <div className="ats-candidate-header">
-            <div className="ats-candidate-avatar">
+            <div className="ats-candidate-avatar" style={{ background: stageColor || 'var(--brand-primary)' }}>
               {application.seeker?.avatar ? (
-                <img src={application.seeker.avatar} alt={application.seeker.name} />
+                <img src={application.seeker.avatar} alt="" />
               ) : (
                 <div className="ats-avatar-placeholder">
                   {application.seeker?.name?.charAt(0).toUpperCase()}
@@ -448,73 +381,58 @@ const CandidateDetailModal = ({ application, stageColor, onClose, onMoveClick, o
               )}
             </div>
             <div>
-              <h2>{application.seeker?.name || 'Unknown Candidate'}</h2>
-              <p>{application.job?.title || 'Unknown Position'}</p>
+              <h2>{application.seeker?.name || 'Unknown'}</h2>
+              <p>{application.job?.title || 'Position'}</p>
             </div>
           </div>
           <button className="ats-modal-close" onClick={onClose}>×</button>
         </div>
 
-        {/* Content */}
         <div className="ats-modal-content">
-          {/* Candidate Info */}
           <section className="ats-modal-section">
-            <h3>Candidate Information</h3>
+            <h3>Details</h3>
             <div className="ats-info-grid">
               <div className="ats-info-item">
                 <label>Email</label>
                 <p>{application.seeker?.email || 'N/A'}</p>
               </div>
               <div className="ats-info-item">
-                <label>Current Stage</label>
+                <label>Stage</label>
                 <p>
-                  <span
-                    className="ats-stage-badge"
-                    style={{ backgroundColor: stageColor }}
-                  >
+                  <span className="ats-stage-badge" style={{ backgroundColor: stageColor }}>
                     {application.stage}
                   </span>
                 </p>
               </div>
               <div className="ats-info-item">
-                <label>Applied Date</label>
+                <label>Applied</label>
                 <p>{new Date(application.createdAt).toLocaleDateString()}</p>
               </div>
               <div className="ats-info-item">
-                <label>Last Updated</label>
+                <label>Updated</label>
                 <p>{new Date(application.updatedAt).toLocaleDateString()}</p>
               </div>
             </div>
           </section>
 
-          {/* Job Info */}
           <section className="ats-modal-section">
-            <h3>Position Details</h3>
+            <h3>Position</h3>
             <div className="ats-info-grid">
               <div className="ats-info-item">
-                <label>Position</label>
+                <label>Title</label>
                 <p>{application.job?.title || 'N/A'}</p>
-              </div>
-              <div className="ats-info-item">
-                <label>Company</label>
-                <p>{application.job?.companyName || 'N/A'}</p>
               </div>
               <div className="ats-info-item">
                 <label>Location</label>
                 <p>{application.job?.location || 'N/A'}</p>
               </div>
-              <div className="ats-info-item">
-                <label>Employment Type</label>
-                <p>{application.job?.employmentType || 'N/A'}</p>
-              </div>
             </div>
           </section>
 
-          {/* Stage History */}
           <section className="ats-modal-section">
-            <h3>Stage Progression</h3>
+            <h3>History</h3>
             {loading ? (
-              <p>Loading history...</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>Loading...</p>
             ) : stageHistory.length > 0 ? (
               <div className="ats-timeline">
                 {stageHistory.map((record, idx) => (
@@ -526,29 +444,19 @@ const CandidateDetailModal = ({ application, stageColor, onClose, onMoveClick, o
                         {new Date(record.createdAt).toLocaleString()}
                       </p>
                       {record.notes && <p className="ats-timeline-notes">{record.notes}</p>}
-                      {record.movedBy && (
-                        <p className="ats-timeline-by">
-                          Moved by: {record.movedBy.name} ({record.movedByRole})
-                        </p>
-                      )}
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <p>No stage history available</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>No history</p>
             )}
           </section>
         </div>
 
-        {/* Footer */}
         <div className="ats-modal-footer">
-          <button className="ats-btn ats-btn-secondary" onClick={onClose}>
-            Close
-          </button>
-          <button className="ats-btn ats-btn-primary" onClick={onMoveClick}>
-            Move to Different Stage
-          </button>
+          <button className="ats-btn ats-btn-secondary" onClick={onClose}>Close</button>
+          <button className="ats-btn ats-btn-primary" onClick={onMoveClick}>Move Stage</button>
         </div>
       </div>
     </div>

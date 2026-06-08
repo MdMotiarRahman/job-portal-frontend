@@ -43,6 +43,7 @@ import ATSPage from './components/ATSPage';
 import EmployerLayout from './components/EmployerLayout';
 import EmployerDashboard from './components/EmployerDashboard';
 import SeekerDashboard from './components/SeekerDashboard';
+import SeekerLayout from './components/SeekerLayout';
 
 import SeekerProfile from './pages/SeekerProfile';
 import ApplyJob from './pages/ApplyJob';
@@ -635,7 +636,8 @@ const AppContent = () => {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
   const isEmployerRoute = location.pathname.startsWith('/employer');
-  const isPortalRoute = isAdminRoute || isEmployerRoute;
+  const isSeekerRoute = location.pathname.startsWith('/seeker');
+  const isPortalRoute = isAdminRoute || isEmployerRoute || isSeekerRoute;
 
 
   return (
@@ -694,7 +696,9 @@ const AppContent = () => {
             path="/employer/messages"
             element={
               <ProtectedRoute allowedRoles={['employer']}>
-                <MessagingPage />
+                <EmployerLayout>
+                  <MessagingPage />
+                </EmployerLayout>
               </ProtectedRoute>
             }
           />
@@ -703,7 +707,9 @@ const AppContent = () => {
             path="/seeker/messages"
             element={
               <ProtectedRoute allowedRoles={['seeker']}>
-                <MessagingPage />
+                <SeekerLayout>
+                  <MessagingPage />
+                </SeekerLayout>
               </ProtectedRoute>
             }
           />
@@ -881,7 +887,9 @@ const AppContent = () => {
             path="/seeker"
             element={
               <ProtectedRoute allowedRoles={['seeker']}>
-                <SeekerDashboard />
+                <SeekerLayout>
+                  <SeekerDashboard />
+                </SeekerLayout>
               </ProtectedRoute>
             }
           />
@@ -890,7 +898,9 @@ const AppContent = () => {
             path="/seeker/profile"
             element={
               <ProtectedRoute allowedRoles={['seeker']}>
-                <SeekerProfile />
+                <SeekerLayout>
+                  <SeekerProfile />
+                </SeekerLayout>
               </ProtectedRoute>
             }
           />
@@ -899,7 +909,9 @@ const AppContent = () => {
               path="/seeker/applications"
               element={
                 <ProtectedRoute allowedRoles={['seeker']}>
-                  <MyApplications />
+                  <SeekerLayout>
+                    <MyApplications />
+                  </SeekerLayout>
                 </ProtectedRoute>
               }
             />

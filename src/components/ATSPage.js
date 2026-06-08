@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from 'react';
-import { RefreshCw } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import ATSDashboard from './ATSDashboard';
 import ATSPipelineBoard from './ATSPipelineBoard';
@@ -25,17 +24,6 @@ const ATSPage = () => {
 
   return (
     <div className="ats-page-container">
-      <div className="ats-page-header">
-        <div className="ats-page-title">
-          <h1>Application Tracking System</h1>
-          <p>Manage your hiring pipeline, interviews, and offers</p>
-        </div>
-        <button className="ats-page-refresh-btn" onClick={handleRefresh}>
-          <RefreshCw size={18} strokeWidth={2} />
-          Refresh
-        </button>
-      </div>
-
       <div className="ats-page-tabs">
         <button
           className={`ats-page-tab ${activeTab === 'board' ? 'active' : ''}`}

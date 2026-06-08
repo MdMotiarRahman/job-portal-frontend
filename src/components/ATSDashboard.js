@@ -56,13 +56,6 @@ const ATSDashboard = () => {
 
   return (
     <div className="ats-simple-container">
-      <div className="ats-header-section">
-        <div>
-          <h1 className="ats-page-title">Hiring Dashboard</h1>
-          <p className="ats-page-subtitle">Track your recruitment pipeline and candidate progress.</p>
-        </div>
-      </div>
-
       <div className="ats-kpi-grid">
         <div className="ats-kpi-card">
           <div className="ats-kpi-icon bg-blue"><Users size={20} /></div>
