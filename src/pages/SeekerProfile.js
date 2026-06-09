@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import '../styles/employerDashboard.css';
 import '../styles/seekerProfile.css';
 import { getFileUrl } from "../utils/fileUrl";
 
