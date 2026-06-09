@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import EmployerLayout from './EmployerLayout';
 import employerService from '../services/employer.service';
 import ReminderWidget from './ReminderWidget';
@@ -12,9 +12,10 @@ const STATUSES = ['Open', 'Closed', 'Draft', 'Pending Approval'];
 const VALID_STATUSES = ['Pending', 'Reviewing', 'Shortlisted', 'Interview Scheduled', 'Accepted', 'Rejected'];
 const VALID_JOB_STATUSES = ['Active', 'Closed'];
 
-const EmployerDashboard = () => {
+const EmployerDashboard = ({ page = 'overview' }) => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('overview');
+  const { jobId } = useParams();
+  const [activeTab, setActiveTab] = useState(page);
 
   const [summary, setSummary] = useState(null);
   const [jobs, setJobs] = useState([]);
@@ -78,6 +79,51 @@ const EmployerDashboard = () => {
     loadJobs();
     loadApplications();
   }, [loadSummary, loadJobs, loadApplications]);
+
+  useEffect(() => {
+    setActiveTab(page);
+  }, [page]);
+
+  useEffect(() => {
+    if (page === 'edit-job' && jobId) {
+      const loadJobForEdit = async () => {
+        try {
+          const data = await employerService.getMyJobs();
+          const job = data.find(j => j._id === jobId);
+          if (job) {
+            setEditingJob(job);
+            setFormData({
+              title: job.title || '',
+              location: job.location || '',
+              jobType: job.jobType || 'Full-time',
+              experienceLevel: job.experienceLevel || 'Mid Level',
+              salaryMin: job.salary?.min?.toString() || '',
+              salaryMax: job.salary?.max?.toString() || '',
+              description: job.description || '',
+              requirements: job.requirements || '',
+              skills: job.skills?.join(', ') || '',
+              applicationDeadline: job.applicationDeadline
+                ? new Date(job.applicationDeadline).toISOString().split('T')[0] : ''
+            });
+          } else {
+            navigate('/employer/jobs');
+          }
+        } catch (err) {
+          console.error('Failed to load job for editing:', err);
+          navigate('/employer/jobs');
+        }
+      };
+      loadJobForEdit();
+    } else if (page === 'new-job') {
+      setEditingJob(null);
+      setFormData({
+        title: '', location: '', jobType: 'Full-time', experienceLevel: 'Mid Level',
+        salaryMin: '', salaryMax: '', description: '', requirements: '', skills: '',
+        applicationDeadline: ''
+      });
+      setFormErrors({});
+    }
+  }, [page, jobId, navigate]);
 
   useEffect(() => {
     if (editingJob) {
@@ -225,26 +271,19 @@ const EmployerDashboard = () => {
   };
 
   const handleTabChange = (tab) => {
-    setActiveTab(tab);
     if (tab === 'edit-job') {
-      setEditingJob(null);
-      setFormData({
-        title: '', location: '', jobType: 'Full-time', experienceLevel: 'Mid Level',
-        salaryMin: '', salaryMax: '', description: '', requirements: '', skills: '',
-        applicationDeadline: ''
-      });
-      setFormErrors({});
-    }
-    if (tab === 'overview') {
-      loadSummary();
-      loadJobs();
-      loadApplications();
+      navigate('/employer/jobs/new');
+    } else if (tab === 'jobs') {
+      navigate('/employer/jobs');
+    } else if (tab === 'overview') {
+      navigate('/employer/dashboard');
+    } else if (tab === 'applications') {
+      navigate('/employer/applications');
     }
   };
 
   const handleEditJob = (job) => {
-    setEditingJob(job);
-    setActiveTab('edit-job');
+    navigate(`/employer/jobs/${job._id}/edit`);
   };
 
   const overviewLoading = loading.summary || loading.jobs || loading.applications;
@@ -286,7 +325,7 @@ const EmployerDashboard = () => {
         />
       )}
 
-      {activeTab === 'edit-job' && (
+      {(activeTab === 'edit-job' || activeTab === 'new-job') && (
         <JobFormSection
           editingJob={editingJob}
           formData={formData}
