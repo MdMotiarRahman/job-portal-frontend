@@ -1,18 +1,21 @@
-import React, { useEffect, useState } from 'react';
-
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-
 import axios from 'axios';
 
 import {
-  Mail,
-  FileText,
   Briefcase,
+  FileText,
   MapPin,
   GraduationCap,
   Code,
   Building2,
   MessageSquare,
+  User,
+  Clock3,
+  CheckCircle,
+  XCircle,
+  Search,
+  Bell,
 } from 'lucide-react';
 
 import {
@@ -21,322 +24,366 @@ import {
 } from '../services/seekerService';
 
 import ReminderWidget from './ReminderWidget';
+import { getFileUrl } from '../utils/fileUrl';
 
+import '../styles/employerDashboard.css';
 import '../styles/seekerDashboard.css';
-import { getFileUrl } from "../utils/fileUrl";
 
 const SeekerDashboard = () => {
-
   const [profile, setProfile] = useState(null);
-
   const [jobs, setJobs] = useState([]);
-
+  const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ============================
-  // FETCH DATA
-  // ============================
-
   const fetchData = async () => {
-
     try {
-
       setLoading(true);
 
-      // PROFILE
-      const profileRes =
-        await getMyProfile();
-
+      const profileRes = await getMyProfile();
       setProfile(profileRes.data);
 
-      // APPLICATIONS
-      const appRes =
-        await getMyApplications();
+      const appRes = await getMyApplications();
 
-      // APPROVED JOBS
-      const jobsRes =
-        await axios.get(
-          'http://localhost:5000/api/jobs'
-        );
-
-      // REMOVE ALREADY APPLIED JOBS
       const myApplications = Array.isArray(appRes.data)
-  ? appRes.data
-  : appRes.data?.applications || [];
+        ? appRes.data
+        : appRes.data?.applications || [];
 
-const allJobs = Array.isArray(jobsRes.data)
-  ? jobsRes.data
-  : jobsRes.data?.jobs || [];
+      setApplications(myApplications);
 
-const appliedJobIds = myApplications
-  .map((item) => item.job?._id || item.job)
-  .filter(Boolean);
+      const jobsRes = await axios.get('http://localhost:5000/api/jobs');
 
-const filteredJobs = allJobs.filter(
-  (job) => !appliedJobIds.includes(job._id)
-);
+      const allJobs = Array.isArray(jobsRes.data)
+        ? jobsRes.data
+        : jobsRes.data?.jobs || [];
+
+      const appliedJobIds = myApplications
+        .map((item) => item.job?._id || item.job)
+        .filter(Boolean)
+        .map(String);
+
+      const filteredJobs = allJobs.filter((job) => {
+        const isApproved =
+          job.isApproved === true ||
+          job.approvalStatus === 'Approved' ||
+          job.status === 'Active' ||
+          job.status === 'active' ||
+          job.status === 'Open';
+
+        const isActive =
+          job.status === 'Active' ||
+          job.status === 'active' ||
+          job.status === 'Open';
+
+        return isApproved && isActive && !appliedJobIds.includes(String(job._id));
+      });
+
       setJobs(filteredJobs);
-
     } catch (error) {
-
-      console.log(error);
-
+      console.log('Seeker dashboard load error:', error);
     } finally {
-
       setLoading(false);
-
     }
-
   };
 
   useEffect(() => {
-
     fetchData();
-
   }, []);
 
+  const stats = useMemo(() => {
+    return {
+      total: applications.length,
+      reviewing: applications.filter((app) =>
+        ['Reviewing', 'Shortlisted', 'Interview Scheduled'].includes(app.status)
+      ).length,
+      interviews: applications.filter((app) => app.status === 'Interview Scheduled').length,
+      accepted: applications.filter((app) => app.status === 'Accepted').length,
+      rejected: applications.filter((app) => app.status === 'Rejected').length,
+    };
+  }, [applications]);
+
+  const profileCompletion = useMemo(() => {
+    if (!profile) return 0;
+
+    const fields = [
+      profile.name,
+      profile.email,
+      profile.location,
+      profile.education,
+      profile.skills,
+      profile.resume,
+      profile.profileImage,
+    ];
+
+    const completed = fields.filter(Boolean).length;
+    return Math.round((completed / fields.length) * 100);
+  }, [profile]);
+
+  const recentApplications = applications.slice(0, 5);
+  const availableJobs = jobs.slice(0, 5);
+
   const profileImage = profile?.profileImage
-    ? profile.profileImage.startsWith('http')
-      ? profile.profileImage
-      : `http://localhost:5000/${profile.profileImage.replace(/\\/g, '/')}`
+    ? getFileUrl(profile.profileImage)
     : 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
 
-  return (
+  const firstName = profile?.name?.split(' ')[0] || 'Seeker';
 
-    <div className="seeker-dashboard">
-
-      {/* HEADER */}
-      <div className="dashboard-top">
-
-        <div>
-
-          <h1>
-            Welcome back,
-            <span> {profile?.name || 'User'}</span>
-          </h1>
-
-          <p>
-            Find jobs and manage applications easily.
-          </p>
-
+  if (loading) {
+    return (
+      <div className="emp-page">
+        <div className="admin-loading">
+          <div className="admin-spinner" />
         </div>
-
-        <div className="dashboard-buttons">
-
-          <Link
-            to="/seeker/profile"
-            className="dashboard-btn"
-          >
-            Edit Profile
-          </Link>
-
-          <Link
-            to="/seeker/applications"
-            className="dashboard-btn primary"
-          >
-            My Applications
-          </Link>
-
-          <Link
-            to="/seeker/messages"
-            className="dashboard-btn"
-          >
-            <MessageSquare size={16} style={{ marginRight: 6 }} />
-            Messages
-          </Link>
-
-        </div>
-
       </div>
-
-      {/* PROFILE */}
-      {profile && (
-
-        <div className="profile-card">
-
-          <div className="profile-header">
-
-            <div className="avatar">
-
-              <img
-  src={
-    profile.profileImage
-      ? getFileUrl(profile.profileImage)
-      : "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+    );
   }
-  alt="profile"
-/>
 
-            </div>
-
-            <div className="profile-info">
-
-              <h2>{profile.name}</h2>
-
-              <div className="email-row">
-
-                <Mail size={18} />
-
-                <span>{profile.email}</span>
-
+  return (
+    <div className="emp-page seeker-modern-page">
+      {/* HERO */}
+      <div className="emp-hero seeker-hero">
+        <div className="emp-hero-content">
+          <div className="emp-hero-text">
+            <div className="seeker-hero-profile">
+              <img src={profileImage} alt="profile" />
+              <div>
+                <h2>Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 17 ? 'afternoon' : 'evening'}, {firstName}</h2>
+                <p>Track your applications, discover new jobs, and keep your seeker profile ready for employers.</p>
               </div>
-
             </div>
-
           </div>
 
-          <div className="profile-grid">
-
-            <div className="profile-item">
-
-              <div className="icon-box">
-                <MapPin size={20} />
-              </div>
-
-              <div>
-
-                <h4>Location</h4>
-
-                <p>
-                  {profile.location ||
-                    'No location added'}
-                </p>
-
-              </div>
-
+          <div className="emp-hero-stats">
+            <div className="emp-hero-stat">
+              <div className="emp-hero-stat-value">{stats.total}</div>
+              <div className="emp-hero-stat-label">Applications</div>
             </div>
 
-            <div className="profile-item">
-
-              <div className="icon-box">
-                <GraduationCap size={20} />
-              </div>
-
-              <div>
-
-                <h4>Education</h4>
-
-                <p>
-                  {profile.education ||
-                    'No education added'}
-                </p>
-
-              </div>
-
+            <div className="emp-hero-stat">
+              <div className="emp-hero-stat-value">{jobs.length}</div>
+              <div className="emp-hero-stat-label">Available Jobs</div>
             </div>
 
-            <div className="profile-item">
-
-              <div className="icon-box">
-                <Code size={20} />
-              </div>
-
-              <div>
-
-                <h4>Skills</h4>
-
-                <p>
-                  {profile.skills ||
-                    'No skills added'}
-                </p>
-
-              </div>
-
+            <div className="emp-hero-stat">
+              <div className="emp-hero-stat-value">{profileCompletion}%</div>
+              <div className="emp-hero-stat-label">Profile</div>
             </div>
-
           </div>
-
-        </div>
-
-      )}
-
-      {/* IMPORTANT UPDATES WIDGET */}
-      <div className="dashboard-section" style={{ marginTop: '24px' }}>
-        <div className="section-card">
-          <ReminderWidget 
-            title="Important Updates" 
-            limit={4}
-          />
         </div>
       </div>
 
-      {/* AVAILABLE JOBS */}
-      <div className="applications-section">
-
-        <div className="section-title">
-
-          <Briefcase size={24} />
-
-          <h2>Available Jobs</h2>
-
-        </div>
-
-        {loading ? (
-
-          <p>Loading jobs...</p>
-
-        ) : jobs.length === 0 ? (
-
-          <div className="empty-state">
-
-            <FileText size={40} />
-
-            <p>No approved jobs found</p>
-
+      {/* QUICK ACTIONS */}
+      <div className="emp-quick-actions">
+        <Link to="/jobs" className="emp-quick-action-card">
+          <div className="emp-quick-action-icon">
+            <Search size={18} />
           </div>
+          <div className="emp-quick-action-info">
+            <h4>Browse Jobs</h4>
+            <p>Find new opportunities</p>
+          </div>
+        </Link>
 
-        ) : (
+        <Link to="/seeker/profile" className="emp-quick-action-card">
+          <div className="emp-quick-action-icon">
+            <User size={18} />
+          </div>
+          <div className="emp-quick-action-info">
+            <h4>Edit Profile</h4>
+            <p>Update profile and CV</p>
+          </div>
+        </Link>
 
-          jobs.map((job) => (
+        <Link to="/seeker/applications" className="emp-quick-action-card">
+          <div className="emp-quick-action-icon">
+            <FileText size={18} />
+          </div>
+          <div className="emp-quick-action-info">
+            <h4>My Applications</h4>
+            <p>Track job progress</p>
+          </div>
+        </Link>
 
-            <div
-              className="application-card"
-              key={job._id}
-            >
-
-              <h3>{job.title}</h3>
-
-              <p>
-
-                <Building2 size={16} />
-                {" "}
-                {job.company?.name || job.company || 'N/A'}
-
-              </p>
-
-              <p>
-
-                <MapPin size={16} />
-                {" "}
-                {job.location || 'Location not specified'}
-
-              </p>
-
-              <p className="cover-letter">
-                {job.description
-                  ? `${job.description.slice(0, 140)}${job.description.length > 140 ? '...' : ''}`
-                  : 'No description provided.'}
-              </p>
-
-              <Link
-                to={`/apply-job/${job._id}`}
-                className="resume-btn"
-              >
-                Apply Now
-              </Link>
-
-            </div>
-
-          ))
-
-        )}
-
+        <Link to="/seeker/messages" className="emp-quick-action-card">
+          <div className="emp-quick-action-icon">
+            <MessageSquare size={18} />
+          </div>
+          <div className="emp-quick-action-info">
+            <h4>Messages</h4>
+            <p>Chat with employers</p>
+          </div>
+        </Link>
       </div>
 
+      {/* STATS */}
+      <div className="emp-stats-grid seeker-stats-grid">
+        <div className="emp-stat-card">
+          <div className="emp-stat-icon blue">
+            <FileText size={18} />
+          </div>
+          <div className="emp-stat-label">Total Applications</div>
+          <div className="emp-stat-value">{stats.total}</div>
+        </div>
+
+        <div className="emp-stat-card">
+          <div className="emp-stat-icon amber">
+            <Clock3 size={18} />
+          </div>
+          <div className="emp-stat-label">Under Review</div>
+          <div className="emp-stat-value">{stats.reviewing}</div>
+        </div>
+
+        <div className="emp-stat-card">
+          <div className="emp-stat-icon purple">
+            <Briefcase size={18} />
+          </div>
+          <div className="emp-stat-label">Interviews</div>
+          <div className="emp-stat-value">{stats.interviews}</div>
+        </div>
+
+        <div className="emp-stat-card">
+          <div className="emp-stat-icon green">
+            <CheckCircle size={18} />
+          </div>
+          <div className="emp-stat-label">Accepted</div>
+          <div className="emp-stat-value">{stats.accepted}</div>
+        </div>
+
+        <div className="emp-stat-card">
+          <div className="emp-stat-icon red">
+            <XCircle size={18} />
+          </div>
+          <div className="emp-stat-label">Rejected</div>
+          <div className="emp-stat-value">{stats.rejected}</div>
+        </div>
+      </div>
+
+      {/* MAIN GRID */}
+      <div className="emp-analytics-grid">
+        {/* PROFILE SUMMARY */}
+        <div className="emp-analytics-card">
+          <div className="emp-analytics-title">Profile Summary</div>
+
+          <div className="seeker-profile-summary">
+            <div className="seeker-profile-row">
+              <MapPin size={16} />
+              <span>{profile?.location || 'No location added'}</span>
+            </div>
+
+            <div className="seeker-profile-row">
+              <GraduationCap size={16} />
+              <span>{profile?.education || 'No education added'}</span>
+            </div>
+
+            <div className="seeker-profile-row">
+              <Code size={16} />
+              <span>{profile?.skills || 'No skills added'}</span>
+            </div>
+          </div>
+
+          <div className="seeker-progress-wrap">
+            <div className="seeker-progress-head">
+              <span>Profile Completion</span>
+              <strong>{profileCompletion}%</strong>
+            </div>
+
+            <div className="seeker-progress-bar">
+              <div
+                className="seeker-progress-fill"
+                style={{ width: `${profileCompletion}%` }}
+              />
+            </div>
+          </div>
+
+          <Link to="/seeker/profile" className="emp-action-btn success seeker-card-action">
+            Complete Profile
+          </Link>
+        </div>
+
+        {/* IMPORTANT UPDATES */}
+        <div className="emp-analytics-card">
+          <div className="emp-analytics-title">
+            <Bell size={16} />
+            Important Updates
+          </div>
+
+          <ReminderWidget title="Important Updates" limit={4} />
+        </div>
+
+        {/* RECENT APPLICATIONS */}
+        <div className="emp-analytics-card">
+          <div className="emp-analytics-title">Recent Applications</div>
+
+          {recentApplications.length === 0 ? (
+            <div className="emp-empty-state">
+              <FileText size={40} />
+              <p className="emp-empty-text">You have not applied for any jobs yet.</p>
+            </div>
+          ) : (
+            <div className="seeker-list">
+              {recentApplications.map((application) => (
+                <div className="seeker-list-item" key={application._id}>
+                  <div>
+                    <h4>{application.job?.title || application.jobTitle || 'Job Application'}</h4>
+                    <p>
+                      {application.job?.company?.name ||
+                        application.job?.company ||
+                        'Company not available'}
+                    </p>
+                  </div>
+
+                  <span className={`emp-status-badge emp-status-${String(application.status || 'pending').toLowerCase().replace(/\s+/g, '')}`}>
+                    {application.status || 'Pending'}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <Link to="/seeker/applications" className="emp-action-btn seeker-card-action">
+            View All Applications
+          </Link>
+        </div>
+
+        {/* AVAILABLE JOBS */}
+        <div className="emp-analytics-card">
+          <div className="emp-analytics-title">Recommended / Available Jobs</div>
+
+          {availableJobs.length === 0 ? (
+            <div className="emp-empty-state">
+              <Briefcase size={40} />
+              <p className="emp-empty-text">No available jobs found.</p>
+            </div>
+          ) : (
+            <div className="seeker-list">
+              {availableJobs.map((job) => (
+                <div className="seeker-list-item" key={job._id}>
+                  <div>
+                    <h4>{job.title}</h4>
+                    <p>
+                      <Building2 size={14} />{' '}
+                      {job.company?.name || job.company || 'Verified Employer'}
+                    </p>
+                    <p>
+                      <MapPin size={14} />{' '}
+                      {job.location || 'Location not specified'}
+                    </p>
+                  </div>
+
+                  <Link to={`/apply-job/${job._id}`} className="emp-action-btn success">
+                    Apply
+                  </Link>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <Link to="/jobs" className="emp-action-btn seeker-card-action">
+            Browse More Jobs
+          </Link>
+        </div>
+      </div>
     </div>
-
   );
-
 };
 
 export default SeekerDashboard;
