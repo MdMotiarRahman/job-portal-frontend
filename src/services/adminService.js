@@ -1,84 +1,73 @@
-import axios from 'axios';
-import authService from './auth.service';
+import api from './api';
 
-const API_URL = 'http://localhost:5000/api/admin';
-
-const authHeader = () => ({
-  headers: {
-    Authorization: `Bearer ${authService.getAuthToken()}`,
-  },
-});
+const API_URL = '/admin';
 
 export const getDashboardStats = () =>
-  axios.get(`${API_URL}/dashboard/stats`, authHeader());
+  api.get(`${API_URL}/dashboard/stats`);
 
 export const getAnalytics = (period = 'month') =>
-  axios.get(`${API_URL}/analytics?period=${period}`, authHeader());
+  api.get(`${API_URL}/analytics`, { params: { period } });
 
 export const getUsers = (params = {}) =>
-  axios.get(`${API_URL}/users`, { ...authHeader(), params });
+  api.get(`${API_URL}/users`, { params });
 
 export const updateUser = (userId, payload) =>
-  axios.put(`${API_URL}/users/${userId}`, payload, authHeader());
+  api.put(`${API_URL}/users/${userId}`, payload);
 
 export const updateUserStatus = (userId, action, payload = {}) =>
-  axios.put(`${API_URL}/users/${userId}/${action}`, payload, authHeader());
+  api.put(`${API_URL}/users/${userId}/${action}`, payload);
 
 export const verifyUser = (userId) =>
-  axios.put(`${API_URL}/users/${userId}/verify`, {}, authHeader());
+  api.put(`${API_URL}/users/${userId}/verify`, {});
 
 export const deleteUser = (userId) =>
-  axios.delete(`${API_URL}/users/${userId}`, authHeader());
+  api.delete(`${API_URL}/users/${userId}`);
 
 export const getJobs = (params = {}) =>
-  axios.get(`${API_URL}/jobs`, { ...authHeader(), params });
+  api.get(`${API_URL}/jobs`, { params });
 
 export const getJobById = (jobId) =>
-  axios.get(`${API_URL}/jobs/${jobId}`, authHeader());
+  api.get(`${API_URL}/jobs/${jobId}`);
 
 export const createJob = (payload) =>
-  axios.post(`${API_URL}/jobs`, payload, authHeader());
+  api.post(`${API_URL}/jobs`, payload);
 
 export const updateJob = (jobId, payload) =>
-  axios.put(`${API_URL}/jobs/${jobId}`, payload, authHeader());
+  api.put(`${API_URL}/jobs/${jobId}`, payload);
 
 export const approveJob = (jobId, notes = '') =>
-  axios.put(`${API_URL}/jobs/${jobId}/approve`, { notes }, authHeader());
+  api.put(`${API_URL}/jobs/${jobId}/approve`, { notes });
 
 export const rejectJob = (jobId, reason) =>
-  axios.put(`${API_URL}/jobs/${jobId}/reject`, { reason }, authHeader());
+  api.put(`${API_URL}/jobs/${jobId}/reject`, { reason });
 
 export const closeJob = (jobId) =>
-  axios.put(`${API_URL}/jobs/${jobId}/close`, {}, authHeader());
+  api.put(`${API_URL}/jobs/${jobId}/close`, {});
 
 export const reopenJob = (jobId) =>
-  axios.put(`${API_URL}/jobs/${jobId}/reopen`, {}, authHeader());
+  api.put(`${API_URL}/jobs/${jobId}/reopen`, {});
 
 export const deleteJob = (jobId) =>
-  axios.delete(`${API_URL}/jobs/${jobId}`, authHeader());
+  api.delete(`${API_URL}/jobs/${jobId}`);
 
 export const getApplications = (params = {}) =>
-  axios.get(`${API_URL}/applications`, { ...authHeader(), params });
+  api.get(`${API_URL}/applications`, { params });
 
 export const updateApplicationStatus = (applicationId, status) =>
-  axios.put(
-    `${API_URL}/applications/${applicationId}/status`,
-    { status },
-    authHeader()
-  );
+  api.put(`${API_URL}/applications/${applicationId}/status`, { status });
 
 // ============= EMPLOYER MANAGEMENT =============
 export const getAllEmployers = (params = {}) =>
-  axios.get(`${API_URL}/employers`, { ...authHeader(), params });
+  api.get(`${API_URL}/employers`, { params });
 
 export const getEmployerById = (employerId) =>
-  axios.get(`${API_URL}/employers/${employerId}`, authHeader());
+  api.get(`${API_URL}/employers/${employerId}`);
 
 export const getPendingEmployers = (params = {}) =>
-  axios.get(`${API_URL}/employers/pending`, { ...authHeader(), params });
+  api.get(`${API_URL}/employers/pending`, { params });
 
 export const approveEmployer = (employerId, payload = {}) =>
-  axios.put(`${API_URL}/employers/${employerId}/approve`, payload, authHeader());
+  api.put(`${API_URL}/employers/${employerId}/approve`, payload);
 
 export const rejectEmployer = (employerId, payload = {}) =>
-  axios.put(`${API_URL}/employers/${employerId}/reject`, payload, authHeader());
+  api.put(`${API_URL}/employers/${employerId}/reject`, payload);

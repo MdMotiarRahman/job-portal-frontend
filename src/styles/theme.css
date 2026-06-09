@@ -43,9 +43,9 @@
   --bg-overlay: rgba(15, 23, 42, 0.6); /* Premium Dark Overlay */
 
   /* Border Colors */
-  --border-color: #e2e8f0;         /* Slate Border */
+  --border-color: #9ca3af;         /* Ash Gray Border */
   --border-light: #f1f5f9;         /* Light Border */
-  --border-dark: #cbd5e1;          /* Dark Border */
+  --border-dark: #6b7280;          /* Dark Ash Border */
 
   /* Shadow System */
   --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);

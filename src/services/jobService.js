@@ -1,12 +1,12 @@
-import axios from 'axios';
+import api from './api';
 
-const API_URL = 'http://localhost:5000/api/jobs';
+const API_URL = '/jobs';
 
 export const getPublicJobs = (params = {}) =>
-  axios.get(API_URL, { params });
+  api.get(API_URL, { params });
 
 export const getPublicJobSnapshot = () =>
-  axios.get(`${API_URL}/snapshot`);
+  api.get(`${API_URL}/snapshot`);
 
 export const getPublicJobById = (jobId) =>
-  axios.get(`${API_URL}/${jobId}`);
+  api.get(`${API_URL}/${jobId}`);

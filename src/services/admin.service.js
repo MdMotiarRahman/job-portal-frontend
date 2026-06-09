@@ -1,41 +1,19 @@
-import axios from "axios";
+import api from './api';
 
-const API_URL = "http://localhost:5000/api/admin";
-
-const getToken = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  return user?.token;
-};
-
-const authHeaders = () => ({
-  headers: {
-    Authorization: `Bearer ${getToken()}`,
-  },
-});
+const API_URL = '/admin';
 
 const getPendingJobs = async () => {
-  const response = await axios.get(
-    `${API_URL}/jobs/pending`,
-    authHeaders()
-  );
+  const response = await api.get(`${API_URL}/jobs/pending`);
   return response.data;
 };
 
 const approveJob = async (jobId) => {
-  const response = await axios.put(
-    `${API_URL}/jobs/${jobId}/approve`,
-    {},
-    authHeaders()
-  );
+  const response = await api.put(`${API_URL}/jobs/${jobId}/approve`, {});
   return response.data;
 };
 
 const rejectJob = async (jobId) => {
-  const response = await axios.put(
-    `${API_URL}/jobs/${jobId}/reject`,
-    {},
-    authHeaders()
-  );
+  const response = await api.put(`${API_URL}/jobs/${jobId}/reject`, {});
   return response.data;
 };
 

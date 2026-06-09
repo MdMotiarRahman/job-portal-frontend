@@ -54,6 +54,12 @@
   border-bottom: 1px solid var(--border-color);
 }
 
+.emp-page-header-left {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-md);
+}
+
 .emp-page-header h1 {
   margin: 0;
   font-size: 22px;
@@ -450,7 +456,7 @@
   padding: 12px 0;
   font-size: 13px;
   color: var(--text-primary);
-  border-bottom: 1px solid rgba(226, 232, 240, 0.4);
+  border-bottom: 1px solid var(--border-color);
   background: transparent;
 }
 
@@ -496,7 +502,7 @@
   display: flex;
   gap: var(--space-md);
   padding: 12px 0;
-  border-bottom: 1px solid rgba(226, 232, 240, 0.4);
+  border-bottom: 1px solid var(--border-color);
   animation: empSlideRight 0.4s ease backwards;
 }
 
@@ -700,7 +706,7 @@
   align-items: center;
   gap: var(--space-sm);
   padding: 0 var(--space-md);
-  border: 1px solid var(--border-color);
+  border: 1px solid rgba(226, 232, 240, 0.5);
   border-radius: var(--radius-md);
   background: var(--bg-primary);
   min-width: 280px;
@@ -728,7 +734,6 @@
 
 .emp-jobs-table-wrap {
   overflow-x: auto;
-  border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   animation: empFadeUp 0.5s ease;
 }
@@ -747,7 +752,7 @@
   padding: var(--space-md) var(--space-lg);
   text-align: left;
   background: var(--bg-tertiary);
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.5);
   white-space: nowrap;
 }
 
@@ -755,7 +760,7 @@
   padding: 14px var(--space-lg);
   font-size: 13px;
   color: var(--text-primary);
-  border-bottom: 1px solid rgba(226, 232, 240, 0.4);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.3);
   vertical-align: middle;
 }
 
@@ -843,7 +848,7 @@
   gap: 4px;
   padding: 5px 10px;
   border-radius: var(--radius-md);
-  border: 1px solid var(--border-color);
+  border: 1px solid rgba(226, 232, 240, 0.5);
   background: var(--bg-primary);
   color: var(--text-secondary);
   font-size: 11px;
@@ -854,29 +859,29 @@
 }
 
 .emp-action-btn:hover {
-  border-color: var(--brand-primary);
+  border-color: rgba(99, 102, 241, 0.3);
   color: var(--brand-primary);
   background: rgba(99, 102, 241, 0.04);
 }
 
 .emp-action-btn.danger {
-  border-color: rgba(239, 68, 68, 0.25);
+  border-color: rgba(239, 68, 68, 0.2);
   color: #ef4444;
 }
 
 .emp-action-btn.danger:hover {
   background: rgba(239, 68, 68, 0.05);
-  border-color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.4);
 }
 
 .emp-action-btn.success {
-  border-color: rgba(16, 185, 129, 0.25);
+  border-color: rgba(16, 185, 129, 0.2);
   color: #10b981;
 }
 
 .emp-action-btn.success:hover {
   background: rgba(16, 185, 129, 0.05);
-  border-color: #10b981;
+  border-color: rgba(16, 185, 129, 0.4);
 }
 
 /* ============================================
@@ -1018,7 +1023,7 @@
 }
 
 .emp-form-cancel-btn:hover {
-  border-color: var(--text-secondary);
+  border-color: rgba(226, 232, 240, 0.8);
   color: var(--text-primary);
 }
 
@@ -1060,12 +1065,25 @@
 .emp-apps-filters {
   display: flex;
   align-items: center;
-  gap: var(--space-md);
-  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.emp-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.emp-filter-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
 .emp-apps-select {
-  padding: 8px var(--space-md);
+  padding: 7px 28px 7px 10px;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   background: var(--bg-primary);
@@ -1073,7 +1091,12 @@
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  transition: border-color 0.2s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%236b7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  min-width: 130px;
 }
 
 .emp-apps-select:focus {
@@ -1190,7 +1213,7 @@
   background: rgba(248, 250, 252, 0.6);
   padding: var(--space-md);
   border-radius: var(--radius-md);
-  border: 1px solid rgba(226, 232, 240, 0.4);
+  border: 1px solid var(--border-color);
 }
 
 .emp-app-card-footer {
@@ -1199,7 +1222,7 @@
   justify-content: space-between;
   gap: var(--space-md);
   padding-top: var(--space-md);
-  border-top: 1px solid rgba(226, 232, 240, 0.4);
+  border-top: 1px solid var(--border-color);
 }
 
 .emp-app-date {
@@ -1250,7 +1273,7 @@
 }
 
 .emp-page-btn:hover:not(:disabled) {
-  border-color: var(--brand-primary);
+  border-color: rgba(99, 102, 241, 0.3);
   color: var(--brand-primary);
 }
 
@@ -1263,6 +1286,351 @@
   background: var(--brand-primary);
   color: white;
   border-color: var(--brand-primary);
+}
+
+/* ============================================
+   APPLICATIONS TABLE
+   ============================================ */
+
+.emp-apps-table-wrap {
+  overflow-x: auto;
+  border-radius: var(--radius-lg);
+  animation: empFadeUp 0.4s ease;
+}
+
+.emp-apps-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.emp-apps-table th {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 12px 16px;
+  text-align: left;
+  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+
+.emp-apps-table td {
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--text-primary);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+  vertical-align: middle;
+}
+
+.emp-apps-table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.emp-apps-table tbody tr:hover {
+  background: rgba(248, 250, 252, 0.7);
+}
+
+.emp-apps-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.emp-apps-table tbody tr.row-expanded {
+  background: rgba(248, 250, 252, 0.5);
+}
+
+/* Candidate Cell */
+.emp-app-candidate {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.emp-app-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: rgba(99, 102, 241, 0.08);
+  color: var(--brand-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.emp-app-candidate-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.emp-app-candidate-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.emp-app-candidate-email {
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Job Cell */
+.emp-app-job-title {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+/* Date Cell */
+.emp-app-date-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+/* Status Cell */
+.emp-app-status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.emp-app-status-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+
+/* Actions Cell */
+.emp-app-actions-cell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.emp-app-view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-primary);
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--brand-primary);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.emp-app-view-btn:hover {
+  background: rgba(99, 102, 241, 0.06);
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
+/* ============================================
+   APPLICATION VIEW MODAL
+   ============================================ */
+
+.emp-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: empFadeIn 0.2s ease;
+  padding: 24px;
+}
+
+.emp-modal {
+  background: white;
+  border-radius: var(--radius-xl);
+  width: 100%;
+  max-width: 640px;
+  max-height: 85vh;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  animation: empFadeUp 0.25s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.emp-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.emp-modal-header h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.emp-modal-close {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-color);
+  background: var(--bg-primary);
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.15s ease;
+}
+
+.emp-modal-close:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.emp-modal-body {
+  padding: 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.emp-modal-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.emp-modal-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.emp-modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.emp-modal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.emp-modal-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.emp-modal-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.emp-modal-cover {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+  padding: 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  white-space: pre-wrap;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.emp-modal-resume-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  color: var(--brand-primary);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.emp-modal-resume-link:hover {
+  background: var(--bg-tertiary);
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
+.emp-modal-status-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.emp-modal-status-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.emp-modal-status-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-primary);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: all 0.15s ease;
+}
+
+.emp-modal-status-btn:hover {
+  border-color: rgba(99, 102, 241, 0.3);
+  color: var(--text-primary);
+}
+
+.emp-modal-status-btn.active {
+  background: rgba(99, 102, 241, 0.06);
+  border-color: rgba(99, 102, 241, 0.3);
+  color: var(--brand-primary);
+  font-weight: 600;
 }
 
 /* ============================================
@@ -1325,15 +1693,51 @@
   .emp-form-grid {
     grid-template-columns: 1fr;
   }
-  .emp-app-card-header {
-    flex-direction: column;
-  }
-  .emp-app-card-footer {
-    flex-direction: column;
-    align-items: flex-start;
-  }
   .emp-quick-action-card {
     min-width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .emp-apps-table {
+    font-size: 12px;
+  }
+  .emp-apps-table th,
+  .emp-apps-table td {
+    padding: 10px 12px;
+  }
+  .emp-app-avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 10px;
+  }
+  .emp-app-candidate-email {
+    display: none;
+  }
+  .emp-apps-table .emp-app-status-select {
+    min-width: 100px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 768px) {
+  .emp-page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-md);
+  }
+  .emp-page-header-left {
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+  .emp-apps-filters {
+    width: 100%;
+  }
+  .emp-filter-group {
+    flex: 1;
+  }
+  .emp-apps-select {
+    width: 100%;
   }
 }
 
@@ -1343,12 +1747,6 @@
   }
   .emp-page {
     padding: var(--space-md);
-  }
-  .emp-apps-filters {
-    width: 100%;
-  }
-  .emp-apps-select {
-    width: 100%;
   }
   .emp-hero {
     padding: 20px;

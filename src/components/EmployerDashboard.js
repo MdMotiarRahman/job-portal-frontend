@@ -973,39 +973,57 @@ const JobFormSection = ({ editingJob, formData, formErrors, isSubmitting, onChan
 };
 
 /* ============================================
-   APPLICATIONS — Card-Based with Filters
+   APPLICATIONS — Table View with Actions Dropdown
    ============================================ */
 
 const ApplicationsSection = ({ applications, loading, selectedJob, selectedStatus, onJobChange, onStatusChange, uniqueJobs, allStatuses, onStatusUpdate, formatDate, getInitials }) => {
-  const [expandedId, setExpandedId] = useState(null);
+  const [viewingApp, setViewingApp] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const perPage = 10;
+  const totalPages = Math.ceil(applications.length / perPage);
+  const paginatedApps = applications.slice((currentPage - 1) * perPage, currentPage * perPage);
+
+  const statusColors = {
+    'Pending': '#f59e0b',
+    'Reviewing': '#6366f1',
+    'Shortlisted': '#06b6d4',
+    'Interview Scheduled': '#ec4899',
+    'Accepted': '#10b981',
+    'Rejected': '#ef4444',
+  };
 
   return (
     <div className="emp-page">
       <div className="emp-page-header">
-        <h1>Applications</h1>
-        <span className="emp-app-count">{applications.length} application{applications.length !== 1 ? 's' : ''}</span>
-      </div>
-
-      <div className="emp-apps-header">
+        <div className="emp-page-header-left">
+          <h1>Applications</h1>
+          <span className="emp-app-count">{applications.length} application{applications.length !== 1 ? 's' : ''}</span>
+        </div>
         <div className="emp-apps-filters">
-          <select
-            className="emp-apps-select"
-            value={selectedJob}
-            onChange={(e) => onJobChange(e.target.value)}
-          >
-            <option value="all">All Jobs</option>
-            {uniqueJobs.map(job => (
-              <option key={job._id} value={job._id}>{job.title}</option>
-            ))}
-          </select>
-          <select
-            className="emp-apps-select"
-            value={selectedStatus}
-            onChange={(e) => onStatusChange(e.target.value)}
-          >
-            <option value="all">All Statuses</option>
-            {allStatuses.map(s => <option key={s} value={s}>{s}</option>)}
-          </select>
+          <div className="emp-filter-group">
+            <label className="emp-filter-label">Job</label>
+            <select
+              className="emp-apps-select"
+              value={selectedJob}
+              onChange={(e) => { onJobChange(e.target.value); setCurrentPage(1); }}
+            >
+              <option value="all">All Jobs</option>
+              {uniqueJobs.map(job => (
+                <option key={job._id} value={job._id}>{job.title}</option>
+              ))}
+            </select>
+          </div>
+          <div className="emp-filter-group">
+            <label className="emp-filter-label">Status</label>
+            <select
+              className="emp-apps-select"
+              value={selectedStatus}
+              onChange={(e) => { onStatusChange(e.target.value); setCurrentPage(1); }}
+            >
+              <option value="all">All Statuses</option>
+              {allStatuses.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+          </div>
         </div>
       </div>
 
@@ -1021,67 +1039,186 @@ const ApplicationsSection = ({ applications, loading, selectedJob, selectedStatu
           </div>
         </div>
       ) : (
-        <div className="emp-app-cards">
-          {applications.map(app => (
-            <div className="emp-app-card" key={app._id}>
-              <div className="emp-app-card-header">
-                <div className="emp-app-card-info">
-                  <h3 className="emp-app-card-name">{app.seeker?.name || 'Unknown Candidate'}</h3>
-                  <span className="emp-app-card-email">{app.seeker?.email || ''}</span>
-                </div>
-                <span className={`emp-status-badge emp-status-${app.status?.toLowerCase().replace(/\s+/g, '') || 'pending'}`}>
-                  {app.status || 'Pending'}
-                </span>
-              </div>
+        <>
+          <div className="emp-apps-table-wrap">
+            <table className="emp-apps-table">
+              <thead>
+                <tr>
+                  <th>Candidate</th>
+                  <th>Job</th>
+                  <th>Applied</th>
+                  <th>Status</th>
+                  <th style={{ width: 140 }}></th>
+                </tr>
+              </thead>
+              <tbody>
+                {paginatedApps.map(app => (
+                  <React.Fragment key={app._id}>
+                    <tr>
+                      <td>
+                        <div className="emp-app-candidate">
+                          <div className="emp-app-avatar">{getInitials(app.seeker?.name)}</div>
+                          <div className="emp-app-candidate-info">
+                            <span className="emp-app-candidate-name">{app.seeker?.name || 'Unknown'}</span>
+                            <span className="emp-app-candidate-email">{app.seeker?.email || ''}</span>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <span className="emp-app-job-title">{app.job?.title || 'N/A'}</span>
+                      </td>
+                      <td>
+                        <span className="emp-app-date-text">{formatDate(app.createdAt)}</span>
+                      </td>
+                      <td>
+                        <span className="emp-app-status-dot" style={{ background: statusColors[app.status] || '#94a3b8' }} />
+                        <span className="emp-app-status-text">{app.status || 'Pending'}</span>
+                      </td>
+                      <td>
+                        <div className="emp-app-actions-cell">
+                          <button
+                            className="emp-app-view-btn"
+                            onClick={() => setViewingApp(app)}
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            View
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  </React.Fragment>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
-              <div className="emp-app-card-meta">
-                <div className="emp-app-meta-item">
-                  <span className="emp-app-meta-label">Job</span>
-                  <span className="emp-app-meta-value">{app.job?.title || 'N/A'}</span>
-                </div>
-                <div className="emp-app-meta-item">
-                  <span className="emp-app-meta-label">Applied</span>
-                  <span className="emp-app-meta-value">{formatDate(app.createdAt)}</span>
-                </div>
-                {app.seeker?.phone && (
-                  <div className="emp-app-meta-item">
-                    <span className="emp-app-meta-label">Phone</span>
-                    <span className="emp-app-meta-value">{app.seeker.phone}</span>
+          {totalPages > 1 && (
+            <div className="emp-pagination">
+              <button className="emp-page-btn" disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)}>Prev</button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+                <button
+                  key={p}
+                  className={`emp-page-btn ${p === currentPage ? 'active' : ''}`}
+                  onClick={() => setCurrentPage(p)}
+                >
+                  {p}
+                </button>
+              ))}
+              <button className="emp-page-btn" disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)}>Next</button>
+            </div>
+          )}
+        </>
+      )}
+
+      {viewingApp && (
+        <div className="emp-modal-overlay" onClick={() => setViewingApp(null)}>
+          <div className="emp-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="emp-modal-header">
+              <h2>Application Details</h2>
+              <button className="emp-modal-close" onClick={() => setViewingApp(null)}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <div className="emp-modal-body">
+              <div className="emp-modal-section">
+                <div className="emp-modal-section-title">Candidate Information</div>
+                <div className="emp-modal-grid">
+                  <div className="emp-modal-field">
+                    <span className="emp-modal-label">Name</span>
+                    <span className="emp-modal-value">{viewingApp.seeker?.name || 'N/A'}</span>
                   </div>
-                )}
+                  <div className="emp-modal-field">
+                    <span className="emp-modal-label">Email</span>
+                    <span className="emp-modal-value">{viewingApp.seeker?.email || 'N/A'}</span>
+                  </div>
+                  <div className="emp-modal-field">
+                    <span className="emp-modal-label">Phone</span>
+                    <span className="emp-modal-value">{viewingApp.seeker?.phone || 'N/A'}</span>
+                  </div>
+                  <div className="emp-modal-field">
+                    <span className="emp-modal-label">Location</span>
+                    <span className="emp-modal-value">{viewingApp.seeker?.location || 'N/A'}</span>
+                  </div>
+                </div>
               </div>
 
-              {app.coverLetter && (
-                <div className="emp-app-card-cover">
-                  <div className="emp-app-cover-label">Cover Letter</div>
-                  <div className="emp-app-cover-text">
-                    {expandedId === app._id ? app.coverLetter : app.coverLetter.slice(0, 200) + (app.coverLetter.length > 200 ? '...' : '')}
-                    {app.coverLetter.length > 200 && (
+              <div className="emp-modal-section">
+                <div className="emp-modal-section-title">Job Information</div>
+                <div className="emp-modal-grid">
+                  <div className="emp-modal-field">
+                    <span className="emp-modal-label">Position</span>
+                    <span className="emp-modal-value">{viewingApp.job?.title || 'N/A'}</span>
+                  </div>
+                  <div className="emp-modal-field">
+                    <span className="emp-modal-label">Location</span>
+                    <span className="emp-modal-value">{viewingApp.job?.location || 'N/A'}</span>
+                  </div>
+                  <div className="emp-modal-field">
+                    <span className="emp-modal-label">Job Type</span>
+                    <span className="emp-modal-value">{viewingApp.job?.jobType || 'N/A'}</span>
+                  </div>
+                  <div className="emp-modal-field">
+                    <span className="emp-modal-label">Experience Level</span>
+                    <span className="emp-modal-value">{viewingApp.job?.experienceLevel || 'N/A'}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="emp-modal-section">
+                <div className="emp-modal-section-title">Application Status</div>
+                <div className="emp-modal-grid">
+                  <div className="emp-modal-field">
+                    <span className="emp-modal-label">Applied Date</span>
+                    <span className="emp-modal-value">{formatDate(viewingApp.createdAt)}</span>
+                  </div>
+                  <div className="emp-modal-field">
+                    <span className="emp-modal-label">Last Updated</span>
+                    <span className="emp-modal-value">{formatDate(viewingApp.updatedAt)}</span>
+                  </div>
+                </div>
+                <div className="emp-modal-status-actions">
+                  <span className="emp-modal-label">Update Status</span>
+                  <div className="emp-modal-status-options">
+                    {VALID_STATUSES.map(s => (
                       <button
-                        onClick={() => setExpandedId(expandedId === app._id ? null : app._id)}
-                        style={{ background: 'none', border: 'none', color: 'var(--brand-primary)', cursor: 'pointer', fontWeight: 600, fontSize: 12, marginLeft: 4 }}
+                        key={s}
+                        className={`emp-modal-status-btn ${viewingApp.status === s ? 'active' : ''}`}
+                        onClick={() => {
+                          onStatusUpdate(viewingApp._id, s);
+                          setViewingApp({ ...viewingApp, status: s });
+                        }}
                       >
-                        {expandedId === app._id ? 'Show less' : 'Read more'}
+                        <span className="emp-app-status-dot" style={{ background: statusColors[s] }} />
+                        {s}
                       </button>
-                    )}
+                    ))}
                   </div>
+                </div>
+              </div>
+
+              {viewingApp.coverLetter && (
+                <div className="emp-modal-section">
+                  <div className="emp-modal-section-title">Cover Letter</div>
+                  <div className="emp-modal-cover">{viewingApp.coverLetter}</div>
                 </div>
               )}
 
-              <div className="emp-app-card-footer">
-                <span className="emp-app-date">Last updated: {formatDate(app.updatedAt)}</span>
-                <select
-                  className="emp-app-status-select"
-                  value={app.status || 'Pending'}
-                  onChange={(e) => onStatusUpdate(app._id, e.target.value)}
-                >
-                  {VALID_STATUSES.map(s => (
-                    <option key={s} value={s}>{s}</option>
-                  ))}
-                </select>
-              </div>
+              {viewingApp.resume && (
+                <div className="emp-modal-section">
+                  <div className="emp-modal-section-title">Resume</div>
+                  <a
+                    href={`http://localhost:5000/${viewingApp.resume}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="emp-modal-resume-link"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    View Resume
+                  </a>
+                </div>
+              )}
             </div>
-          ))}
+          </div>
         </div>
       )}
     </div>

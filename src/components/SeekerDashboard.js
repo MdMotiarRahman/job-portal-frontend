@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import { Link } from 'react-router-dom';
 
-import axios from 'axios';
+import api from '../services/api';
 
 import {
   Mail,
@@ -54,9 +54,7 @@ const SeekerDashboard = () => {
 
       // APPROVED JOBS
       const jobsRes =
-        await axios.get(
-          'http://localhost:5000/api/jobs'
-        );
+        await api.get('/jobs');
 
       // REMOVE ALREADY APPLIED JOBS
       const appliedJobIds =

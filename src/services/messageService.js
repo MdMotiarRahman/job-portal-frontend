@@ -1,62 +1,35 @@
-import axios from 'axios';
-import authService from './auth.service';
-
-const API_URL = 'http://localhost:5000/api/messages';
-
-const getAuthHeaders = () => ({
-  Authorization: `Bearer ${authService.getAuthToken()}`,
-});
+import api from './api';
 
 const messageService = {
   getConversations: async () => {
-    const response = await axios.get(`${API_URL}/conversations`, {
-      headers: getAuthHeaders(),
-    });
+    const response = await api.get('/messages/conversations');
     return response.data;
   },
 
   createConversation: async (participantId, jobId = null) => {
-    const response = await axios.post(
-      `${API_URL}/conversations`,
-      { participantId, jobId },
-      { headers: getAuthHeaders() }
-    );
+    const response = await api.post('/messages/conversations', { participantId, jobId });
     return response.data;
   },
 
   getMessages: async (conversationId, page = 1, limit = 50) => {
-    const response = await axios.get(
-      `${API_URL}/conversations/${conversationId}`,
-      {
-        params: { page, limit },
-        headers: getAuthHeaders(),
-      }
-    );
+    const response = await api.get(`/messages/conversations/${conversationId}`, {
+      params: { page, limit },
+    });
     return response.data;
   },
 
   sendMessage: async (conversationId, content) => {
-    const response = await axios.post(
-      `${API_URL}/conversations/${conversationId}/messages`,
-      { content },
-      { headers: getAuthHeaders() }
-    );
+    const response = await api.post(`/messages/conversations/${conversationId}/messages`, { content });
     return response.data;
   },
 
   markAsRead: async (conversationId) => {
-    const response = await axios.put(
-      `${API_URL}/conversations/${conversationId}/read`,
-      {},
-      { headers: getAuthHeaders() }
-    );
+    const response = await api.put(`/messages/conversations/${conversationId}/read`, {});
     return response.data;
   },
 
   getUnreadCount: async () => {
-    const response = await axios.get(`${API_URL}/unread-count`, {
-      headers: getAuthHeaders(),
-    });
+    const response = await api.get('/messages/unread-count');
     return response.data;
   },
 };

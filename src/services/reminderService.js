@@ -1,19 +1,8 @@
-import axios from 'axios';
-
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-
-const getAuthHeader = () => {
-  const user = JSON.parse(localStorage.getItem('user'));
-  const token = user?.token || localStorage.getItem('token');
-  return token ? { Authorization: `Bearer ${token}` } : {};
-};
+import api from './api';
 
 const reminderService = {
   getReminders: async (page = 1, limit = 10) => {
-    const response = await axios.get(`${API_BASE_URL}/reminders`, {
-      params: { page, limit },
-      headers: getAuthHeader(),
-    });
+    const response = await api.get('/reminders', { params: { page, limit } });
     const payload = response.data;
     if (payload.success && payload.data) {
       return { reminders: payload.data.reminders || [], ...payload.data };
@@ -22,82 +11,52 @@ const reminderService = {
   },
 
   getReminder: async (reminderId) => {
-    const response = await axios.get(`${API_BASE_URL}/reminders/${reminderId}`, {
-      headers: getAuthHeader(),
-    });
+    const response = await api.get(`/reminders/${reminderId}`);
     return response.data;
   },
 
   markAsViewed: async (reminderId) => {
-    const response = await axios.put(
-      `${API_BASE_URL}/reminders/${reminderId}/view`,
-      {},
-      { headers: getAuthHeader() }
-    );
+    const response = await api.put(`/reminders/${reminderId}/view`, {});
     return response.data;
   },
 
   markAllAsViewed: async () => {
-    const response = await axios.put(
-      `${API_BASE_URL}/reminders/mark-all/viewed`,
-      {},
-      { headers: getAuthHeader() }
-    );
+    const response = await api.put('/reminders/mark-all/viewed', {});
     return response.data;
   },
 
   snoozeReminder: async (reminderId, snoozeMinutes = 60) => {
-    const response = await axios.put(
-      `${API_BASE_URL}/reminders/${reminderId}/snooze`,
-      { snoozeMinutes },
-      { headers: getAuthHeader() }
-    );
+    const response = await api.put(`/reminders/${reminderId}/snooze`, { snoozeMinutes });
     return response.data;
   },
 
   dismissReminder: async (reminderId) => {
-    const response = await axios.delete(`${API_BASE_URL}/reminders/${reminderId}`, {
-      headers: getAuthHeader(),
-    });
+    const response = await api.delete(`/reminders/${reminderId}`);
     return response.data;
   },
 
   deleteReminder: async (reminderId) => {
-    const response = await axios.delete(`${API_BASE_URL}/reminders/${reminderId}`, {
-      headers: getAuthHeader(),
-    });
+    const response = await api.delete(`/reminders/${reminderId}`);
     return response.data;
   },
 
   getReminderStats: async () => {
-    const response = await axios.get(`${API_BASE_URL}/reminders/stats`, {
-      headers: getAuthHeader(),
-    });
+    const response = await api.get('/reminders/stats');
     return response.data;
   },
 
   createReminder: async (reminderData) => {
-    const response = await axios.post(`${API_BASE_URL}/admin/reminders`, reminderData, {
-      headers: getAuthHeader(),
-    });
+    const response = await api.post('/admin/reminders', reminderData);
     return response.data;
   },
 
   sendPendingReminders: async () => {
-    const response = await axios.post(
-      `${API_BASE_URL}/admin/reminders/send-pending`,
-      {},
-      { headers: getAuthHeader() }
-    );
+    const response = await api.post('/admin/reminders/send-pending', {});
     return response.data;
   },
 
   cleanupReminders: async () => {
-    const response = await axios.post(
-      `${API_BASE_URL}/admin/reminders/cleanup`,
-      {},
-      { headers: getAuthHeader() }
-    );
+    const response = await api.post('/admin/reminders/cleanup', {});
     return response.data;
   },
 };

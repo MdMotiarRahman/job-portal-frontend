@@ -1,68 +1,54 @@
-import axios from 'axios';
+import api from './api';
 
-const API_URL = 'http://localhost:5000/api/employer';
-
-const getToken = () => {
-  const user = JSON.parse(localStorage.getItem('user'));
-  return user?.token;
-};
-
-const authConfig = () => ({
-  headers: {
-    Authorization: `Bearer ${getToken()}`,
-  },
-});
+const API_URL = '/employer';
 
 const getSummary = async () => {
-  const response = await axios.get(`${API_URL}/summary`, authConfig());
+  const response = await api.get(`${API_URL}/summary`);
   return response.data;
 };
 
 const getMyJobs = async () => {
-  const response = await axios.get(`${API_URL}/jobs`, authConfig());
+  const response = await api.get(`${API_URL}/jobs`);
   return response.data.jobs || [];
 };
 
 const createJob = async (jobData) => {
-  const response = await axios.post(`${API_URL}/jobs`, jobData, authConfig());
+  const response = await api.post(`${API_URL}/jobs`, jobData);
   return response.data;
 };
 
 const updateJob = async (jobId, jobData) => {
-  const response = await axios.put(`${API_URL}/jobs/${jobId}`, jobData, authConfig());
+  const response = await api.put(`${API_URL}/jobs/${jobId}`, jobData);
   return response.data;
 };
 
 const deleteJob = async (jobId) => {
-  const response = await axios.delete(`${API_URL}/jobs/${jobId}`, authConfig());
+  const response = await api.delete(`${API_URL}/jobs/${jobId}`);
   return response.data;
 };
 
 const closeJob = async (jobId) => {
-  const response = await axios.put(`${API_URL}/jobs/${jobId}/close`, {}, authConfig());
+  const response = await api.put(`${API_URL}/jobs/${jobId}/close`, {});
   return response.data;
 };
 
 const reopenJob = async (jobId) => {
-  const response = await axios.put(`${API_URL}/jobs/${jobId}/reopen`, {}, authConfig());
+  const response = await api.put(`${API_URL}/jobs/${jobId}/reopen`, {});
   return response.data;
 };
 
 const getApplications = async (params = {}) => {
-  const response = await axios.get(`${API_URL}/applications`, {
-    ...authConfig(),
-    params,
-  });
+  const response = await api.get(`${API_URL}/applications`, { params });
   return response.data.applications || [];
 };
 
 const getApplicants = async (jobId) => {
-  const response = await axios.get(`${API_URL}/applications/${jobId}`, authConfig());
+  const response = await api.get(`${API_URL}/applications/${jobId}`);
   return response.data.applications || [];
 };
 
 const updateApplication = async (applicationId, data) => {
-  const response = await axios.put(`${API_URL}/applications/${applicationId}`, data, authConfig());
+  const response = await api.put(`${API_URL}/applications/${applicationId}`, data);
   return response.data;
 };
 
