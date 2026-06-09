@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { AlertCircle, Loader } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/reminderWidget.css';
 import reminderService from '../services/reminderService';
@@ -31,48 +30,30 @@ const ReminderWidget = ({ filterType = null, title = 'Recent Reminders', limit =
       setReminders(filtered.slice(0, limit));
     } catch (err) {
       console.error('Failed to fetch reminders:', err);
-      setError('Failed to load reminders');
+      setReminders([]);
     } finally {
       setLoading(false);
     }
   };
 
   const getReminderIcon = (type) => {
-    const icons = {
-      'new-application': '📝',
-      'interview': '📅',
-      'application-status': '✅',
-      'job-deadline': '⏰',
-      'job-expiring': '⚠️',
-      'verification-pending': '🔍',
+    const colors = {
+      'new-application': '#3b82f6',
+      'interview': '#8b5cf6',
+      'application-status': '#10b981',
+      'job-deadline': '#f59e0b',
+      'job-expiring': '#ef4444',
+      'verification-pending': '#f97316',
     };
-    return icons[type] || '📧';
+    return colors[type] || '#94a3b8';
   };
 
   if (loading) {
-    return (
-      <div className="reminder-widget loading">
-        <Loader size={20} className="spinner" />
-        <p>Loading reminders...</p>
-      </div>
-    );
+    return null;
   }
 
-  if (error) {
-    return (
-      <div className="reminder-widget error">
-        <AlertCircle size={20} />
-        <p>{error}</p>
-      </div>
-    );
-  }
-
-  if (reminders.length === 0) {
-    return (
-      <div className="reminder-widget empty">
-        <p>📭 No reminders</p>
-      </div>
-    );
+  if (error || reminders.length === 0) {
+    return null;
   }
 
   return (
@@ -88,7 +69,9 @@ const ReminderWidget = ({ filterType = null, title = 'Recent Reminders', limit =
             key={reminder._id}
             className={`widget-item ${reminder.isViewed ? 'viewed' : 'unviewed'}`}
           >
-            <div className="item-icon">{getReminderIcon(reminder.type)}</div>
+            <div className="item-icon">
+              <span style={{ display: 'block', width: 8, height: 8, borderRadius: '50%', background: getReminderIcon(reminder.type) }} />
+            </div>
             <div className="item-content">
               <div className="item-title">{reminder.templateData?.title}</div>
               <div className="item-preview">

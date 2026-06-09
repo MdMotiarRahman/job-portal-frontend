@@ -76,22 +76,15 @@ const ReminderBell = () => {
   };
 
   const getReminderIcon = (type) => {
-    switch (type) {
-      case 'new-application':
-        return '📝';
-      case 'interview':
-        return '📅';
-      case 'application-status':
-        return '✅';
-      case 'job-deadline':
-        return '⏰';
-      case 'job-expiring':
-        return '⚠️';
-      case 'verification-pending':
-        return '🔍';
-      default:
-        return '📧';
-    }
+    const colors = {
+      'new-application': '#3b82f6',
+      'interview': '#8b5cf6',
+      'application-status': '#10b981',
+      'job-deadline': '#f59e0b',
+      'job-expiring': '#ef4444',
+      'verification-pending': '#f97316',
+    };
+    return colors[type] || '#94a3b8';
   };
 
   return (
@@ -118,7 +111,7 @@ const ReminderBell = () => {
 
           {reminders.length === 0 ? (
             <div className="empty-reminders">
-              <p>📭 No reminders yet</p>
+              <p>No reminders yet</p>
             </div>
           ) : (
             <div className="reminders-list">
@@ -128,7 +121,7 @@ const ReminderBell = () => {
                   className={`reminder-item ${reminder.isViewed ? 'viewed' : 'unviewed'}`}
                 >
                   <div className="reminder-icon">
-                    {getReminderIcon(reminder.type)}
+                    <span style={{ display: 'block', width: 8, height: 8, borderRadius: '50%', background: getReminderIcon(reminder.type) }} />
                   </div>
                   <div className="reminder-content">
                     <h5>{reminder.templateData?.title || 'Reminder'}</h5>

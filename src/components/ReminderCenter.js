@@ -139,43 +139,28 @@ const ReminderCenter = () => {
 
   const getReminderTypeColor = (type) => {
     const colors = {
-      'new-application': '#3498db',
-      'interview': '#9b59b6',
-      'application-status': '#2ecc71',
-      'job-deadline': '#f39c12',
-      'job-expiring': '#e74c3c',
-      'verification-pending': '#e67e22',
+      'new-application': '#3b82f6',
+      'interview': '#8b5cf6',
+      'application-status': '#10b981',
+      'job-deadline': '#f59e0b',
+      'job-expiring': '#ef4444',
+      'verification-pending': '#f97316',
     };
-    return colors[type] || '#95a5a6';
+    return colors[type] || '#94a3b8';
   };
 
   const getReminderIcon = (type) => {
-    switch (type) {
-      case 'new-application':
-        return '📝';
-      case 'interview':
-        return '📅';
-      case 'application-status':
-        return '✅';
-      case 'job-deadline':
-        return '⏰';
-      case 'job-expiring':
-        return '⚠️';
-      case 'verification-pending':
-        return '🔍';
-      default:
-        return '📧';
-    }
+    return null;
   };
 
   const filterOptions = [
     { value: 'all', label: 'All Reminders' },
     { value: 'unviewed', label: 'Unread' },
     { value: 'viewed', label: 'Read' },
-    { value: 'urgent', label: '🔴 Urgent' },
-    { value: 'follow-up', label: '🟡 Follow-up' },
-    { value: 'info-only', label: '🔵 Info Only' },
-    { value: 'action-required', label: '⚠️ Action Required' },
+    { value: 'urgent', label: 'Urgent' },
+    { value: 'follow-up', label: 'Follow-up' },
+    { value: 'info-only', label: 'Info Only' },
+    { value: 'action-required', label: 'Action Required' },
     { value: 'new-application', label: 'New Applications' },
     { value: 'interview', label: 'Interviews' },
     { value: 'application-status', label: 'Application Status' },
@@ -278,11 +263,13 @@ const ReminderCenter = () => {
             <p>Loading reminders...</p>
           </div>
         ) : filteredReminders.length === 0 ? (
-          <div className="empty-state">
-            <div className="empty-icon">📭</div>
-            <h3>No reminders found</h3>
-            <p>You don't have any reminders matching this filter.</p>
-          </div>
+            <div className="empty-state">
+              <div className="empty-icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              </div>
+              <h3>No reminders found</h3>
+              <p>You don't have any reminders matching this filter.</p>
+            </div>
         ) : (
           <>
             <div className="reminders-table">
@@ -300,8 +287,8 @@ const ReminderCenter = () => {
                   className={`table-row ${reminder.isViewed ? 'viewed' : 'unviewed'}`}
                 >
                   <div className="col-type">
-                    <span className="type-badge" title={reminder.type}>
-                      {getReminderIcon(reminder.type)}
+                    <span className="type-badge">
+                      <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: getReminderTypeColor(reminder.type), flexShrink: 0 }} />
                       <span className="type-text">
                         {reminder.type.replace('-', ' ')}
                       </span>
