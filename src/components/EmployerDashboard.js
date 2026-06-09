@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import EmployerLayout from './EmployerLayout';
 import employerService from '../services/employer.service';
+import recommendationService from '../services/recommendationService';
 import ReminderWidget from './ReminderWidget';
 import '../styles/employerDashboard.css';
 import '../styles/dashboard.css';
@@ -979,9 +980,32 @@ const JobFormSection = ({ editingJob, formData, formErrors, isSubmitting, onChan
 const ApplicationsSection = ({ applications, loading, selectedJob, selectedStatus, onJobChange, onStatusChange, uniqueJobs, allStatuses, onStatusUpdate, formatDate, getInitials }) => {
   const [viewingApp, setViewingApp] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [fitScores, setFitScores] = useState({});
+  const [fitLoading, setFitLoading] = useState(false);
   const perPage = 10;
   const totalPages = Math.ceil(applications.length / perPage);
   const paginatedApps = applications.slice((currentPage - 1) * perPage, currentPage * perPage);
+
+  useEffect(() => {
+    const loadFitScores = async () => {
+      setFitLoading(true);
+      try {
+        const res = await recommendationService.getCandidateFitScores();
+        if (res.success && res.data) {
+          const scoreMap = {};
+          res.data.forEach((item) => {
+            scoreMap[item.applicationId] = item.fitScore;
+          });
+          setFitScores(scoreMap);
+        }
+      } catch (err) {
+        console.log('Fit scores not available');
+      } finally {
+        setFitLoading(false);
+      }
+    };
+    loadFitScores();
+  }, []);
 
   const statusColors = {
     'Pending': '#f59e0b',
@@ -1046,6 +1070,7 @@ const ApplicationsSection = ({ applications, loading, selectedJob, selectedStatu
                 <tr>
                   <th>Candidate</th>
                   <th>Job</th>
+                  <th>Fit</th>
                   <th>Applied</th>
                   <th>Status</th>
                   <th style={{ width: 140 }}></th>
@@ -1066,6 +1091,17 @@ const ApplicationsSection = ({ applications, loading, selectedJob, selectedStatu
                       </td>
                       <td>
                         <span className="emp-app-job-title">{app.job?.title || 'N/A'}</span>
+                      </td>
+                      <td>
+                        {fitScores[app._id] !== undefined ? (
+                          <span className={`emp-fit-badge ${fitScores[app._id] >= 70 ? 'high' : fitScores[app._id] >= 40 ? 'mid' : 'low'}`}>
+                            {fitScores[app._id]}%
+                          </span>
+                        ) : fitLoading ? (
+                          <span className="emp-fit-loading">...</span>
+                        ) : (
+                          <span className="emp-fit-na">-</span>
+                        )}
                       </td>
                       <td>
                         <span className="emp-app-date-text">{formatDate(app.createdAt)}</span>
@@ -1167,6 +1203,16 @@ const ApplicationsSection = ({ applications, loading, selectedJob, selectedStatu
               <div className="emp-modal-section">
                 <div className="emp-modal-section-title">Application Status</div>
                 <div className="emp-modal-grid">
+                  <div className="emp-modal-field">
+                    <span className="emp-modal-label">Match Score</span>
+                    <span className="emp-modal-value">
+                      {fitScores[viewingApp._id] !== undefined ? (
+                        <span className={`emp-fit-badge large ${fitScores[viewingApp._id] >= 70 ? 'high' : fitScores[viewingApp._id] >= 40 ? 'mid' : 'low'}`}>
+                          {fitScores[viewingApp._id]}% Match
+                        </span>
+                      ) : '-'}
+                    </span>
+                  </div>
                   <div className="emp-modal-field">
                     <span className="emp-modal-label">Applied Date</span>
                     <span className="emp-modal-value">{formatDate(viewingApp.createdAt)}</span>

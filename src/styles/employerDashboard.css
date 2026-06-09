@@ -1752,3 +1752,47 @@
     padding: 20px;
   }
 }
+
+/* ============================================
+   FIT SCORE BADGES
+   ============================================ */
+
+.emp-fit-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.emp-fit-badge.high {
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+}
+
+.emp-fit-badge.mid {
+  background: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+}
+
+.emp-fit-badge.low {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+}
+
+.emp-fit-badge.large {
+  padding: 5px 14px;
+  font-size: 13px;
+}
+
+.emp-fit-loading {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.emp-fit-na {
+  color: var(--text-muted);
+  font-size: 12px;
+}
