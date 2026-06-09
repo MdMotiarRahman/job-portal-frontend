@@ -18,6 +18,7 @@ import {
 import messageService from "../services/messageService";
 
 import "../styles/seekerDashboard.css";
+import { getFileUrl } from "../utils/fileUrl";
 
 const MyApplications = () => {
 
@@ -138,11 +139,7 @@ const MyApplications = () => {
             {app.resume && (
 
               <a
-                href={
-                  app.resume.startsWith("http")
-                    ? app.resume
-                    : `http://localhost:5000/${app.resume.replace(/\\/g, "/")}`
-                }
+                href={getFileUrl(app.resume)}
                 target="_blank"
                 rel="noreferrer"
                 className="resume-btn"

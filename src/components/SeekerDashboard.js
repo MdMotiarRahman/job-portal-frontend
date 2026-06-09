@@ -23,6 +23,7 @@ import {
 import ReminderWidget from './ReminderWidget';
 
 import '../styles/seekerDashboard.css';
+import { getFileUrl } from "../utils/fileUrl";
 
 const SeekerDashboard = () => {
 
@@ -59,17 +60,21 @@ const SeekerDashboard = () => {
         );
 
       // REMOVE ALREADY APPLIED JOBS
-      const appliedJobIds =
-        appRes.data.map(
-          (item) => item.job?._id
-        );
+      const myApplications = Array.isArray(appRes.data)
+  ? appRes.data
+  : appRes.data?.applications || [];
 
-      const filteredJobs =
-        jobsRes.data.filter(
-          (job) =>
-            !appliedJobIds.includes(job._id)
-        );
+const allJobs = Array.isArray(jobsRes.data)
+  ? jobsRes.data
+  : jobsRes.data?.jobs || [];
 
+const appliedJobIds = myApplications
+  .map((item) => item.job?._id || item.job)
+  .filter(Boolean);
+
+const filteredJobs = allJobs.filter(
+  (job) => !appliedJobIds.includes(job._id)
+);
       setJobs(filteredJobs);
 
     } catch (error) {
@@ -154,9 +159,13 @@ const SeekerDashboard = () => {
             <div className="avatar">
 
               <img
-                src={profileImage}
-                alt="profile"
-              />
+  src={
+    profile.profileImage
+      ? getFileUrl(profile.profileImage)
+      : "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+  }
+  alt="profile"
+/>
 
             </div>
 

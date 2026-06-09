@@ -5,6 +5,7 @@ import employerService from '../services/employer.service';
 import ReminderWidget from './ReminderWidget';
 import '../styles/employerDashboard.css';
 import '../styles/dashboard.css';
+import { getFileUrl } from "../utils/fileUrl";
 
 const JOB_TYPES = ['Full-time', 'Part-time', 'Contract', 'Internship', 'Temporary'];
 const EXPERIENCE_LEVELS = ['Entry Level', 'Mid Level', 'Senior Level', 'Lead', 'Executive'];
@@ -1067,6 +1068,25 @@ const ApplicationsSection = ({ applications, loading, selectedJob, selectedStatu
                   </div>
                 </div>
               )}
+
+              <div className="emp-app-card-cover">
+  <div className="emp-app-cover-label">Resume / CV</div>
+
+  <div className="emp-app-cover-text">
+    {app.resume ? (
+      <a
+        href={getFileUrl(app.resume)}
+        target="_blank"
+        rel="noreferrer"
+        className="resume-link"
+      >
+        Open CV
+      </a>
+    ) : (
+      "No CV uploaded"
+    )}
+  </div>
+</div>
 
               <div className="emp-app-card-footer">
                 <span className="emp-app-date">Last updated: {formatDate(app.updatedAt)}</span>

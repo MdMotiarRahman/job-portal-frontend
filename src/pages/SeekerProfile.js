@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import '../styles/seekerProfile.css';
+import { getFileUrl } from "../utils/fileUrl";
 
 const emptyProfile = {
   fullName: '',
@@ -135,9 +136,10 @@ const SeekerProfile = () => {
   };
 
   const previewImage = selectedImage
-    ? URL.createObjectURL(selectedImage)
-    : profile.profileImage || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
-
+  ? URL.createObjectURL(selectedImage)
+  : profile.profileImage
+    ? getFileUrl(profile.profileImage)
+    : 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
   return (
     <div className="profile-page">
       <div className="profile-shell">
@@ -291,7 +293,7 @@ const SeekerProfile = () => {
 
             {profile.resume && !selectedResume && (
               <a
-                href={profile.resume.startsWith('http') ? profile.resume : `http://localhost:5000/${profile.resume.replace(/\\/g, '/')}`}
+               href={getFileUrl(profile.resume)}
                 target="_blank"
                 rel="noreferrer"
                 className="resume-link"

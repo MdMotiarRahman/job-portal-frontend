@@ -5,6 +5,7 @@ import AdminLayout from './AdminLayout';
 import { getApplications, updateApplicationStatus } from '../services/adminService';
 import '../styles/adminDashboard.css';
 import '../styles/adminApplicationManagement.css';
+import { getFileUrl } from "../utils/fileUrl";
 
 const appStatuses = ['Pending', 'Reviewing', 'Shortlisted', 'Interview Scheduled', 'Accepted', 'Rejected'];
 
@@ -256,7 +257,7 @@ const AdminApplicationManagement = () => {
                       </td>
                       <td>
                         {application.resume ? (
-                          <a className="admin-application-link" href={application.resume} target="_blank" rel="noreferrer">
+                          <a className="admin-application-link" href={getFileUrl(application.resume)} target="_blank" rel="noreferrer">
                             View Resume
                           </a>
                         ) : (
@@ -375,7 +376,7 @@ const AdminApplicationManagement = () => {
                 {reviewApplication.resume ? (
                   <a
                     className="admin-action-btn admin-action-neutral"
-                    href={reviewApplication.resume}
+                    href={getFileUrl(reviewApplication.resume)}
                     target="_blank"
                     rel="noreferrer"
                   >
