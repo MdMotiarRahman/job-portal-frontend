@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -9,6 +8,8 @@ import {
   XCircle,
   Clock3,
   MessageSquare,
+  Building2,
+  MapPin,
 } from "lucide-react";
 
 import {
@@ -17,244 +18,255 @@ import {
 
 import messageService from "../services/messageService";
 
-import "../styles/seekerDashboard.css";
+import "../styles/employerDashboard.css";
+import "../styles/myApplications.css";
+import { getFileUrl } from "../utils/fileUrl";
 
 const MyApplications = () => {
-
   const navigate = useNavigate();
 
   const [applications, setApplications] = useState([]);
-
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-
     const fetchApplications = async () => {
-
       try {
+        const response = await getMyApplications();
 
-        const response =
-          await getMyApplications();
+        const data = Array.isArray(response.data)
+          ? response.data
+          : response.data?.applications || [];
 
-        if (Array.isArray(response.data)) {
-
-          setApplications(response.data);
-
-        }
-
+        setApplications(data);
       } catch (error) {
-
         console.log(error);
-
       } finally {
-
         setLoading(false);
-
       }
-
     };
 
     fetchApplications();
-
   }, []);
 
   const getStatusClass = (status) => {
+    const value = String(status || "").toLowerCase().replace(/\s+/g, "");
 
-    const value =
-      String(status || "").toLowerCase();
-
-    if (
-      value === "accepted" ||
-      value === "shortlisted"
-    ) {
-      return "status-approved";
+    if (value === "accepted" || value === "shortlisted") {
+      return "emp-status-badge emp-status-active";
     }
 
     if (value === "rejected") {
-      return "status-rejected";
+      return "emp-status-badge emp-status-closed";
     }
 
-    return "status-pending";
+    if (value === "interviewscheduled") {
+      return "emp-status-badge emp-status-open";
+    }
 
+    return "emp-status-badge emp-status-pending";
+  };
+
+  const getCompanyName = (company) => {
+    if (!company) return "Company not available";
+
+    if (typeof company === "object") {
+      return company.name || company.email || "Company not available";
+    }
+
+    return company;
+  };
+
+  const startConversation = async (app) => {
+    try {
+      const employerId =
+        typeof app.job?.company === "object"
+          ? app.job.company._id
+          : app.job?.company;
+
+      const conv = await messageService.createConversation(
+        employerId,
+        app.job?._id
+      );
+
+      navigate(`/seeker/messages?conversation=${conv._id}`);
+    } catch (err) {
+      console.error("Failed to start conversation", err);
+    }
   };
 
   return (
-
-    <div className="seeker-dashboard">
-
-      <div className="section-title">
-
-        <Briefcase size={24} />
-
-        <h2>My Applications</h2>
-
+    <div className="my-applications-page">
+      <div className="my-applications-hero">
+        <h1>My Applications</h1>
+        <p>
+          Track your job applications, resume submissions, interview details,
+          and employer messages in one place.
+        </p>
       </div>
 
       {loading ? (
-
-        <p>Loading applications...</p>
-
-      ) : applications.length === 0 ? (
-
-        <div className="empty-state">
-
-          <FileText size={40} />
-
-          <p>No applications found</p>
-
+        <div className="admin-loading">
+          <div className="admin-spinner" />
         </div>
-
+      ) : applications.length === 0 ? (
+        <div className="my-empty-state">
+          <FileText size={42} />
+          <p>No applications found</p>
+        </div>
       ) : (
+        <div className="my-applications-grid">
+          {applications.map((app) => (
+            <div
+              className="my-application-card"
+              key={app._id}
+            >
+              <div className="my-application-header">
+                <div className="my-application-title">
+                  <h3>
+                    {app.job?.title || app.jobTitle || "Job Application"}
+                  </h3>
 
-        applications.map((app) => (
-
-          <div
-            className="application-card"
-            key={app._id}
-          >
-
-            <div className="d-flex justify-content-between align-items-center">
-
-              <h3>{app.job?.title}</h3>
-
-              <span
-                className={`status-pill ${getStatusClass(app.status)}`}
-              >
-                {app.status}
-              </span>
-
-            </div>
-
-            <p>
-              <strong>Company:</strong>{" "}
-              {app.job?.company}
-            </p>
-
-            <p className="cover-letter">
-              {app.coverLetter}
-            </p>
-
-            {/* RESUME */}
-            {app.resume && (
-
-              <a
-                href={
-                  app.resume.startsWith("http")
-                    ? app.resume
-                    : `http://localhost:5000/${app.resume.replace(/\\/g, "/")}`
-                }
-                target="_blank"
-                rel="noreferrer"
-                className="resume-btn"
-              >
-                View Resume
-              </a>
-
-            )}
-
-            {/* MESSAGE EMPLOYER */}
-            {app.job?.company && (
-              <button
-                className="resume-btn"
-                style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', gap: 6, cursor: 'pointer', border: 'none', background: 'var(--brand-primary)', color: '#fff', padding: '8px 16px', borderRadius: 8, fontSize: 13, fontWeight: 600 }}
-                onClick={async () => {
-                  try {
-                    const employerId = typeof app.job.company === 'object' ? app.job.company._id : app.job.company;
-                    const conv = await messageService.createConversation(employerId, app.job?._id);
-                    navigate(`/seeker/messages?conversation=${conv._id}`);
-                  } catch (err) {
-                    console.error('Failed to start conversation', err);
-                  }
-                }}
-              >
-                <MessageSquare size={14} />
-                Message Employer
-              </button>
-            )}
-
-            {/* REJECTED MESSAGE */}
-            {app.status === "Rejected" && (
-
-              <div className="rejected-box">
-
-                <XCircle size={20} />
-
-                <p>
-                  Sorry, you were not selected
-                  for this position.
-                </p>
-
-              </div>
-
-            )}
-
-            {/* INTERVIEW DETAILS */}
-            {app.status !== "Rejected" &&
-              (
-                app.status === "Shortlisted" ||
-                app.status === "Interview Scheduled" ||
-                app.status === "Accepted"
-              ) && (
-
-              <div className="interview-box">
-
-                <div className="interview-title">
-
-                  <CheckCircle2 size={18} />
-
-                  Interview Details
-
+                  <p>
+                    <Building2 size={14} />{" "}
+                    {getCompanyName(app.job?.company)}
+                  </p>
                 </div>
 
-                <p>
-                  <strong>Date:</strong>{" "}
-                  {app.interviewDate || "Not set"}
-                </p>
-
-                <p>
-                  <strong>Time:</strong>{" "}
-                  {app.interviewTime || "Not set"}
-                </p>
-
-                <p>
-                  <strong>Mode / Location:</strong>{" "}
-                  {app.interviewMode || "Not set"}
-                </p>
-
-                <p>
-                  <strong>Employer Message:</strong>{" "}
-                  {app.employerMessage || "—"}
-                </p>
-
+                <span className={getStatusClass(app.status)}>
+                  {app.status || "Pending"}
+                </span>
               </div>
 
-            )}
+              <div className="my-application-meta">
+                <div className="my-application-meta-item">
+                  <span className="my-application-meta-label">
+                    Job
+                  </span>
+                  <span className="my-application-meta-value">
+                    {app.job?.title || app.jobTitle || "N/A"}
+                  </span>
+                </div>
 
-            {/* PENDING MESSAGE */}
-            {app.status === "Pending" && (
+                <div className="my-application-meta-item">
+                  <span className="my-application-meta-label">
+                    Location
+                  </span>
+                  <span className="my-application-meta-value">
+                    {app.job?.location || "Not available"}
+                  </span>
+                </div>
 
-              <div className="pending-box">
-
-                <Clock3 size={18} />
-
-                <p>
-                  Your application is under review.
-                </p>
-
+                <div className="my-application-meta-item">
+                  <span className="my-application-meta-label">
+                    Applied
+                  </span>
+                  <span className="my-application-meta-value">
+                    {app.createdAt
+                      ? new Date(app.createdAt).toLocaleDateString()
+                      : "N/A"}
+                  </span>
+                </div>
               </div>
 
-            )}
+              <div className="my-application-section">
+                <div className="my-application-label">
+                  Cover Letter
+                </div>
 
-          </div>
+                <div className="my-application-text">
+                  {app.coverLetter || "No cover letter provided."}
+                </div>
+              </div>
 
-        ))
+              <div className="my-application-actions">
+                {app.resume && (
+                  <a
+                    href={getFileUrl(app.resume)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="my-application-btn"
+                  >
+                    <FileText size={14} />
+                    View Resume
+                  </a>
+                )}
 
+                {app.job?.company && (
+                  <button
+                    type="button"
+                    className="my-application-btn primary"
+                    onClick={() => startConversation(app)}
+                  >
+                    <MessageSquare size={14} />
+                    Message Employer
+                  </button>
+                )}
+              </div>
+
+              {app.status === "Rejected" && (
+                <div className="my-application-box rejected">
+                  <div className="my-application-box-title">
+                    <XCircle size={18} />
+                    Application Rejected
+                  </div>
+                  <p>
+                    Sorry, you were not selected for this position.
+                  </p>
+                </div>
+              )}
+
+              {app.status !== "Rejected" &&
+                (
+                  app.status === "Shortlisted" ||
+                  app.status === "Interview Scheduled" ||
+                  app.status === "Accepted"
+                ) && (
+                  <div className="my-application-box interview">
+                    <div className="my-application-box-title">
+                      <CheckCircle2 size={18} />
+                      Interview Details
+                    </div>
+
+                    <p>
+                      <strong>Date:</strong>{" "}
+                      {app.interviewDate || "Not set"}
+                    </p>
+
+                    <p>
+                      <strong>Time:</strong>{" "}
+                      {app.interviewTime || "Not set"}
+                    </p>
+
+                    <p>
+                      <strong>Mode / Location:</strong>{" "}
+                      {app.interviewMode || "Not set"}
+                    </p>
+
+                    <p>
+                      <strong>Employer Message:</strong>{" "}
+                      {app.employerMessage || "—"}
+                    </p>
+                  </div>
+                )}
+
+              {(app.status === "Pending" || !app.status) && (
+                <div className="my-application-box pending">
+                  <div className="my-application-box-title">
+                    <Clock3 size={18} />
+                    Under Review
+                  </div>
+
+                  <p>
+                    Your application is under review.
+                  </p>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
       )}
-
     </div>
-
   );
-
 };
 
 export default MyApplications;

@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { getPublicJobs } from '../services/jobService';
 import '../styles/jobs.css';
+import { getMyApplications } from "../services/seekerService";
 
 const jobTypes = ['', 'Full-time', 'Part-time', 'Contract', 'Internship'];
 const experienceLevels = ['', 'Entry', 'Mid', 'Senior'];
@@ -59,24 +60,57 @@ const Jobs = () => {
   }, [searchParams]);
 
   const loadJobs = useCallback(async () => {
-    setLoading(true);
-    setError('');
+  setLoading(true);
+  setError('');
+
+  try {
+    const response = await getPublicJobs(activeQuery);
+
+    let allJobs = Array.isArray(response.data)
+      ? response.data
+      : response.data?.jobs || [];
 
     try {
-      const response = await getPublicJobs(activeQuery);
-      setJobs(response.data.jobs || []);
-      setPagination(response.data.pagination || {
-        total: 0,
+      const applicationsResponse = await getMyApplications();
+
+      const myApplications = Array.isArray(applicationsResponse.data)
+        ? applicationsResponse.data
+        : applicationsResponse.data?.applications || [];
+
+      const appliedJobIds = myApplications
+        .map((app) =>
+          app.job?._id ||
+          app.job?.id ||
+          app.jobId?._id ||
+          app.jobId ||
+          app.job
+        )
+        .filter(Boolean)
+        .map(String);
+
+      allJobs = allJobs.filter(
+        (job) => !appliedJobIds.includes(String(job._id))
+      );
+    } catch (applicationError) {
+      console.log('Could not filter applied jobs', applicationError);
+    }
+
+    setJobs(allJobs);
+
+    setPagination({
+      ...(response.data?.pagination || {
         page: activeQuery.page,
         pages: 1,
         limit: activeQuery.limit,
-      });
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to load jobs.');
-    } finally {
-      setLoading(false);
-    }
-  }, [activeQuery]);
+      }),
+      total: allJobs.length,
+    });
+  } catch (err) {
+    setError(err.response?.data?.message || 'Failed to load jobs.');
+  } finally {
+    setLoading(false);
+  }
+}, [activeQuery]);
 
   useEffect(() => {
     setFilters(getInitialFilters(searchParams));

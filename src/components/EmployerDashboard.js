@@ -6,6 +6,7 @@ import recommendationService from '../services/recommendationService';
 import ReminderWidget from './ReminderWidget';
 import '../styles/employerDashboard.css';
 import '../styles/dashboard.css';
+import { getFileUrl } from "../utils/fileUrl";
 
 const JOB_TYPES = ['Full-time', 'Part-time', 'Contract', 'Internship', 'Temporary'];
 const EXPERIENCE_LEVELS = ['Entry Level', 'Mid Level', 'Senior Level', 'Lead', 'Executive'];
