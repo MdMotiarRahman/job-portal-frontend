@@ -11,6 +11,7 @@ import {
   X,
   Activity,
   MessageSquare,
+  UserCog,
 } from 'lucide-react';
 import authService from '../services/auth.service';
 import ReminderBell from './ReminderBell';
@@ -23,6 +24,7 @@ const menuItems = [
   { path: '/employer/applications', label: 'Applications', icon: ClipboardList },
   { path: '/employer/ats', label: 'ATS Pipeline', icon: Activity },
   { path: '/employer/messages', label: 'Messages', icon: MessageSquare },
+  { path: '/employer/profile', label: 'Company Profile', icon: UserCog },
 ];
 
 const EmployerSidebar = ({ isOpen, setIsOpen }) => {

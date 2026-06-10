@@ -1,0 +1,501 @@
+/* ============================================
+   Employer Profile — Eye-Soothing Minimal
+   ============================================ */
+
+/* --- PAGE --- */
+.emp-profile-page {
+  max-width: 900px;
+}
+
+/* --- HERO --- */
+.emp-profile-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xl);
+  padding: 32px 36px;
+  border-radius: var(--radius-xl);
+  background: #1e293b;
+  color: #f1f5f9;
+  margin-bottom: var(--space-xl);
+  animation: empFadeUp 0.5s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.emp-profile-hero::before {
+  content: '';
+  position: absolute;
+  top: -60%;
+  right: -5%;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(20, 184, 166, 0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.emp-profile-hero-content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  position: relative;
+  z-index: 1;
+}
+
+/* Position logo remove button relative to hero content */
+.emp-profile-hero-content .emp-profile-logo-remove {
+  position: absolute;
+  top: -4px;
+  left: 68px;
+}
+
+.emp-profile-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-lg);
+  background: rgba(20, 184, 166, 0.15);
+  border: 2px solid rgba(20, 184, 166, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Logo Upload */
+.emp-profile-logo-upload {
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.emp-profile-logo-upload:hover {
+  border-color: rgba(20, 184, 166, 0.6);
+}
+
+.emp-profile-logo-upload:hover .emp-profile-logo-overlay {
+  opacity: 1;
+}
+
+.emp-profile-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+.emp-profile-logo-input {
+  display: none;
+}
+
+.emp-profile-logo-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  border-radius: inherit;
+  color: #f1f5f9;
+}
+
+.emp-profile-logo-remove {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--error-color, #ef4444);
+  color: white;
+  border: 2px solid #1e293b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  transition: transform 0.15s ease;
+  padding: 0;
+}
+
+.emp-profile-logo-remove:hover {
+  transform: scale(1.1);
+}
+
+.emp-profile-initials {
+  font-size: 26px;
+  font-weight: 700;
+  color: #14b8a6;
+}
+
+.emp-profile-hero-info h2 {
+  margin: 0 0 4px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+
+.emp-profile-hero-info p {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+/* Verification badges */
+.emp-profile-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.emp-profile-badge.verified {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+}
+
+.emp-profile-badge.pending {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+}
+
+.emp-profile-badge.rejected {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+}
+
+.emp-profile-hero-stats {
+  display: flex;
+  gap: var(--space-xl);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.emp-profile-hero-stat {
+  text-align: center;
+}
+
+.emp-profile-hero-stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #14b8a6;
+  line-height: 1;
+}
+
+.emp-profile-hero-stat-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: #64748b;
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* --- COMPLETION CARD --- */
+.emp-profile-completion-card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-xl);
+  animation: empFadeUp 0.5s ease 0.1s backwards;
+}
+
+.emp-profile-completion-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.emp-profile-completion-head strong {
+  color: var(--brand-primary);
+  font-weight: 700;
+}
+
+.emp-profile-completion-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.emp-profile-completion-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: linear-gradient(90deg, var(--brand-primary), #14b8a6);
+  transition: width 0.5s ease;
+}
+
+.emp-profile-completion-hint {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* --- ALERT --- */
+.emp-profile-alert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-xl);
+  font-size: 13px;
+  font-weight: 500;
+  animation: empFadeUp 0.3s ease;
+}
+
+.emp-profile-alert.success {
+  background: rgba(16, 185, 129, 0.08);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.emp-profile-alert.error {
+  background: rgba(239, 68, 68, 0.08);
+  color: #dc2626;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* --- FORM SECTION --- */
+.emp-profile-form-section {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  margin-bottom: var(--space-xl);
+  animation: empFadeUp 0.5s ease 0.15s backwards;
+}
+
+.emp-profile-form-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-xl);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.emp-profile-form-title::before {
+  content: '';
+  width: 3px;
+  height: 14px;
+  border-radius: 2px;
+  background: var(--brand-primary);
+  flex-shrink: 0;
+}
+
+/* --- FORM GRID --- */
+.emp-profile-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-lg);
+}
+
+.emp-profile-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.emp-profile-form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.emp-profile-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  letter-spacing: 0.02em;
+}
+
+/* --- INPUTS --- */
+.emp-profile-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.emp-profile-input-icon {
+  position: absolute;
+  left: 14px;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  pointer-events: none;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.emp-profile-input {
+  width: 100%;
+  padding: 10px 14px 10px 44px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+  line-height: 1.5;
+}
+
+.emp-profile-input:focus {
+  outline: none;
+  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.06);
+}
+
+.emp-profile-input::placeholder {
+  color: var(--text-muted);
+}
+
+.emp-profile-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%236b7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+}
+
+.emp-profile-textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  line-height: 1.5;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+
+.emp-profile-textarea:focus {
+  outline: none;
+  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.06);
+}
+
+.emp-profile-textarea::placeholder {
+  color: var(--text-muted);
+}
+
+/* Website link */
+.emp-profile-website-link {
+  position: absolute;
+  right: 14px;
+  color: var(--brand-primary);
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.emp-profile-website-link:hover {
+  color: var(--brand-dark);
+}
+
+/* --- FORM ACTIONS --- */
+.emp-profile-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  animation: empFadeUp 0.5s ease 0.2s backwards;
+}
+
+.emp-profile-save-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 24px;
+  border-radius: var(--radius-md);
+  border: none;
+  background: var(--brand-primary);
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.emp-profile-save-btn:hover:not(:disabled) {
+  background: var(--brand-dark);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+}
+
+.emp-profile-save-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+  .emp-profile-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 24px;
+  }
+
+  .emp-profile-hero-stats {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .emp-profile-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .emp-profile-page {
+    padding: var(--space-lg) !important;
+  }
+
+  .emp-profile-hero-content .emp-profile-logo-remove {
+    left: 64px;
+    top: -2px;
+  }
+}
+
+@media (max-width: 480px) {
+  .emp-profile-hero {
+    padding: 20px;
+  }
+
+  .emp-profile-hero-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .emp-profile-avatar {
+    width: 56px;
+    height: 56px;
+  }
+
+  .emp-profile-initials {
+    font-size: 20px;
+  }
+}

@@ -19,7 +19,7 @@ const EmployerLayout = ({ children }) => {
     const fetchProfile = async () => {
       try {
         const res = await employerService.getProfile();
-        setProfile(res.data);
+        setProfile(res.profile || res);
       } catch (err) {
         console.log('Employer profile load error:', err);
       }
@@ -35,6 +35,7 @@ const EmployerLayout = ({ children }) => {
     if (path.startsWith('/employer/applications')) return 'Applications';
     if (path.startsWith('/employer/ats')) return 'ATS Pipeline';
     if (path.startsWith('/employer/messages')) return 'Messages';
+    if (path.startsWith('/employer/profile')) return 'Company Profile';
     return 'Employer Dashboard';
   }, [location.pathname]);
 

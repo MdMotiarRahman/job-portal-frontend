@@ -1,18 +1,35 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import EmployerLayout from './EmployerLayout';
 import employerService from '../services/employer.service';
 import recommendationService from '../services/recommendationService';
 import ReminderWidget from './ReminderWidget';
+import UserAvatar from './UserAvatar';
 import '../styles/employerDashboard.css';
 import '../styles/dashboard.css';
 import { getFileUrl } from "../utils/fileUrl";
+import {
+  Briefcase,
+  FileText,
+  Users,
+  Clock,
+  CheckCircle,
+  Plus,
+  ClipboardList,
+  CalendarDays,
+  Sparkles,
+  MessageSquare,
+  Building2,
+  Eye,
+  X,
+  File,
+} from 'lucide-react';
 
-const JOB_TYPES = ['Full-time', 'Part-time', 'Contract', 'Internship', 'Temporary'];
-const EXPERIENCE_LEVELS = ['Entry Level', 'Mid Level', 'Senior Level', 'Lead', 'Executive'];
+const JOB_TYPES = ['Full-time', 'Part-time', 'Contract', 'Internship'];
+const EXPERIENCE_LEVELS = ['Entry', 'Mid', 'Senior'];
 const STATUSES = ['Open', 'Closed', 'Draft', 'Pending Approval'];
 const VALID_STATUSES = ['Pending', 'Reviewing', 'Shortlisted', 'Interview Scheduled', 'Accepted', 'Rejected'];
-const VALID_JOB_STATUSES = ['Active', 'Closed'];
+const VALID_JOB_STATUSES = ['active', 'closed'];
 
 const EmployerDashboard = ({ page = 'overview' }) => {
   const navigate = useNavigate();
@@ -119,7 +136,7 @@ const EmployerDashboard = ({ page = 'overview' }) => {
     } else if (page === 'new-job') {
       setEditingJob(null);
       setFormData({
-        title: '', location: '', jobType: 'Full-time', experienceLevel: 'Mid Level',
+    title: '', location: '', jobType: 'Full-time', experienceLevel: 'Mid',
         salaryMin: '', salaryMax: '', description: '', requirements: '', skills: '',
         applicationDeadline: ''
       });
@@ -191,7 +208,7 @@ const EmployerDashboard = ({ page = 'overview' }) => {
   const handleCloseJob = async (jobId) => {
     if (!window.confirm('Close this job?')) return;
     try {
-      await employerService.updateJob(jobId, { status: 'Closed' });
+      await employerService.closeJob(jobId);
       await loadJobs();
       await loadSummary();
     } catch (err) {
@@ -201,7 +218,7 @@ const EmployerDashboard = ({ page = 'overview' }) => {
 
   const handleReopenJob = async (jobId) => {
     try {
-      await employerService.updateJob(jobId, { status: 'Active' });
+      await employerService.reopenJob(jobId);
       await loadJobs();
       await loadSummary();
     } catch (err) {
@@ -267,11 +284,6 @@ const EmployerDashboard = ({ page = 'overview' }) => {
     return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };
 
-  const getInitials = (name) => {
-    if (!name) return '??';
-    return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-  };
-
   const handleTabChange = (tab) => {
     if (tab === 'edit-job') {
       navigate('/employer/jobs/new');
@@ -308,7 +320,6 @@ const EmployerDashboard = ({ page = 'overview' }) => {
           applications={applications}
           loading={overviewLoading}
           formatDate={formatDate}
-          getInitials={getInitials}
         />
       )}
 
@@ -351,7 +362,6 @@ const EmployerDashboard = ({ page = 'overview' }) => {
           allStatuses={allStatuses}
           onStatusUpdate={handleStatusUpdate}
           formatDate={formatDate}
-          getInitials={getInitials}
         />
       )}
     </EmployerLayout>
@@ -362,7 +372,21 @@ const EmployerDashboard = ({ page = 'overview' }) => {
    OVERVIEW — Analytics + Visual Sections
    ============================================ */
 
-const OverviewSection = ({ summary, jobs, applications, loading, formatDate, getInitials }) => {
+const OverviewSection = ({ summary, jobs, applications, loading, formatDate }) => {
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await employerService.getProfile();
+        setProfile(res.profile || res);
+      } catch (err) {
+        console.log('Profile load error:', err);
+      }
+    };
+    fetchProfile();
+  }, []);
+
   const userName = useMemo(() => {
     try {
       const u = JSON.parse(localStorage.getItem('user'));
@@ -370,9 +394,9 @@ const OverviewSection = ({ summary, jobs, applications, loading, formatDate, get
     } catch { return 'Employer'; }
   }, []);
 
-  const activeJobs = jobs.filter(j => j.status === 'Active').length;
+  const activeJobs = jobs.filter(j => j.status === 'active').length;
   const pendingApproval = jobs.filter(j => j.status === 'Pending Approval').length;
-  const closedJobs = jobs.filter(j => j.status === 'Closed').length;
+  const closedJobs = jobs.filter(j => j.status === 'closed').length;
   const totalJobs = jobs.length;
 
   const pipelineData = useMemo(() => {
@@ -466,8 +490,13 @@ const OverviewSection = ({ summary, jobs, applications, loading, formatDate, get
       <div className="emp-hero">
         <div className="emp-hero-content">
           <div className="emp-hero-text">
-            <h2>Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 17 ? 'afternoon' : 'evening'}, {userName}</h2>
-            <p>Here's what's happening with your hiring pipeline today. You have {activeJobs} active job{activeJobs !== 1 ? 's' : ''} and {pipelineData['Pending'] || 0} application{pipelineData['Pending'] !== 1 ? 's' : ''} waiting for review.</p>
+            <div className="seeker-hero-profile">
+              <UserAvatar profile={profile} size={72} />
+              <div>
+                <h2>Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 17 ? 'afternoon' : 'evening'}, {userName}</h2>
+                <p>Here's what's happening with your hiring pipeline today. You have {activeJobs} active job{activeJobs !== 1 ? 's' : ''} and {pipelineData['Pending'] || 0} application{pipelineData['Pending'] !== 1 ? 's' : ''} waiting for review.</p>
+              </div>
+            </div>
           </div>
           <div className="emp-hero-stats">
             <div className="emp-hero-stat">
@@ -488,77 +517,77 @@ const OverviewSection = ({ summary, jobs, applications, loading, formatDate, get
 
       {/* Quick Actions */}
       <div className="emp-quick-actions">
-        <a href="#create-job" className="emp-quick-action-card" onClick={(e) => { e.preventDefault(); }}>
+        <Link to="/employer/jobs/new" className="emp-quick-action-card">
           <div className="emp-quick-action-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v14M5 12h14"/></svg>
+            <Plus size={18} />
           </div>
           <div className="emp-quick-action-info">
             <h4>Post New Job</h4>
             <p>Create a job listing</p>
           </div>
-        </a>
-        <a href="#view-apps" className="emp-quick-action-card" onClick={(e) => { e.preventDefault(); }}>
+        </Link>
+        <Link to="/employer/applications" className="emp-quick-action-card">
           <div className="emp-quick-action-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <ClipboardList size={18} />
           </div>
           <div className="emp-quick-action-info">
             <h4>Review Applications</h4>
             <p>{pipelineData['Pending'] || 0} pending review</p>
           </div>
-        </a>
-        <a href="#view-jobs" className="emp-quick-action-card" onClick={(e) => { e.preventDefault(); }}>
+        </Link>
+        <Link to="/employer/jobs" className="emp-quick-action-card">
           <div className="emp-quick-action-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+            <Briefcase size={18} />
           </div>
           <div className="emp-quick-action-info">
             <h4>Manage Jobs</h4>
             <p>{totalJobs} total listings</p>
           </div>
-        </a>
-        <a href="#view-interviews" className="emp-quick-action-card" onClick={(e) => { e.preventDefault(); }}>
+        </Link>
+        <Link to="/employer/messages" className="emp-quick-action-card">
           <div className="emp-quick-action-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M8 2v4"/><path d="M16 2v4"/><rect x="2" y="4" width="20" height="18" rx="2"/><path d="M12 11v4"/><path d="M10 13h4"/></svg>
+            <MessageSquare size={18} />
           </div>
           <div className="emp-quick-action-info">
-            <h4>Interviews</h4>
-            <p>{pipelineData['Interview Scheduled'] || 0} scheduled</p>
+            <h4>Messages</h4>
+            <p>Chat with candidates</p>
           </div>
-        </a>
+        </Link>
       </div>
 
       {/* Stats */}
       <div className="emp-stats-grid">
         <div className="emp-stat-card">
           <div className="emp-stat-icon blue">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+            <Briefcase size={16} />
           </div>
           <div className="emp-stat-label">Active Jobs</div>
           <div className="emp-stat-value">{activeJobs}</div>
         </div>
         <div className="emp-stat-card">
           <div className="emp-stat-icon green">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <Users size={16} />
           </div>
           <div className="emp-stat-label">Total Applications</div>
           <div className="emp-stat-value">{totalApps}</div>
         </div>
         <div className="emp-stat-card">
           <div className="emp-stat-icon amber">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <Clock size={16} />
           </div>
           <div className="emp-stat-label">Pending Review</div>
           <div className="emp-stat-value">{pipelineData['Pending'] || 0}</div>
         </div>
         <div className="emp-stat-card">
           <div className="emp-stat-icon purple">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M8 2v4"/><path d="M16 2v4"/><rect x="2" y="4" width="20" height="18" rx="2"/><path d="M12 11v4"/><path d="M10 13h4"/></svg>
+            <CalendarDays size={16} />
           </div>
           <div className="emp-stat-label">Interviews</div>
           <div className="emp-stat-value">{pipelineData['Interview Scheduled'] || 0}</div>
         </div>
         <div className="emp-stat-card">
           <div className="emp-stat-icon green">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 6L9 17l-5-5"/></svg>
+            <CheckCircle size={16} />
           </div>
           <div className="emp-stat-label">Hired</div>
           <div className="emp-stat-value">{pipelineData['Accepted'] || 0}</div>
@@ -627,11 +656,20 @@ const OverviewSection = ({ summary, jobs, applications, loading, formatDate, get
           ) : (
             <div className="emp-empty-state">
               <div className="emp-empty-icon">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+                <Briefcase size={40} />
               </div>
               <p className="emp-empty-text">No jobs yet</p>
             </div>
           )}
+        </div>
+
+        {/* Important Updates */}
+        <div className="emp-analytics-card">
+          <div className="emp-analytics-title">
+            <Sparkles size={14} />
+            Important Updates
+          </div>
+          <ReminderWidget title="Important Updates" limit={4} />
         </div>
 
         {/* Activity */}
@@ -652,7 +690,7 @@ const OverviewSection = ({ summary, jobs, applications, loading, formatDate, get
           ) : (
             <div className="emp-empty-state">
               <div className="emp-empty-icon">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <Clock size={40} />
               </div>
               <p className="emp-empty-text">No recent activity</p>
             </div>
@@ -660,7 +698,7 @@ const OverviewSection = ({ summary, jobs, applications, loading, formatDate, get
         </div>
 
         {/* Trends */}
-        <div className="emp-analytics-card">
+        <div className="emp-analytics-card full-width">
           <div className="emp-analytics-title">Application Trends (Last 7 Days)</div>
           <div className="emp-trends-chart">
             {trendsData.map((day, i) => (
@@ -777,7 +815,7 @@ const JobsSection = ({ jobs, loading, search, onSearchChange, onEdit, onClose, o
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                           Edit
                         </button>
-                        {job.status === 'Active' ? (
+                        {job.status === 'active' ? (
                           <button className="emp-action-btn danger" onClick={() => onClose(job._id)} title="Close">
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
                             Close
@@ -978,7 +1016,7 @@ const JobFormSection = ({ editingJob, formData, formErrors, isSubmitting, onChan
    APPLICATIONS — Table View with Actions Dropdown
    ============================================ */
 
-const ApplicationsSection = ({ applications, loading, selectedJob, selectedStatus, onJobChange, onStatusChange, uniqueJobs, allStatuses, onStatusUpdate, formatDate, getInitials }) => {
+const ApplicationsSection = ({ applications, loading, selectedJob, selectedStatus, onJobChange, onStatusChange, uniqueJobs, allStatuses, onStatusUpdate, formatDate }) => {
   const [viewingApp, setViewingApp] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [fitScores, setFitScores] = useState({});
@@ -1056,12 +1094,12 @@ const ApplicationsSection = ({ applications, loading, selectedJob, selectedStatu
         <div className="admin-loading"><div className="admin-spinner" /></div>
       ) : applications.length === 0 ? (
         <div className="emp-analytics-card">
-          <div className="emp-empty-state">
-            <div className="emp-empty-icon">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <div className="emp-empty-state">
+              <div className="emp-empty-icon">
+                <Users size={40} />
+              </div>
+              <p className="emp-empty-text">No applications match your filters</p>
             </div>
-            <p className="emp-empty-text">No applications match your filters</p>
-          </div>
         </div>
       ) : (
         <>
@@ -1083,7 +1121,7 @@ const ApplicationsSection = ({ applications, loading, selectedJob, selectedStatu
                     <tr>
                       <td>
                         <div className="emp-app-candidate">
-                          <div className="emp-app-avatar">{getInitials(app.seeker?.name)}</div>
+                          <UserAvatar profile={app.seeker} size={34} />
                           <div className="emp-app-candidate-info">
                             <span className="emp-app-candidate-name">{app.seeker?.name || 'Unknown'}</span>
                             <span className="emp-app-candidate-email">{app.seeker?.email || ''}</span>
@@ -1117,7 +1155,7 @@ const ApplicationsSection = ({ applications, loading, selectedJob, selectedStatu
                             className="emp-app-view-btn"
                             onClick={() => setViewingApp(app)}
                           >
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            <Eye size={14} />
                             View
                           </button>
                         </div>
@@ -1153,7 +1191,7 @@ const ApplicationsSection = ({ applications, loading, selectedJob, selectedStatu
             <div className="emp-modal-header">
               <h2>Application Details</h2>
               <button className="emp-modal-close" onClick={() => setViewingApp(null)}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                <X size={18} />
               </button>
             </div>
             <div className="emp-modal-body">
@@ -1254,12 +1292,12 @@ const ApplicationsSection = ({ applications, loading, selectedJob, selectedStatu
                 <div className="emp-modal-section">
                   <div className="emp-modal-section-title">Resume</div>
                   <a
-                    href={`http://localhost:5000/${viewingApp.resume}`}
+                    href={getFileUrl(viewingApp.resume)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="emp-modal-resume-link"
                   >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    <File size={14} />
                     View Resume
                   </a>
                 </div>

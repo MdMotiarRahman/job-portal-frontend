@@ -7,6 +7,16 @@ const getSummary = async () => {
   return response.data;
 };
 
+const getProfile = async () => {
+  const response = await api.get(`${API_URL}/profile`);
+  return response.data;
+};
+
+const updateProfile = async (profileData) => {
+  const response = await api.put(`${API_URL}/profile`, profileData);
+  return response.data;
+};
+
 const getMyJobs = async () => {
   const response = await api.get(`${API_URL}/jobs`);
   return response.data.jobs || [];
@@ -59,12 +69,14 @@ const employerService = {
   getApplicants,
   getApplications,
   getMyJobs,
+  getProfile,
   getSummary,
   reopenJob,
   updateApplication,
   updateApplicationDetails: updateApplication,
   updateApplicationStatus: updateApplication,
   updateJob,
+  updateProfile,
 };
 
 export default employerService;

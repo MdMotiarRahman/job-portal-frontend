@@ -706,7 +706,7 @@
   align-items: center;
   gap: var(--space-sm);
   padding: 0 var(--space-md);
-  border: 1px solid rgba(226, 232, 240, 0.5);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   background: var(--bg-primary);
   min-width: 280px;
@@ -752,7 +752,7 @@
   padding: var(--space-md) var(--space-lg);
   text-align: left;
   background: var(--bg-tertiary);
-  border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+  border-bottom: 1px solid var(--border-color);
   white-space: nowrap;
 }
 
@@ -760,7 +760,7 @@
   padding: 14px var(--space-lg);
   font-size: 13px;
   color: var(--text-primary);
-  border-bottom: 1px solid rgba(226, 232, 240, 0.3);
+  border-bottom: 1px solid var(--border-color);
   vertical-align: middle;
 }
 
@@ -848,7 +848,7 @@
   gap: 4px;
   padding: 5px 10px;
   border-radius: var(--radius-md);
-  border: 1px solid rgba(226, 232, 240, 0.5);
+  border: 1px solid var(--border-color);
   background: var(--bg-primary);
   color: var(--text-secondary);
   font-size: 11px;
@@ -1023,7 +1023,7 @@
 }
 
 .emp-form-cancel-btn:hover {
-  border-color: rgba(226, 232, 240, 0.8);
+  border-color: var(--border-color);
   color: var(--text-primary);
 }
 
@@ -1320,7 +1320,7 @@
   padding: 12px 16px;
   font-size: 13px;
   color: var(--text-primary);
-  border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+  border-bottom: 1px solid var(--border-color);
   vertical-align: middle;
 }
 
@@ -1461,7 +1461,7 @@
 }
 
 .emp-modal {
-  background: white;
+  background: var(--bg-primary);
   border-radius: var(--radius-xl);
   width: 100%;
   max-width: 640px;

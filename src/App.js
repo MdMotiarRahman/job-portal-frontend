@@ -42,6 +42,7 @@ import AdminWorkspacePage from './components/AdminWorkspacePage';
 import ATSPage from './components/ATSPage';
 import EmployerLayout from './components/EmployerLayout';
 import EmployerDashboard from './components/EmployerDashboard';
+import EmployerProfile from './pages/EmployerProfile';
 import SeekerDashboard from './components/SeekerDashboard';
 import SeekerLayout from './components/SeekerLayout';
 
@@ -867,6 +868,15 @@ const AppContent = () => {
             element={
               <ProtectedRoute allowedRoles={['employer']}>
                 <EmployerDashboard page="applications" />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/employer/profile"
+            element={
+              <ProtectedRoute allowedRoles={['employer']}>
+                <EmployerProfile />
               </ProtectedRoute>
             }
           />

@@ -18,12 +18,29 @@
   font-size: 16px;
   text-align: center;
   padding: var(--space-3xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.admin-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border-color);
+  border-top-color: var(--brand-primary);
+  border-radius: 50%;
+  animation: adminSpin 0.7s linear infinite;
+}
+
+@keyframes adminSpin {
+  to { transform: rotate(360deg); }
 }
 
 /* HEADER CARD */
 .admin-header-card {
   background: var(--bg-primary);
-  border: 1px solid rgba(226, 232, 240, 0.6);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-xl);
   padding: var(--space-lg);
   box-shadow: 0 16px 40px rgba(15, 23, 42, 0.06);
@@ -54,7 +71,7 @@
 
 .admin-refresh-btn {
   padding: var(--space-sm) var(--space-lg);
-  border: 1px solid rgba(226, 232, 240, 0.8);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   background: var(--bg-primary);
   color: var(--text-primary);
@@ -175,7 +192,7 @@
 
 .admin-stat-card {
   background: linear-gradient(135deg, var(--bg-primary) 0%, rgba(248, 250, 252, 0.5) 100%);
-  border: 1px solid rgba(226, 232, 240, 0.55);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   padding: var(--space-lg);
   box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
@@ -229,7 +246,7 @@
 /* SECTIONS */
 .admin-section {
   background: var(--bg-primary);
-  border: 1px solid rgba(226, 232, 240, 0.55);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   padding: var(--space-lg);
   margin-bottom: var(--space-xl);
@@ -289,7 +306,7 @@
 .admin-form-field textarea,
 .admin-search-field input {
   width: 100%;
-  border: 1px solid rgba(226, 232, 240, 0.9);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   background: var(--bg-primary);
   color: var(--text-primary);
@@ -347,7 +364,7 @@
   gap: var(--space-sm);
   min-width: min(100%, 320px);
   padding: 0 var(--space-md);
-  border: 1px solid rgba(226, 232, 240, 0.9);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   background: var(--bg-primary);
   color: var(--text-muted);
@@ -368,7 +385,7 @@
   overflow-x: auto;
   border-radius: var(--radius-md);
   border: none;
-  box-shadow: inset 0 0 0 1px rgba(226, 232, 240, 0.55);
+  box-shadow: inset 0 0 0 1px var(--border-color);
 }
 
 .admin-table {
@@ -379,7 +396,7 @@
 
 .admin-table th,
 .admin-table td {
-  border-bottom: 1px solid rgba(226, 232, 240, 0.55);
+  border-bottom: 1px solid var(--border-color);
   padding: var(--space-md);
   text-align: left;
   vertical-align: middle;
