@@ -70,7 +70,7 @@ const MessageBell = () => {
         onClick={() => setShowDropdown(!showDropdown)}
         title="Messages"
       >
-        <MessageSquare size={20} />
+        <MessageSquare size={22} />
         {unreadCount > 0 && (
           <span className="message-bell-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>
         )}

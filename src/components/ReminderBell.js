@@ -94,7 +94,7 @@ const ReminderBell = () => {
         onClick={() => setShowDropdown(!showDropdown)}
         title="View reminders"
       >
-        <Bell size={20} />
+        <Bell size={22} />
         {unviewedCount > 0 && (
           <span className="notification-badge">{unviewedCount}</span>
         )}

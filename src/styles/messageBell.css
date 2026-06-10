@@ -10,8 +10,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   background: var(--bg-tertiary);
   border: none;
   border-radius: var(--radius-md);
@@ -24,6 +24,7 @@
 .message-bell-btn:hover {
   background: var(--brand-light);
   color: var(--brand-primary);
+  transform: scale(1.05);
 }
 
 .message-bell-btn.has-unread {
@@ -35,7 +36,7 @@
   position: absolute;
   top: 4px;
   right: 4px;
-  background: var(--error-color);
+  background: var(--error-color, #ef4444);
   color: #fff;
   font-size: 10px;
   font-weight: 700;
@@ -58,13 +59,19 @@
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
-  width: 340px;
+  width: 360px;
   background: var(--bg-primary);
   border: 1px solid var(--border-color);
   border-radius: 12px;
   box-shadow: var(--shadow-lg);
   z-index: 1000;
   overflow: hidden;
+  animation: msgDdSlideIn 0.2s ease;
+}
+
+@keyframes msgDdSlideIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .message-bell-dropdown-header {
@@ -72,7 +79,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 14px 16px;
-  border-bottom: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .message-bell-dropdown-header h4 {
@@ -98,7 +105,7 @@
 }
 
 .message-bell-empty {
-  padding: 24px 16px;
+  padding: 40px 20px;
   text-align: center;
   color: var(--text-muted);
 }
@@ -109,7 +116,7 @@
 }
 
 .message-bell-list {
-  max-height: 320px;
+  max-height: 340px;
   overflow-y: auto;
 }
 
@@ -118,7 +125,7 @@
 }
 
 .message-bell-list::-webkit-scrollbar-thumb {
-  background: var(--border-dark);
+  background: var(--border-color);
   border-radius: 2px;
 }
 
@@ -129,7 +136,7 @@
   gap: 10px;
   cursor: pointer;
   transition: background var(--transition-fast);
-  border-bottom: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border-light, #f1f5f9);
 }
 
 .message-bell-item:last-child {
@@ -144,7 +151,7 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: var(--gradient-primary);
+  background: var(--brand-primary);
   display: flex;
   align-items: center;
   justify-content: center;
