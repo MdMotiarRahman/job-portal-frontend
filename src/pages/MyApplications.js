@@ -2,14 +2,12 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
-  Briefcase,
   FileText,
   CheckCircle2,
   XCircle,
   Clock3,
   MessageSquare,
   Building2,
-  MapPin,
 } from "lucide-react";
 
 import {

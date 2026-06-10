@@ -1,16 +1,31 @@
-import React, { useMemo, useState } from 'react';
-import { ChevronLeft, ChevronRight, User } from 'lucide-react';
+import React, { useMemo, useState, useEffect } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import EmployerSidebar from './EmployerSidebar';
 import ReminderBell from './ReminderBell';
 import MessageBell from './MessageBell';
+import UserAvatar from './UserAvatar';
 import authService from '../services/auth.service';
+import employerService from '../services/employer.service';
 import '../styles/adminLayout.css';
 
 const EmployerLayout = ({ children }) => {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [profile, setProfile] = useState(null);
   const currentUser = authService.getCurrentUser()?.user;
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await employerService.getProfile();
+        setProfile(res.data);
+      } catch (err) {
+        console.log('Employer profile load error:', err);
+      }
+    };
+    fetchProfile();
+  }, []);
 
   const pageTitle = useMemo(() => {
     const path = location.pathname;
@@ -46,9 +61,12 @@ const EmployerLayout = ({ children }) => {
             <ReminderBell />
             <MessageBell />
             <div className="admin-topbar-user">
-              <div className="admin-user-avatar">
-                <User size={20} strokeWidth={1.5} />
-              </div>
+              <UserAvatar
+                profile={profile}
+                user={currentUser}
+                size={40}
+                className="admin-user-avatar"
+              />
               <div className="admin-user-meta">
                 <strong>{currentUser?.name || 'Employer'}</strong>
                 <span>{currentUser?.email || 'Hiring workspace'}</span>

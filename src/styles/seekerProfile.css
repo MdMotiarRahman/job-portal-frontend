@@ -63,6 +63,19 @@
   object-fit: cover;
 }
 
+.profile-avatar-initials {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #14b8a6, #2dd4bf);
+  color: white;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
 .upload-btn {
   margin-top: 12px;
   padding: 8px 14px;
@@ -122,6 +135,54 @@
   border: 1px solid rgba(16, 185, 129, 0.18);
 }
 
+/* COMPLETION CARD */
+.profile-completion-card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  margin-bottom: var(--space-xl);
+}
+
+.profile-completion-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+}
+
+.profile-completion-header svg {
+  color: var(--brand);
+}
+
+.profile-completion-header strong {
+  margin-left: auto;
+  color: var(--brand);
+}
+
+.profile-completion-bar {
+  height: 6px;
+  background: var(--bg-tertiary);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.profile-completion-fill {
+  height: 100%;
+  background: var(--brand);
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+.profile-completion-hint {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
 /* FORM CARD */
 .profile-card {
   background: var(--bg-primary);
@@ -170,6 +231,9 @@
 }
 
 .field label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
   font-size: 12px;
   font-weight: 700;
   color: var(--text-secondary);
@@ -177,7 +241,8 @@
 }
 
 .field input,
-.field textarea {
+.field textarea,
+.field select {
   width: 100%;
   padding: 11px 14px;
   border: 1px solid var(--border-color);
@@ -191,7 +256,8 @@
 }
 
 .field input:focus,
-.field textarea:focus {
+.field textarea:focus,
+.field select:focus {
   outline: none;
   border-color: rgba(99, 102, 241, 0.4);
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.06);
@@ -201,6 +267,125 @@
   resize: vertical;
   min-height: 130px;
   line-height: 1.5;
+}
+
+.field-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: -4px;
+}
+
+/* SKILL TAG INPUT */
+.skill-tag-input {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  min-height: 42px;
+  cursor: text;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.skill-tag-input:focus-within {
+  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.06);
+}
+
+.skill-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.skill-tag-remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 1px;
+  border-radius: 3px;
+}
+
+.skill-tag-remove:hover {
+  color: #dc2626;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.skill-tag-field {
+  border: none !important;
+  background: none !important;
+  box-shadow: none !important;
+  padding: 2px 0 !important;
+  flex: 1;
+  min-width: 120px;
+  font-size: 13px !important;
+}
+
+/* EXPERIENCE SELECTOR */
+.exp-selector {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.exp-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 8px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.exp-option:hover {
+  border-color: var(--brand);
+  background: var(--bg-secondary);
+}
+
+.exp-option.active {
+  border-color: var(--brand);
+  background: rgba(99, 102, 241, 0.06);
+}
+
+.exp-option-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.exp-option-desc {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.exp-option.active .exp-option-label {
+  color: var(--brand);
+}
+
+/* EDUCATION SELECT */
+.edu-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px !important;
 }
 
 /* RESUME */
@@ -268,6 +453,10 @@
   }
 
   .field-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .exp-selector {
     grid-template-columns: 1fr;
   }
 }

@@ -46,6 +46,7 @@ import SeekerDashboard from './components/SeekerDashboard';
 import SeekerLayout from './components/SeekerLayout';
 
 import SeekerProfile from './pages/SeekerProfile';
+import SeekerRecommendations from './pages/SeekerRecommendations';
 import ApplyJob from './pages/ApplyJob';
 import Jobs from './pages/Jobs';
 import MyApplications from './pages/MyApplications';
@@ -900,6 +901,17 @@ const AppContent = () => {
               <ProtectedRoute allowedRoles={['seeker']}>
                 <SeekerLayout>
                   <SeekerProfile />
+                </SeekerLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/seeker/recommendations"
+            element={
+              <ProtectedRoute allowedRoles={['seeker']}>
+                <SeekerLayout>
+                  <SeekerRecommendations />
                 </SeekerLayout>
               </ProtectedRoute>
             }

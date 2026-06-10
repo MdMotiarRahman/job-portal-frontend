@@ -8,6 +8,7 @@ import {
   X,
   User,
   MessageSquare,
+  Sparkles,
 } from 'lucide-react';
 import authService from '../services/auth.service';
 import ReminderBell from './ReminderBell';
@@ -17,6 +18,7 @@ const menuItems = [
   { path: '/seeker', label: 'Dashboard', icon: BarChart3, exact: true },
   { path: '/seeker/profile', label: 'My Profile', icon: User },
   { path: '/jobs', label: 'Browse Jobs', icon: Briefcase },
+  { path: '/seeker/recommendations', label: 'Recommended Jobs', icon: Sparkles },
   { path: '/seeker/applications', label: 'Applications', icon: FileText },
   { path: '/seeker/messages', label: 'Messages', icon: MessageSquare },
 ];
