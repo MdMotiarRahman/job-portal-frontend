@@ -66,7 +66,7 @@ const SeekerDashboard = () => {
           (item) => item.job?._id
         );
 
-      const filteredJobs = allJobs.filter((job) => {
+      const filteredJobs = jobsRes.data.filter((job) => {
         const isApproved =
           job.isApproved === true ||
           job.approvalStatus === 'Approved' ||
