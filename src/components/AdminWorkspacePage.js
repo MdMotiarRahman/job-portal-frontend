@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   BarChart3,
   Briefcase,
@@ -10,8 +10,11 @@ import {
   ShieldCheck,
   User,
   Users,
+  Camera,
+  X,
 } from 'lucide-react';
 import AdminLayout from './AdminLayout';
+import UserAvatar from './UserAvatar';
 import authService from '../services/auth.service';
 import {
   getAnalytics,
@@ -89,6 +92,9 @@ const AdminWorkspacePage = ({ page = 'analytics' }) => {
   const [settingsLoading, setSettingsLoading] = useState(false);
   const [settingsSuccess, setSettingsSuccess] = useState('');
   const [settingsError, setSettingsError] = useState('');
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const imageInputRef = useRef(null);
 
   const loadPage = useCallback(async () => {
     setLoading(true);
@@ -176,22 +182,39 @@ const AdminWorkspacePage = ({ page = 'analytics' }) => {
     setSettingsSuccess('');
     
     try {
-      const payload = {
-        name: settingsForm.name,
-        phone: settingsForm.phone,
-        location: settingsForm.location,
-      };
+      const formData = new FormData();
+      formData.append('name', settingsForm.name);
+      formData.append('phone', settingsForm.phone);
+      formData.append('location', settingsForm.location);
       
       if (settingsForm.newPassword) {
         if (!settingsForm.currentPassword) {
           throw new Error('Current password is required to set a new password');
         }
-        payload.currentPassword = settingsForm.currentPassword;
-        payload.newPassword = settingsForm.newPassword;
+        formData.append('currentPassword', settingsForm.currentPassword);
+        formData.append('newPassword', settingsForm.newPassword);
+      }
+
+      if (selectedImage) {
+        formData.append('profileImage', selectedImage);
       }
       
-      const res = await authService.updateMe(payload);
+      const res = await authService.updateMe(formData);
       setUser(res.data.user);
+
+      // Update localStorage so topbar name stays current
+      const stored = JSON.parse(localStorage.getItem('user') || '{}');
+      if (stored.user) {
+        stored.user.name = res.data.user.name;
+        localStorage.setItem('user', JSON.stringify(stored));
+      }
+
+      setSelectedImage(null);
+      setImagePreview(null);
+      if (imageInputRef.current) imageInputRef.current.value = '';
+
+      window.dispatchEvent(new Event('admin-profile-updated'));
+
       setSettingsSuccess('Profile settings updated successfully!');
       setSettingsForm(prev => ({ ...prev, currentPassword: '', newPassword: '' }));
     } catch (err) {
@@ -203,6 +226,23 @@ const AdminWorkspacePage = ({ page = 'analytics' }) => {
 
   const handleSettingsChange = (e) => {
     setSettingsForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setSettingsError('Only image files are allowed.');
+      return;
+    }
+    setSelectedImage(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
+
+  const handleRemoveImage = () => {
+    setSelectedImage(null);
+    setImagePreview(null);
+    if (imageInputRef.current) imageInputRef.current.value = '';
   };
 
   const renderHeader = () => (
@@ -355,6 +395,72 @@ const AdminWorkspacePage = ({ page = 'analytics' }) => {
           
           {settingsError && <div className="admin-alert admin-alert-error">{settingsError}</div>}
           {settingsSuccess && <div className="admin-alert admin-alert-success">{settingsSuccess}</div>}
+
+          {/* Profile Image Upload */}
+          <div className="admin-profile-image-section" style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '24px', padding: '16px', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)' }}>
+            <div
+              style={{
+                width: 72,
+                height: 72,
+                borderRadius: '50%',
+                overflow: 'hidden',
+                flexShrink: 0,
+                position: 'relative',
+                cursor: 'pointer',
+                border: '2px solid var(--border-color)',
+              }}
+              onClick={() => imageInputRef.current?.click()}
+              title="Click to upload photo"
+            >
+              <UserAvatar
+                profile={{ profileImage: imagePreview || user?.profileImage || '' }}
+                user={user}
+                size={72}
+              />
+              <div style={{
+                position: 'absolute',
+                inset: 0,
+                background: 'rgba(15, 23, 42, 0.45)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                opacity: 0,
+                transition: 'opacity 0.2s',
+                borderRadius: '50%',
+              }}
+                onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+                onMouseLeave={(e) => e.currentTarget.style.opacity = '0'}
+              >
+                <Camera size={18} color="#f1f5f9" />
+              </div>
+              <input
+                ref={imageInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                style={{ display: 'none' }}
+              />
+            </div>
+            <div>
+              <p style={{ margin: 0, fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>Profile Photo</p>
+              <p style={{ margin: '2px 0 8px', fontSize: '12px', color: 'var(--text-muted)' }}>JPG, PNG. Max 5MB.</p>
+              {imagePreview && (
+                <button
+                  type="button"
+                  onClick={handleRemoveImage}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: '4px',
+                    padding: '4px 10px', fontSize: '12px', fontWeight: 600,
+                    background: 'rgba(239, 68, 68, 0.08)', color: '#dc2626',
+                    border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: 'var(--radius-sm)',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <X size={12} /> Remove
+                </button>
+              )}
+            </div>
+          </div>
           
           <form className="admin-form-grid" onSubmit={handleSettingsSubmit}>
             <label className="admin-form-field">
@@ -443,9 +549,12 @@ const AdminWorkspacePage = ({ page = 'analytics' }) => {
   const renderProfile = () => (
     <section className="admin-section">
       <div className="admin-profile-panel">
-        <div className="admin-profile-avatar">
-          <User size={30} />
-        </div>
+        <UserAvatar
+          profile={{ profileImage: user?.profileImage || '' }}
+          user={user}
+          size={60}
+          className="admin-profile-avatar"
+        />
         <div>
           <h2>{user?.name || 'Admin User'}</h2>
           <p>{user?.email || 'Email not available'}</p>

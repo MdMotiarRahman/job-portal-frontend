@@ -1,19 +1,38 @@
-import React, { useMemo, useState } from 'react';
-import { User, ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import AdminSidebar from './AdminSidebar';
 import ReminderBell from './ReminderBell';
+import UserAvatar from './UserAvatar';
 import authService from '../services/auth.service';
 import '../styles/adminLayout.css';
 
 const AdminLayout = ({ children }) => {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [profile, setProfile] = useState(null);
   const currentUser = authService.getCurrentUser()?.user;
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
+
+  const fetchProfile = async () => {
+    try {
+      const res = await authService.getMe();
+      setProfile(res.data?.user || null);
+    } catch (err) {
+      console.log('Admin profile load error:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchProfile();
+
+    const handleProfileUpdate = () => fetchProfile();
+    window.addEventListener('admin-profile-updated', handleProfileUpdate);
+    return () => window.removeEventListener('admin-profile-updated', handleProfileUpdate);
+  }, []);
 
   const pageTitle = useMemo(() => {
     const path = location.pathname;
@@ -53,9 +72,12 @@ const AdminLayout = ({ children }) => {
           <div className="admin-topbar-right">
             <ReminderBell />
             <div className="admin-topbar-user">
-              <div className="admin-user-avatar">
-                <User size={20} strokeWidth={1.5} />
-              </div>
+              <UserAvatar
+                profile={profile ? { profileImage: profile.profileImage } : null}
+                user={currentUser}
+                size={40}
+                className="admin-user-avatar"
+              />
               <div className="admin-user-meta">
                 <strong>{currentUser?.name || 'Admin'}</strong>
                 <span>{currentUser?.email || 'Administrator'}</span>
