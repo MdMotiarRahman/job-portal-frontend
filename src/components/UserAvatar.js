@@ -29,8 +29,16 @@ const getColor = (name) => {
 };
 
 const UserAvatar = ({ user, profile, name, src, size = 40, className = '' }) => {
-  const displayName = name || profile?.fullName || user?.name || '';
-  const imageSrc = src || (profile?.profileImage ? getFileUrl(profile.profileImage) : null);
+  const displayName = name || profile?.fullName || profile?.userName || user?.name || '';
+
+  const resolveImage = () => {
+    if (src) return src;
+    if (profile?.profileImage) return getFileUrl(profile.profileImage);
+    if (profile?.logo?.url) return getFileUrl(profile.logo.url);
+    return null;
+  };
+
+  const imageSrc = resolveImage();
 
   const style = {
     width: size,

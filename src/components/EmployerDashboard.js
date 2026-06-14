@@ -385,6 +385,10 @@ const OverviewSection = ({ summary, jobs, applications, loading, formatDate }) =
       }
     };
     fetchProfile();
+
+    const handleProfileUpdate = () => fetchProfile();
+    window.addEventListener('employer-profile-updated', handleProfileUpdate);
+    return () => window.removeEventListener('employer-profile-updated', handleProfileUpdate);
   }, []);
 
   const userName = useMemo(() => {

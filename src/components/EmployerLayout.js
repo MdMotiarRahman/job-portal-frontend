@@ -25,6 +25,10 @@ const EmployerLayout = ({ children }) => {
       }
     };
     fetchProfile();
+
+    const handleProfileUpdate = () => fetchProfile();
+    window.addEventListener('employer-profile-updated', handleProfileUpdate);
+    return () => window.removeEventListener('employer-profile-updated', handleProfileUpdate);
   }, []);
 
   const pageTitle = useMemo(() => {

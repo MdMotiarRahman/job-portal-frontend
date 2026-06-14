@@ -1,10 +1,10 @@
 /* ============================================
-   Employer Profile — Eye-Soothing Minimal
+   Employer Profile — Professional Clean Design
    ============================================ */
 
 /* --- PAGE --- */
 .emp-profile-page {
-  max-width: 900px;
+  max-width: 960px;
 }
 
 /* --- HERO --- */
@@ -43,13 +43,13 @@
   z-index: 1;
 }
 
-/* Position logo remove button relative to hero content */
 .emp-profile-hero-content .emp-profile-logo-remove {
   position: absolute;
   top: -4px;
   left: 68px;
 }
 
+/* --- AVATAR / LOGO --- */
 .emp-profile-avatar {
   width: 72px;
   height: 72px;
@@ -64,14 +64,14 @@
   position: relative;
 }
 
-/* Logo Upload */
 .emp-profile-logo-upload {
   cursor: pointer;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
 .emp-profile-logo-upload:hover {
   border-color: rgba(20, 184, 166, 0.6);
+  transform: scale(1.03);
 }
 
 .emp-profile-logo-upload:hover .emp-profile-logo-overlay {
@@ -122,15 +122,17 @@
 }
 
 .emp-profile-logo-remove:hover {
-  transform: scale(1.1);
+  transform: scale(1.15);
 }
 
 .emp-profile-initials {
   font-size: 26px;
   font-weight: 700;
   color: #14b8a6;
+  user-select: none;
 }
 
+/* --- HERO INFO --- */
 .emp-profile-hero-info h2 {
   margin: 0 0 4px;
   font-size: 22px;
@@ -145,7 +147,6 @@
   color: #94a3b8;
 }
 
-/* Verification badges */
 .emp-profile-badge {
   display: inline-flex;
   align-items: center;
@@ -172,6 +173,7 @@
   color: #fca5a5;
 }
 
+/* --- HERO STATS --- */
 .emp-profile-hero-stats {
   display: flex;
   gap: var(--space-xl);
@@ -205,7 +207,7 @@
   background: var(--bg-primary);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
-  padding: var(--space-lg);
+  padding: var(--space-lg) var(--space-xl);
   margin-bottom: var(--space-xl);
   animation: empFadeUp 0.5s ease 0.1s backwards;
 }
@@ -214,7 +216,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   font-size: 13px;
   color: var(--text-secondary);
 }
@@ -226,7 +228,7 @@
 
 .emp-profile-completion-bar {
   width: 100%;
-  height: 8px;
+  height: 6px;
   background: var(--bg-tertiary);
   border-radius: var(--radius-full);
   overflow: hidden;
@@ -240,9 +242,10 @@
 }
 
 .emp-profile-completion-hint {
-  margin: 8px 0 0;
+  margin: 10px 0 0;
   font-size: 12px;
   color: var(--text-muted);
+  line-height: 1.4;
 }
 
 /* --- ALERT --- */
@@ -270,12 +273,14 @@
   border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
-/* --- FORM SECTION --- */
+/* ============================================
+   FORM SECTION — Spacious & Aligned
+   ============================================ */
 .emp-profile-form-section {
   background: var(--bg-primary);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
-  padding: var(--space-xl);
+  padding: var(--space-2xl) var(--space-2xl) var(--space-xl);
   margin-bottom: var(--space-xl);
   animation: empFadeUp 0.5s ease 0.15s backwards;
 }
@@ -283,11 +288,11 @@
 .emp-profile-form-title {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
-  font-size: 14px;
+  gap: 10px;
+  font-size: 15px;
   font-weight: 700;
   color: var(--text-primary);
-  margin-bottom: var(--space-xl);
+  margin-bottom: var(--space-2xl);
   padding-bottom: var(--space-md);
   border-bottom: 1px solid var(--border-color);
 }
@@ -295,7 +300,7 @@
 .emp-profile-form-title::before {
   content: '';
   width: 3px;
-  height: 14px;
+  height: 16px;
   border-radius: 2px;
   background: var(--brand-primary);
   flex-shrink: 0;
@@ -305,13 +310,14 @@
 .emp-profile-form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--space-lg);
+  column-gap: var(--space-2xl);
+  row-gap: var(--space-xl);
 }
 
 .emp-profile-form-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .emp-profile-form-group.full-width {
@@ -319,13 +325,15 @@
 }
 
 .emp-profile-label {
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 13px;
+  font-weight: 600;
   color: var(--text-secondary);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
 }
 
-/* --- INPUTS --- */
+/* ============================================
+   INPUT FIELDS — Tall, Clean, Spacious
+   ============================================ */
 .emp-profile-input-wrap {
   position: relative;
   display: flex;
@@ -344,11 +352,17 @@
   pointer-events: none;
   flex-shrink: 0;
   z-index: 1;
+  transition: color 0.2s ease;
+}
+
+.emp-profile-input-wrap:focus-within .emp-profile-input-icon {
+  color: var(--brand-primary);
 }
 
 .emp-profile-input {
   width: 100%;
-  padding: 10px 14px 10px 44px;
+  height: 48px;
+  padding: 0 16px 0 44px;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   background: var(--bg-primary);
@@ -357,7 +371,6 @@
   font-family: inherit;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   box-sizing: border-box;
-  line-height: 1.5;
 }
 
 .emp-profile-input:focus {
@@ -368,6 +381,7 @@
 
 .emp-profile-input::placeholder {
   color: var(--text-muted);
+  font-weight: 400;
 }
 
 .emp-profile-select {
@@ -376,11 +390,14 @@
   background-repeat: no-repeat;
   background-position: right 14px center;
   padding-right: 36px;
+  cursor: pointer;
 }
 
+/* --- TEXTAREA --- */
 .emp-profile-textarea {
   width: 100%;
-  padding: 12px;
+  min-height: 140px;
+  padding: 14px 16px;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   background: var(--bg-primary);
@@ -388,7 +405,7 @@
   font-size: 14px;
   font-family: inherit;
   resize: vertical;
-  line-height: 1.5;
+  line-height: 1.6;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   box-sizing: border-box;
 }
@@ -401,48 +418,61 @@
 
 .emp-profile-textarea::placeholder {
   color: var(--text-muted);
+  font-weight: 400;
 }
 
 /* Website link */
 .emp-profile-website-link {
   position: absolute;
   right: 14px;
-  color: var(--brand-primary);
+  color: var(--text-muted);
   display: flex;
   align-items: center;
   text-decoration: none;
   transition: color 0.2s ease;
+  padding: 4px;
 }
 
 .emp-profile-website-link:hover {
-  color: var(--brand-dark);
+  color: var(--brand-primary);
 }
 
-/* --- FORM ACTIONS --- */
+/* ============================================
+   FORM ACTIONS — Inside the Section
+   ============================================ */
 .emp-profile-form-actions {
   display: flex;
   justify-content: flex-end;
+  padding-top: var(--space-lg);
+  margin-top: var(--space-xl);
+  border-top: 1px solid var(--border-color);
   animation: empFadeUp 0.5s ease 0.2s backwards;
 }
 
 .emp-profile-save-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 10px 24px;
+  gap: 8px;
+  padding: 12px 32px;
   border-radius: var(--radius-md);
   border: none;
   background: var(--brand-primary);
   color: white;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+  letter-spacing: 0.01em;
 }
 
 .emp-profile-save-btn:hover:not(:disabled) {
   background: var(--brand-dark);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.25);
+  transform: translateY(-1px);
+}
+
+.emp-profile-save-btn:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .emp-profile-save-btn:disabled {
@@ -466,8 +496,13 @@
     justify-content: space-between;
   }
 
+  .emp-profile-form-section {
+    padding: var(--space-xl) var(--space-lg);
+  }
+
   .emp-profile-form-grid {
     grid-template-columns: 1fr;
+    row-gap: var(--space-lg);
   }
 
   .emp-profile-page {
@@ -497,5 +532,10 @@
 
   .emp-profile-initials {
     font-size: 20px;
+  }
+
+  .emp-profile-hero-content .emp-profile-logo-remove {
+    left: 48px;
+    top: -2px;
   }
 }

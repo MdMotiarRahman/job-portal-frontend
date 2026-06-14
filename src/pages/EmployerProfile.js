@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+
 import EmployerLayout from '../components/EmployerLayout';
 import employerService from '../services/employer.service';
 import { getFileUrl } from '../utils/fileUrl';
@@ -22,7 +22,6 @@ import '../styles/employerProfile.css';
 const COMPANY_SIZES = ['1-50', '51-200', '201-500', '501-1000', '1000+'];
 
 const EmployerProfile = () => {
-  const navigate = useNavigate();
   const [profile, setProfile] = useState({
     companyName: '',
     companyWebsite: '',
@@ -139,6 +138,8 @@ const EmployerProfile = () => {
       setSelectedLogo(null);
       setLogoPreview(null);
       if (logoInputRef.current) logoInputRef.current.value = '';
+
+      window.dispatchEvent(new Event('employer-profile-updated'));
 
       setAlert({ type: 'success', message: 'Profile updated successfully.' });
       setTimeout(() => setAlert({ type: '', message: '' }), 3000);
@@ -395,24 +396,24 @@ const EmployerProfile = () => {
               />
             </div>
           </div>
-        </div>
 
-        {/* Save Button */}
-        <div className="emp-profile-form-actions">
-          <button
-            className="emp-profile-save-btn"
-            onClick={handleSubmit}
-            disabled={saving}
-          >
-            {saving ? (
-              <>Saving...</>
-            ) : (
-              <>
-                <Save size={15} />
-                Save Profile
-              </>
-            )}
-          </button>
+          {/* Save Button — inside form section */}
+          <div className="emp-profile-form-actions">
+            <button
+              className="emp-profile-save-btn"
+              onClick={handleSubmit}
+              disabled={saving}
+            >
+              {saving ? (
+                <>Saving...</>
+              ) : (
+                <>
+                  <Save size={15} />
+                  Save Profile
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </EmployerLayout>
