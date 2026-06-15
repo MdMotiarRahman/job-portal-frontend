@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Building2, MapPin, Globe, Phone, Mail, Users, ArrowLeft, Loader2, Briefcase } from 'lucide-react';
+import api from '../services/api';
 import '../styles/publicPages.css';
 
 const CompanyDetails = () => {
@@ -13,16 +14,21 @@ const CompanyDetails = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [compRes, jobsRes] = await Promise.all([
-          fetch(`/api/employers/${id}`),
-          fetch(`/api/jobs?company=${id}&limit=10`)
-        ]);
-        const compData = await compRes.json();
-        const jobsData = await jobsRes.json();
-        setCompany(compData.data?.employer || compData.data);
-        setJobs(jobsData.data?.jobs || jobsData.jobs || []);
-      } catch { /* empty */ }
-      finally { setLoading(false); }
+        const compRes = await api.get(`/employers/${id}`);
+        const employer = compRes.data?.data?.employer || compRes.data?.data;
+        setCompany(employer);
+
+        try {
+          const jobsRes = await api.get('/jobs', { params: { company: id, limit: 10 } });
+          setJobs(jobsRes.data?.jobs || jobsRes.data?.data?.jobs || []);
+        } catch {
+          setJobs([]);
+        }
+      } catch (err) {
+        console.error('Failed to load company:', err);
+      } finally {
+        setLoading(false);
+      }
     };
     fetchData();
   }, [id]);
