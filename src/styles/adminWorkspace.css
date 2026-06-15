@@ -1,3 +1,8 @@
+/* ============================
+   ADMIN WORKSPACE — Analytics & Reports
+   Consistent with adminModule.css pattern
+   ============================ */
+
 .admin-kicker {
   display: inline-flex;
   align-items: center;
@@ -5,130 +10,387 @@
   margin-bottom: 6px;
 }
 
-.admin-workspace-grid {
+/* ============================================
+   KPI CARDS
+   ============================================ */
+
+.aw-kpi-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: var(--space-lg);
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
 }
 
-.admin-workspace-grid .admin-section {
-  margin-bottom: 0;
-}
-
-.admin-workspace-bars {
-  display: grid;
-  gap: 14px;
-}
-
-.admin-workspace-bar-row {
-  display: grid;
-  grid-template-columns: 112px minmax(120px, 1fr) 44px;
+.aw-kpi {
+  position: relative;
+  background: var(--bg-primary);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  display: flex;
   align-items: center;
-  gap: 12px;
-  color: var(--text-secondary);
-  font-size: 13px;
-  font-weight: 700;
-  text-transform: capitalize;
-}
-
-.admin-workspace-bar-row strong {
-  color: var(--text-primary);
-  text-align: right;
-}
-
-.admin-workspace-bar-track {
-  height: 10px;
-  border-radius: var(--radius-full);
-  background: #eef2f7;
+  gap: 14px;
+  transition: all 0.2s ease;
   overflow: hidden;
 }
 
-.admin-workspace-bar-track div {
-  height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, #2563eb, #10b981);
+.aw-kpi:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
+  transform: translateY(-1px);
 }
 
-.admin-workspace-report-grid,
-.admin-workspace-settings {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: var(--space-lg);
+.aw-kpi-accent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  opacity: 0.85;
 }
 
-.admin-workspace-report-grid > div,
-.admin-workspace-settings > div {
-  border: 1px solid var(--border-color);
+.aw-kpi-icon {
+  width: 42px;
+  height: 42px;
   border-radius: var(--radius-md);
-  background: #fbfdff;
-  padding: var(--space-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
-.admin-workspace-report-grid h3 {
-  margin: 0 0 12px;
-  color: var(--text-primary);
-  font-size: 14px;
+.aw-kpi-label {
+  margin: 0 0 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.aw-kpi-value {
+  margin: 0;
+  font-size: 28px;
   font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1;
+  letter-spacing: -0.02em;
 }
 
-.admin-workspace-report-grid p {
+/* ============================================
+   PERIOD ACTIVITY CARDS
+   ============================================ */
+
+.aw-section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+  margin-bottom: 14px;
+}
+
+.aw-section-header svg {
+  color: var(--text-muted);
+}
+
+.aw-section-header h2 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+}
+
+.aw-section-header::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.aw-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(16, 185, 129, 0.08);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.15);
+  margin-left: auto;
+}
+
+.aw-period-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.aw-period-card {
+  background: var(--bg-primary);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.2s ease;
+}
+
+.aw-period-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
+}
+
+.aw-period-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.aw-period-value {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+/* ============================================
+   DISTRIBUTION CHARTS
+   ============================================ */
+
+.aw-charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.aw-card {
+  background: var(--bg-primary);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.aw-card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.aw-card-header h3 {
   margin: 0;
-  padding: 10px 0;
-  border-top: 1px solid var(--border-color);
-  color: var(--text-primary);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
+  color: var(--text-primary);
 }
 
-.admin-workspace-report-grid span,
-.admin-workspace-settings span {
-  color: var(--text-muted);
+.aw-card-total {
   font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--text-muted);
 }
 
-.admin-workspace-settings strong {
-  display: block;
-  margin-top: 8px;
-  color: var(--text-primary);
-  font-size: 15px;
+.aw-empty {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 24px 0;
 }
 
-.admin-profile-panel {
+.aw-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.aw-bar-row {
   display: flex;
   align-items: center;
-  gap: var(--space-lg);
-  margin-bottom: var(--space-xl);
-  padding-bottom: var(--space-lg);
-  border-bottom: 1px solid var(--border-color);
+  gap: 10px;
 }
 
-.admin-profile-avatar {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 64px;
-  height: 64px;
-  border-radius: 18px;
-  background: #111827;
-  color: white;
+.aw-bar-label {
+  width: 100px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: capitalize;
+  flex-shrink: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.admin-profile-panel h2 {
-  margin: 0;
+.aw-bar-track {
+  flex: 1;
+  height: 10px;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.aw-bar-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 0.5s ease;
+}
+
+.aw-bar-value {
+  width: 56px;
+  text-align: right;
+  font-size: 13px;
+  font-weight: 700;
   color: var(--text-primary);
-  font-size: 24px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 4px;
 }
 
-.admin-profile-panel p {
-  margin: 5px 0 10px;
+.aw-bar-pct {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+/* ============================================
+   REPORT CARDS — Recent Activity Tables
+   ============================================ */
+
+.aw-report-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.aw-report-card {
+  background: var(--bg-primary);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+}
+
+.aw-report-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.aw-report-card-header svg {
+  color: var(--text-muted);
+}
+
+.aw-report-card-header h3 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
   color: var(--text-secondary);
 }
+
+.aw-report-table {
+  padding: 0;
+}
+
+.aw-report-table-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+.aw-report-table-head span {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.aw-report-table-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+  transition: background 0.1s ease;
+}
+
+.aw-report-table-row:last-child {
+  border-bottom: none;
+}
+
+.aw-report-table-row:hover {
+  background: rgba(99, 102, 241, 0.02);
+}
+
+.aw-report-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.aw-report-name {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.aw-report-sub {
+  margin: 1px 0 0;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Badges */
+.aw-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: capitalize;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.aw-badge-info { background: rgba(59, 130, 246, 0.08); color: #2563eb; }
+.aw-badge-success { background: rgba(16, 185, 129, 0.08); color: #059669; }
+.aw-badge-warning { background: rgba(245, 158, 11, 0.08); color: #d97706; }
+.aw-badge-error { background: rgba(239, 68, 68, 0.08); color: #dc2626; }
+.aw-badge-neutral { background: rgba(107, 114, 128, 0.08); color: #4b5563; }
+
+/* ============================================
+   WORKSPACE FOOTNOTE
+   ============================================ */
 
 .admin-workspace-footnote {
   display: inline-flex;
@@ -139,46 +401,360 @@
   font-weight: 700;
 }
 
-.admin-empty-state {
-  color: var(--text-secondary);
+/* ============================================
+   SETTINGS PAGE
+   ============================================ */
+
+.aw-settings-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 16px;
+  align-items: start;
+}
+
+/* Avatar Upload Section */
+.aw-avatar-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  margin-bottom: 8px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.aw-avatar-wrapper {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  position: relative;
+  cursor: pointer;
+  border: 2px solid rgba(0, 0, 0, 0.08);
+  transition: border-color 0.15s ease;
+}
+
+.aw-avatar-wrapper:hover {
+  border-color: var(--brand-primary);
+}
+
+.aw-avatar-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+  border-radius: 50%;
+}
+
+.aw-avatar-wrapper:hover .aw-avatar-overlay {
+  opacity: 1;
+}
+
+.aw-avatar-info {
+  flex: 1;
+}
+
+.aw-avatar-title {
+  margin: 0;
   font-size: 14px;
   font-weight: 600;
-  padding: var(--space-lg);
-  text-align: center;
+  color: var(--text-primary);
 }
 
-@media (max-width: 640px) {
-  .admin-workspace-bar-row {
-    grid-template-columns: 1fr;
-    gap: 8px;
-  }
-
-  .admin-workspace-bar-row strong {
-    text-align: left;
-  }
-
-  .admin-profile-panel {
-    align-items: flex-start;
-    flex-direction: column;
-  }
+.aw-avatar-sub {
+  margin: 2px 0 8px;
+  font-size: 12px;
+  color: var(--text-muted);
 }
 
-/* Settings Layout */
-.admin-settings-layout {
+.aw-btn-remove {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(239, 68, 68, 0.08);
+  color: #dc2626;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.aw-btn-remove:hover {
+  background: rgba(239, 68, 68, 0.15);
+}
+
+/* Form Grid */
+.aw-form-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: var(--space-xl);
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
 }
 
-.admin-input-disabled {
-  background: #f1f5f9;
+.aw-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.aw-form-field span {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.aw-form-field input {
+  height: 42px;
+  padding: 0 14px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 500;
+  transition: border-color 0.15s ease;
+}
+
+.aw-form-field input:focus {
+  outline: none;
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.08);
+}
+
+.aw-form-field input::placeholder {
+  color: var(--text-muted);
+}
+
+.aw-input-disabled {
+  background: var(--bg-secondary) !important;
+  cursor: not-allowed !important;
+  opacity: 0.7;
+}
+
+.aw-form-divider {
+  grid-column: 1 / -1;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  margin: 8px 0;
+}
+
+.aw-form-actions {
+  grid-column: 1 / -1;
+  padding-top: 8px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  margin-top: 8px;
+}
+
+.aw-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  background: #6366f1;
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.aw-btn-primary:hover {
+  background: #4f46e5;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+}
+
+.aw-btn-primary:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
-  opacity: 0.8;
 }
 
-@media (max-width: 900px) {
-  .admin-settings-layout {
+/* Info List (sidebar cards) */
+.aw-info-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.aw-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.aw-info-row:last-child {
+  border-bottom: none;
+}
+
+.aw-info-row span {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.aw-info-row strong {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-transform: capitalize;
+}
+
+.aw-settings-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ============================================
+   PROFILE PAGE
+   ============================================ */
+
+.aw-profile-hero {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.aw-profile-avatar-lg {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 3px solid rgba(99, 102, 241, 0.15);
+}
+
+.aw-profile-hero-info h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.aw-profile-hero-info p {
+  margin: 4px 0 10px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.aw-profile-badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* Info Grid */
+.aw-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.aw-info-item {
+  padding: 14px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+.aw-info-item span {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+
+.aw-info-item strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  word-break: break-all;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 1200px) {
+  .aw-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .aw-charts-grid,
+  .aw-report-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .aw-settings-layout {
     grid-template-columns: 1fr;
   }
 }
 
+@media (max-width: 768px) {
+  .aw-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .aw-period-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .aw-charts-grid,
+  .aw-report-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .aw-kpi-value {
+    font-size: 24px;
+  }
+
+  .aw-period-value {
+    font-size: 20px;
+  }
+
+  .aw-bar-label {
+    width: 70px;
+    font-size: 11px;
+  }
+
+  .aw-settings-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .aw-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .aw-profile-hero {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .aw-profile-badges {
+    justify-content: center;
+  }
+
+  .aw-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .aw-avatar-section {
+    flex-direction: column;
+    text-align: center;
+  }
+}

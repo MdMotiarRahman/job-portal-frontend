@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { TrendingUp, Users, Clock, Target, AlertCircle, Loader2, ArrowRight, CheckCircle } from 'lucide-react';
 import atsService from '../services/atsService';
+import '../styles/adminModule.css';
 import '../styles/atsDashboard.css';
 
 const ATSDashboard = () => {
@@ -24,18 +25,16 @@ const ATSDashboard = () => {
     };
 
     fetchDashboardData();
-
-    // Real-time polling: refresh stats every 30 seconds
     const interval = setInterval(fetchDashboardData, 30000);
     return () => clearInterval(interval);
   }, []);
 
   if (loading) {
     return (
-      <div className="ats-simple-container">
-        <div className="ats-state-center">
-          <Loader2 size={32} className="animate-spin text-brand" />
-          <p>Loading your ATS workspace...</p>
+      <div className="adm-mod">
+        <div className="adm-mod-empty">
+          <Loader2 size={28} className="adm-spin" />
+          <p>Loading analytics...</p>
         </div>
       </div>
     );
@@ -43,10 +42,10 @@ const ATSDashboard = () => {
 
   if (error) {
     return (
-      <div className="ats-simple-container">
-        <div className="ats-state-center text-error">
-          <AlertCircle size={32} />
-          <p>{error}</p>
+      <div className="adm-mod">
+        <div className="admin-alert admin-alert-error" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <AlertCircle size={16} />
+          <p style={{ margin: 0 }}>{error}</p>
         </div>
       </div>
     );
@@ -59,31 +58,38 @@ const ATSDashboard = () => {
   const getCount = (stage) => stageBreakdown[stage]?.count || 0;
 
   return (
-    <div className="ats-simple-container">
+    <div className="adm-mod">
+      <div className="adm-mod-header">
+        <div className="adm-mod-header-text">
+          <h1>Hiring Analytics</h1>
+          <p>Track pipeline performance, time-to-hire, and conversion metrics.</p>
+        </div>
+      </div>
+
       <div className="ats-kpi-grid">
         <div className="ats-kpi-card">
-          <div className="ats-kpi-icon bg-blue"><Users size={20} /></div>
+          <div className="ats-kpi-icon ats-kpi-blue"><Users size={20} /></div>
           <div>
             <p className="ats-kpi-label">Total Applications</p>
             <h3 className="ats-kpi-value">{totalApplications}</h3>
           </div>
         </div>
         <div className="ats-kpi-card">
-          <div className="ats-kpi-icon bg-green"><Target size={20} /></div>
+          <div className="ats-kpi-icon ats-kpi-green"><Target size={20} /></div>
           <div>
             <p className="ats-kpi-label">Shortlisted</p>
             <h3 className="ats-kpi-value">{getCount('Shortlisted')}</h3>
           </div>
         </div>
         <div className="ats-kpi-card">
-          <div className="ats-kpi-icon bg-purple"><TrendingUp size={20} /></div>
+          <div className="ats-kpi-icon ats-kpi-purple"><TrendingUp size={20} /></div>
           <div>
             <p className="ats-kpi-label">Offers Extended</p>
             <h3 className="ats-kpi-value">{getCount('Offer Extended')}</h3>
           </div>
         </div>
         <div className="ats-kpi-card">
-          <div className="ats-kpi-icon bg-orange"><Clock size={20} /></div>
+          <div className="ats-kpi-icon ats-kpi-orange"><Clock size={20} /></div>
           <div>
             <p className="ats-kpi-label">Avg Time to Hire</p>
             <h3 className="ats-kpi-value">{avgTimeToHire ? `${avgTimeToHire} days` : 'N/A'}</h3>

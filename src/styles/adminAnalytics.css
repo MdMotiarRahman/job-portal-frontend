@@ -1,0 +1,83 @@
+/* ============================
+   ANALYTICS SUB-PAGES
+   Shared styles for Users/Jobs/Applications breakdown
+   ============================ */
+
+/* Back Button */
+.aw-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.aw-back-btn:hover {
+  color: var(--brand-primary);
+}
+
+/* ============================================
+   APPLICATION FUNNEL
+   ============================================ */
+
+.aw-funnel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.aw-funnel-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.aw-funnel-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  border-radius: var(--radius-md);
+  transition: width 0.5s ease;
+  flex-shrink: 0;
+}
+
+.aw-funnel-count {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  padding: 0 12px;
+}
+
+.aw-funnel-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.aw-funnel-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-transform: capitalize;
+}
+
+.aw-funnel-pct {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.aw-funnel-arrow {
+  color: var(--text-muted);
+  font-size: 16px;
+  margin-left: auto;
+}

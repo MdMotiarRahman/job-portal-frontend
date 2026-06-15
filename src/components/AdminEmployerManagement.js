@@ -1,26 +1,34 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
-  AlertCircle,
   Building2,
   CheckCircle2,
-  ChevronRight,
-  Loader2,
-  RefreshCw,
-  Search,
-  XCircle,
   Clock,
-  Ban
+  Loader2,
+  Search,
+  X,
+  Ban,
+  Eye,
+  Globe,
+  MapPin,
+  Phone,
+  Mail,
+  Users,
 } from 'lucide-react';
 import AdminLayout from './AdminLayout';
+import UserAvatar from './UserAvatar';
 import {
   approveEmployer,
   getAllEmployers,
   getPendingEmployers,
   rejectEmployer,
 } from '../services/adminService';
-import '../styles/adminDashboard.css';
-import '../styles/adminEmployerManagement.css';
+import '../styles/adminModule.css';
+
+const formatDate = (v) => {
+  if (!v) return '—';
+  return new Date(v).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+};
 
 const AdminEmployerManagement = () => {
   const navigate = useNavigate();
@@ -29,7 +37,6 @@ const AdminEmployerManagement = () => {
 
   const [loading, setLoading] = useState(true);
   const [employers, setEmployers] = useState([]);
-  const [filteredEmployers, setFilteredEmployers] = useState([]);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [search, setSearch] = useState('');
@@ -41,31 +48,24 @@ const AdminEmployerManagement = () => {
   const [rejectionReason, setRejectionReason] = useState('');
   const [adminNotes, setAdminNotes] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
-
   const limit = 10;
 
   const loadEmployers = useCallback(async () => {
     setLoading(true);
     setError('');
-
     try {
       let response;
-
       if (currentTab === 'pending') {
         response = await getPendingEmployers({ page, limit });
       } else {
         response = await getAllEmployers({
           verificationStatus: currentTab === 'all' ? null : currentTab,
-          page,
-          limit,
+          page, limit,
           search: search || null,
         });
       }
-
       const data = response.data;
-      const employerList = data.employers || data.data || [];
-      setEmployers(employerList);
-      setFilteredEmployers(employerList);
+      setEmployers(data.employers || data.data || []);
       setTotalPages(data.pagination?.pages || 1);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to load employers.');
@@ -74,517 +74,229 @@ const AdminEmployerManagement = () => {
     }
   }, [page, search, currentTab]);
 
-  useEffect(() => {
-    setPage(1);
-  }, [search, currentTab]);
+  useEffect(() => { setPage(1); }, [search, currentTab]);
+  useEffect(() => { loadEmployers(); }, [loadEmployers]);
 
-  useEffect(() => {
-    loadEmployers();
-  }, [loadEmployers]);
-
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case 'pending':
-        return <span className="admin-badge admin-badge-warning">Pending</span>;
-      case 'approved':
-        return <span className="admin-badge admin-badge-success">Approved</span>;
-      case 'rejected':
-        return <span className="admin-badge admin-badge-error">Rejected</span>;
-      default:
-        return <span className="admin-badge admin-badge-status">Unknown</span>;
-    }
-  };
-
-  const openDetails = (employer) => {
-    setSelectedEmployer(employer);
-    setModalMode('details');
-    setShowModal(true);
-    setRejectionReason('');
-    setAdminNotes('');
-  };
-
-  const openApproveModal = (employer) => {
-    setSelectedEmployer(employer);
-    setModalMode('approve');
-    setShowModal(true);
-    setAdminNotes('');
-  };
-
-  const openRejectModal = (employer) => {
-    setSelectedEmployer(employer);
-    setModalMode('reject');
-    setShowModal(true);
-    setRejectionReason('');
-  };
+  const openDetails = (e) => { setSelectedEmployer(e); setModalMode('details'); setShowModal(true); setRejectionReason(''); setAdminNotes(''); };
+  const openApprove = (e) => { setSelectedEmployer(e); setModalMode('approve'); setShowModal(true); setAdminNotes(''); };
+  const openReject = (e) => { setSelectedEmployer(e); setModalMode('reject'); setShowModal(true); setRejectionReason(''); };
+  const closeModal = () => { setShowModal(false); setSelectedEmployer(null); setModalMode('details'); setActionLoading(false); };
 
   const handleApprove = async () => {
     if (!selectedEmployer) return;
-
     setActionLoading(true);
     try {
-      setError('');
-      setSuccess('');
-
+      setError(''); setSuccess('');
       await approveEmployer(selectedEmployer.user._id, { adminNotes });
-
-      setSuccess(`Employer "${selectedEmployer.profile?.companyName}" approved successfully!`);
-      setShowModal(false);
+      setSuccess(`Employer approved successfully.`);
+      closeModal();
       await loadEmployers();
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to approve employer.');
-    } finally {
-      setActionLoading(false);
-    }
+    } catch (err) { setError(err.response?.data?.message || 'Failed to approve.'); }
+    finally { setActionLoading(false); }
   };
 
   const handleReject = async () => {
-    if (!selectedEmployer || !rejectionReason.trim()) {
-      setError('Please provide a rejection reason.');
-      return;
-    }
-
+    if (!selectedEmployer || !rejectionReason.trim()) { setError('Rejection reason is required.'); return; }
     setActionLoading(true);
     try {
-      setError('');
-      setSuccess('');
-
-      await rejectEmployer(selectedEmployer.user._id, {
-        rejectionReason,
-        adminNotes,
-      });
-
-      setSuccess(`Employer "${selectedEmployer.profile?.companyName}" rejected successfully!`);
-      setShowModal(false);
+      setError(''); setSuccess('');
+      await rejectEmployer(selectedEmployer.user._id, { rejectionReason, adminNotes });
+      setSuccess(`Employer rejected successfully.`);
+      closeModal();
       await loadEmployers();
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to reject employer.');
-    } finally {
-      setActionLoading(false);
-    }
+    } catch (err) { setError(err.response?.data?.message || 'Failed to reject.'); }
+    finally { setActionLoading(false); }
+  };
+
+  const statusBadge = (s) => {
+    if (s === 'approved') return 'adm-badge-success';
+    if (s === 'rejected') return 'adm-badge-error';
+    return 'adm-badge-warning';
   };
 
   const tabs = [
-    { id: 'all', label: 'All Employers', icon: <Building2 size={16} /> },
-    { id: 'pending', label: 'Pending Review', icon: <Clock size={16} /> },
-    { id: 'approved', label: 'Approved', icon: <CheckCircle2 size={16} /> },
-    { id: 'rejected', label: 'Rejected', icon: <Ban size={16} /> },
+    { id: 'all', label: 'All Employers', icon: Building2 },
+    { id: 'pending', label: 'Pending', icon: Clock },
+    { id: 'approved', label: 'Approved', icon: CheckCircle2 },
+    { id: 'rejected', label: 'Rejected', icon: Ban },
   ];
 
   return (
     <AdminLayout>
-      <div className="admin-page admin-employer-management">
-        <div className="admin-header-card">
-          <div className="admin-header">
-            <div>
-              <p className="admin-subtitle" style={{ marginBottom: 6 }}>Employer verification</p>
-              <h1>Employers</h1>
-              <p className="admin-subtitle">
-                Review company registrations, verify employer accounts, and manage approval decisions.
-              </p>
-            </div>
-            <button
-              className="admin-refresh-btn"
-              onClick={loadEmployers}
-              disabled={loading}
-              title="Refresh employer list"
-              type="button"
-            >
-              <RefreshCw size={16} className={loading ? 'animate-spin' : ''} strokeWidth={2} />
-              Refresh
-            </button>
+      <div className="admin-page adm-mod">
+        <div className="adm-mod-header">
+          <div className="adm-mod-header-text">
+            <h1>Employer Verification</h1>
+            <p>Review company registrations, verify accounts, and manage approvals.</p>
           </div>
         </div>
 
-        {error ? (
-          <div className="admin-alert admin-alert-error">
-            <AlertCircle size={18} />
-            {error}
-          </div>
-        ) : null}
+        {error && <div className="admin-alert admin-alert-error">{error}</div>}
+        {success && <div className="admin-alert admin-alert-success">{success}</div>}
 
-        {success ? (
-          <div className="admin-alert admin-alert-success">
-            <CheckCircle2 size={18} />
-            {success}
-          </div>
-        ) : null}
-
-        <div className="admin-tabs">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              className={`admin-tab ${currentTab === tab.id ? 'active' : ''}`}
-              onClick={() => navigate(`/admin/employers/${tab.id}`)}
-            >
-              <span className="admin-tab-icon">{tab.icon}</span>
-              {tab.label}
-            </button>
-          ))}
+        <div className="adm-mod-tabs">
+          {tabs.map((tab) => {
+            const Icon = tab.icon;
+            return (
+              <button key={tab.id} className={`adm-mod-tab ${currentTab === tab.id ? 'active' : ''}`} onClick={() => navigate(`/admin/employers/${tab.id}`)}>
+                <Icon size={15} />{tab.label}
+              </button>
+            );
+          })}
         </div>
 
-        <section className="admin-section">
-          <div className="admin-section-heading-row">
-            <h2 className="admin-section-title">
-              <Building2 size={18} />
-              {tabs.find(t => t.id === currentTab)?.label || 'All Employers'}
-            </h2>
-            <div className="admin-filter-row">
-              <div className="admin-search-field">
-                <Search size={16} />
-                <input
-                  type="text"
-                  placeholder="Search company or email"
-                  value={search}
-                  onChange={(event) => setSearch(event.target.value)}
-                />
-              </div>
+        <div className="adm-mod-card">
+          <div className="adm-mod-toolbar">
+            <div className="adm-mod-search">
+              <Search size={15} />
+              <input type="text" placeholder="Search company or email..." value={search} onChange={(e) => setSearch(e.target.value)} />
             </div>
           </div>
 
           {loading ? (
-            <div className="employer-state">
-              <Loader2 size={32} className="animate-spin" />
-              <p>Loading employers...</p>
-            </div>
-          ) : filteredEmployers.length === 0 ? (
-            <div className="employer-state">
-              <Building2 size={48} />
-              <p>No employers found</p>
-              <span>Try adjusting your search or filters.</span>
-            </div>
+            <div className="adm-mod-empty"><Loader2 size={28} className="adm-spin" /><p>Loading employers...</p></div>
+          ) : employers.length === 0 ? (
+            <div className="adm-mod-empty"><Building2 size={36} /><p>No employers found</p><span>Try adjusting your search or filters.</span></div>
           ) : (
-            <>
-              <div className="admin-table-wrap">
-                <table className="admin-table employer-table">
-                  <thead>
-                    <tr>
-                      <th>Company</th>
-                      <th>Contact Person</th>
-                      <th>Email</th>
-                      <th>Status</th>
-                      <th>Registered</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredEmployers.map((employer) => (
-                      <tr key={employer.user._id}>
-                        <td>
-                          <div className="company-info">
-                            <div className="company-avatar">
-                              <Building2 size={18} />
-                            </div>
-                            <div>
-                              <strong>{employer.profile?.companyName || 'N/A'}</strong>
-                              <div className="admin-muted-text">
-                                {employer.profile?.companySize
-                                  ? `${employer.profile.companySize} employees`
-                                  : 'Company size not listed'}
-                              </div>
-                            </div>
+            <div className="adm-mod-table-wrap">
+              <table className="adm-mod-table">
+                <thead>
+                  <tr>
+                    <th>Company</th>
+                    <th>Contact</th>
+                    <th>Status</th>
+                    <th>Registered</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {employers.map((emp) => (
+                    <tr key={emp.user._id}>
+                      <td>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                          <UserAvatar user={emp.user} size={36} />
+                          <div>
+                            <p className="adm-mod-cell-main">{emp.profile?.companyName || 'N/A'}</p>
+                            <p className="adm-mod-cell-sub">{emp.profile?.industry || 'Industry not set'}</p>
                           </div>
-                        </td>
-                        <td>{employer.user.name}</td>
-                        <td className="email-cell">{employer.user.email}</td>
-                        <td>{getStatusBadge(employer.profile?.verificationStatus)}</td>
-                        <td>
-                          {employer.user.createdAt
-                            ? new Date(employer.user.createdAt).toLocaleDateString()
-                            : 'N/A'}
-                        </td>
-                        <td>
-                          <button
-                            className="admin-action-btn admin-action-neutral"
-                            onClick={() => openDetails(employer)}
-                            title="View details"
-                            type="button"
-                          >
-                            Review
-                            <ChevronRight size={13} />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                        </div>
+                      </td>
+                      <td>
+                        <p className="adm-mod-cell-main">{emp.user.name}</p>
+                        <p className="adm-mod-cell-sub">{emp.user.email}</p>
+                      </td>
+                      <td><span className={`adm-badge ${statusBadge(emp.profile?.verificationStatus)}`}>{emp.profile?.verificationStatus || 'Unknown'}</span></td>
+                      <td className="adm-mod-date">{formatDate(emp.user.createdAt)}</td>
+                      <td><button className="adm-mod-view-btn" onClick={() => openDetails(emp)}><Eye size={14} /> View</button></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {totalPages > 1 && (
+            <div className="adm-mod-pagination">
+              <span>Page {page} of {totalPages}</span>
+              <div className="adm-mod-pagination-btns">
+                <button disabled={page <= 1 || loading} onClick={() => setPage(p => Math.max(1, p - 1))}>Previous</button>
+                <button disabled={page >= totalPages || loading} onClick={() => setPage(p => Math.min(totalPages, p + 1))}>Next</button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Modal */}
+        {showModal && selectedEmployer && (
+          <div className="adm-modal-backdrop" onClick={closeModal}>
+            <div className="adm-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+              <button className="adm-modal-close" onClick={closeModal}><X size={18} /></button>
+
+              <div className="adm-modal-header">
+                <UserAvatar user={selectedEmployer.user} size={52} />
+                <div>
+                  <h2>{selectedEmployer.profile?.companyName || 'Company'}</h2>
+                  <p>{selectedEmployer.user.email}</p>
+                </div>
               </div>
 
-              {totalPages > 1 ? (
-                <div className="admin-pagination">
-                  <span>
-                    Page {page} of {totalPages}
-                  </span>
-                  <div className="admin-pagination-actions">
-                    <button
-                      className="admin-action-btn admin-action-neutral"
-                      onClick={() => setPage(Math.max(1, page - 1))}
-                      disabled={page === 1}
-                      type="button"
-                    >
-                      Previous
-                    </button>
-                    <button
-                      className="admin-action-btn admin-action-neutral"
-                      onClick={() => setPage(Math.min(totalPages, page + 1))}
-                      disabled={page === totalPages}
-                      type="button"
-                    >
-                      Next
-                    </button>
-                  </div>
-                </div>
-              ) : null}
-            </>
-          )}
-        </section>
+              <div className="adm-modal-body">
+                {modalMode === 'details' && (
+                  <>
+                    <div className="adm-modal-status-row">
+                      <span className={`adm-badge ${statusBadge(selectedEmployer.profile?.verificationStatus)}`}>{selectedEmployer.profile?.verificationStatus || 'Unknown'}</span>
+                      <span className="adm-badge adm-badge-role">{selectedEmployer.user.role}</span>
+                    </div>
 
-        {showModal && selectedEmployer ? (
-          <div className="employer-modal-backdrop" onClick={() => setShowModal(false)}>
-            <section
-              className="employer-modal"
-              onClick={(event) => event.stopPropagation()}
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="employer-modal-title"
-            >
-              {modalMode === 'details' ? (
-                <>
-                  <div className="employer-modal-header">
-                    <div>
-                      <p className="admin-subtitle" style={{ marginBottom: 4 }}>Employer review</p>
-                      <h2 id="employer-modal-title">Employer Details</h2>
+                    <div className="adm-modal-info">
+                      <div className="adm-modal-info-item"><Building2 size={14} /><div><span>Company</span><strong>{selectedEmployer.profile?.companyName || '—'}</strong></div></div>
+                      <div className="adm-modal-info-item"><Users size={14} /><div><span>Size</span><strong>{selectedEmployer.profile?.companySize || '—'} employees</strong></div></div>
+                      <div className="adm-modal-info-item"><Mail size={14} /><div><span>Email</span><strong>{selectedEmployer.user.email}</strong></div></div>
+                      <div className="adm-modal-info-item"><Phone size={14} /><div><span>Phone</span><strong>{selectedEmployer.user.phone || selectedEmployer.profile?.phone || '—'}</strong></div></div>
+                      <div className="adm-modal-info-item"><MapPin size={14} /><div><span>Location</span><strong>{selectedEmployer.profile?.location || '—'}</strong></div></div>
+                      <div className="adm-modal-info-item"><Globe size={14} /><div><span>Website</span><strong>{selectedEmployer.profile?.companyWebsite || '—'}</strong></div></div>
+                      {selectedEmployer.profile?.companyDescription && (
+                        <div className="adm-modal-wide"><span>Description</span><p>{selectedEmployer.profile.companyDescription}</p></div>
+                      )}
+                      {selectedEmployer.profile?.rejectionReason && (
+                        <div className="adm-modal-banner adm-modal-banner-error"><Ban size={14} /><div><strong>Rejection Reason</strong><p>{selectedEmployer.profile.rejectionReason}</p></div></div>
+                      )}
                     </div>
-                    <button
-                      className="admin-icon-btn employer-modal-close"
-                      onClick={() => setShowModal(false)}
-                      type="button"
-                      aria-label="Close employer details"
-                    >
-                      x
-                    </button>
-                  </div>
 
-                  <div className="employer-detail-grid">
-                    <div>
-                      <span>Company Name</span>
-                      <strong>{selectedEmployer.profile?.companyName || 'N/A'}</strong>
+                    <div className="adm-modal-actions">
+                      {selectedEmployer.profile?.verificationStatus === 'pending' ? (
+                        <>
+                          <button className="adm-action adm-action-danger" onClick={() => openReject(selectedEmployer)}>Reject</button>
+                          <button className="adm-action adm-action-success" onClick={() => openApprove(selectedEmployer)}>Approve</button>
+                        </>
+                      ) : (
+                        <button className="adm-action adm-action-neutral" onClick={closeModal}>Close</button>
+                      )}
                     </div>
-                    <div>
-                      <span>Company Size</span>
-                      <strong>{selectedEmployer.profile?.companySize || 'N/A'}</strong>
-                    </div>
-                    <div>
-                      <span>Contact Person</span>
-                      <strong>{selectedEmployer.user.name}</strong>
-                    </div>
-                    <div>
-                      <span>Email</span>
-                      <strong>{selectedEmployer.user.email}</strong>
-                    </div>
-                    {selectedEmployer.user.phone ? (
-                      <div>
-                        <span>Phone</span>
-                        <strong>{selectedEmployer.user.phone}</strong>
-                      </div>
-                    ) : null}
-                    {selectedEmployer.profile?.industry ? (
-                      <div>
-                        <span>Industry</span>
-                        <strong>{selectedEmployer.profile.industry}</strong>
-                      </div>
-                    ) : null}
-                    {selectedEmployer.profile?.location ? (
-                      <div>
-                        <span>Location</span>
-                        <strong>{selectedEmployer.profile.location}</strong>
-                      </div>
-                    ) : null}
-                    {selectedEmployer.profile?.companyWebsite ? (
-                      <div>
-                        <span>Website</span>
-                        <strong>
-                          <a
-                            href={selectedEmployer.profile.companyWebsite}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            {selectedEmployer.profile.companyWebsite}
-                          </a>
-                        </strong>
-                      </div>
-                    ) : null}
-                    <div>
-                      <span>Status</span>
-                      <strong>{getStatusBadge(selectedEmployer.profile?.verificationStatus)}</strong>
-                    </div>
-                    {selectedEmployer.profile?.rejectionReason ? (
-                      <div className="employer-detail-wide employer-rejection-reason">
-                        <span>Rejection Reason</span>
-                        <p>{selectedEmployer.profile.rejectionReason}</p>
-                      </div>
-                    ) : null}
-                    {selectedEmployer.profile?.companyDescription ? (
-                      <div className="employer-detail-wide">
-                        <span>Company Description</span>
-                        <p>{selectedEmployer.profile.companyDescription}</p>
-                      </div>
-                    ) : null}
-                  </div>
+                  </>
+                )}
 
-                  <div className="employer-modal-actions">
-                    {selectedEmployer.profile?.verificationStatus === 'pending' ? (
-                      <>
-                        <button
-                          className="admin-action-btn admin-action-danger"
-                          onClick={() => openRejectModal(selectedEmployer)}
-                          type="button"
-                        >
-                          <XCircle size={13} />
-                          Reject
-                        </button>
-                        <button
-                          className="admin-action-btn admin-action-success"
-                          onClick={() => openApproveModal(selectedEmployer)}
-                          type="button"
-                        >
-                          <CheckCircle2 size={13} />
-                          Approve
-                        </button>
-                      </>
-                    ) : (
-                      <button
-                        className="admin-action-btn admin-action-neutral"
-                        onClick={() => setShowModal(false)}
-                        type="button"
-                      >
-                        Close
+                {modalMode === 'approve' && (
+                  <>
+                    <h3 style={{ margin: '0 0 6px', fontSize: 16, fontWeight: 700 }}>Approve Employer</h3>
+                    <p style={{ margin: '0 0 14px', fontSize: 13, color: 'var(--text-secondary)' }}>You are about to approve <strong>{selectedEmployer.profile?.companyName}</strong>. They will be able to post jobs.</p>
+                    <label style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 16 }}>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Admin Notes (Optional)</span>
+                      <textarea rows={3} placeholder="Add notes for this approval..." value={adminNotes} onChange={(e) => setAdminNotes(e.target.value)} style={{ width: '100%', padding: '10px 12px', border: '1px solid rgba(0,0,0,0.08)', borderRadius: 'var(--radius-md)', background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontSize: 13, fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box' }} />
+                    </label>
+                    <div className="adm-modal-actions">
+                      <button className="adm-action adm-action-neutral" disabled={actionLoading} onClick={() => setModalMode('details')}>Back</button>
+                      <button className="adm-action adm-action-success" disabled={actionLoading} onClick={handleApprove}>
+                        {actionLoading && <Loader2 size={14} className="adm-spin" />} Confirm Approval
                       </button>
-                    )}
-                  </div>
-                </>
-              ) : null}
-
-              {modalMode === 'approve' ? (
-                <>
-                  <div className="employer-modal-header">
-                    <div>
-                      <p className="admin-subtitle" style={{ marginBottom: 4 }}>Employer review</p>
-                      <h2 id="employer-modal-title">Approve Employer</h2>
                     </div>
-                    <button
-                      className="admin-icon-btn employer-modal-close"
-                      onClick={() => setShowModal(false)}
-                      type="button"
-                      aria-label="Close approval dialog"
-                    >
-                      x
-                    </button>
-                  </div>
+                  </>
+                )}
 
-                  <p className="employer-modal-description">
-                    You are about to approve <strong>{selectedEmployer.profile?.companyName}</strong>.
-                    They will be able to post jobs and manage applications.
-                  </p>
-
-                  <label className="admin-form-field employer-modal-field">
-                    <span>Admin Notes (Optional)</span>
-                    <textarea
-                      placeholder="Add any notes for this approval..."
-                      value={adminNotes}
-                      onChange={(event) => setAdminNotes(event.target.value)}
-                      rows="4"
-                    />
-                  </label>
-
-                  <div className="employer-modal-actions">
-                    <button
-                      className="admin-action-btn admin-action-neutral"
-                      onClick={() => setModalMode('details')}
-                      disabled={actionLoading}
-                      type="button"
-                    >
-                      Back
-                    </button>
-                    <button
-                      className="admin-action-btn admin-action-success"
-                      onClick={handleApprove}
-                      disabled={actionLoading}
-                      type="button"
-                    >
-                      {actionLoading ? <Loader2 className="animate-spin" size={13} /> : null}
-                      Confirm Approval
-                    </button>
-                  </div>
-                </>
-              ) : null}
-
-              {modalMode === 'reject' ? (
-                <>
-                  <div className="employer-modal-header">
-                    <div>
-                      <p className="admin-subtitle" style={{ marginBottom: 4 }}>Employer review</p>
-                      <h2 id="employer-modal-title">Reject Employer</h2>
+                {modalMode === 'reject' && (
+                  <>
+                    <h3 style={{ margin: '0 0 6px', fontSize: 16, fontWeight: 700 }}>Reject Employer</h3>
+                    <p style={{ margin: '0 0 14px', fontSize: 13, color: 'var(--text-secondary)' }}>You are about to reject <strong>{selectedEmployer.profile?.companyName}</strong>.</p>
+                    <label style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 12 }}>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Rejection Reason *</span>
+                      <textarea rows={3} placeholder="Explain why..." value={rejectionReason} onChange={(e) => setRejectionReason(e.target.value)} required style={{ width: '100%', padding: '10px 12px', border: '1px solid rgba(0,0,0,0.08)', borderRadius: 'var(--radius-md)', background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontSize: 13, fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box' }} />
+                    </label>
+                    <label style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 16 }}>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Admin Notes (Optional)</span>
+                      <textarea rows={2} placeholder="Internal notes..." value={adminNotes} onChange={(e) => setAdminNotes(e.target.value)} style={{ width: '100%', padding: '10px 12px', border: '1px solid rgba(0,0,0,0.08)', borderRadius: 'var(--radius-md)', background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontSize: 13, fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box' }} />
+                    </label>
+                    <div className="adm-modal-actions">
+                      <button className="adm-action adm-action-neutral" disabled={actionLoading} onClick={() => setModalMode('details')}>Back</button>
+                      <button className="adm-action adm-action-danger" disabled={actionLoading || !rejectionReason.trim()} onClick={handleReject}>
+                        {actionLoading && <Loader2 size={14} className="adm-spin" />} Confirm Rejection
+                      </button>
                     </div>
-                    <button
-                      className="admin-icon-btn employer-modal-close"
-                      onClick={() => setShowModal(false)}
-                      type="button"
-                      aria-label="Close rejection dialog"
-                    >
-                      x
-                    </button>
-                  </div>
-
-                  <p className="employer-modal-description">
-                    You are about to reject <strong>{selectedEmployer.profile?.companyName}</strong>.
-                    They will be notified of the rejection.
-                  </p>
-
-                  <label className="admin-form-field employer-modal-field">
-                    <span>Rejection Reason *</span>
-                    <textarea
-                      placeholder="Explain why you are rejecting this employer registration..."
-                      value={rejectionReason}
-                      onChange={(event) => setRejectionReason(event.target.value)}
-                      rows="4"
-                      required
-                    />
-                  </label>
-
-                  <label className="admin-form-field employer-modal-field">
-                    <span>Admin Notes (Optional)</span>
-                    <textarea
-                      placeholder="Internal notes for this rejection..."
-                      value={adminNotes}
-                      onChange={(event) => setAdminNotes(event.target.value)}
-                      rows="3"
-                    />
-                  </label>
-
-                  <div className="employer-modal-actions">
-                    <button
-                      className="admin-action-btn admin-action-neutral"
-                      onClick={() => setModalMode('details')}
-                      disabled={actionLoading}
-                      type="button"
-                    >
-                      Back
-                    </button>
-                    <button
-                      className="admin-action-btn admin-action-danger"
-                      onClick={handleReject}
-                      disabled={actionLoading || !rejectionReason.trim()}
-                      type="button"
-                    >
-                      {actionLoading ? <Loader2 className="animate-spin" size={13} /> : null}
-                      Confirm Rejection
-                    </button>
-                  </div>
-                </>
-              ) : null}
-            </section>
+                  </>
+                )}
+              </div>
+            </div>
           </div>
-        ) : null}
+        )}
       </div>
     </AdminLayout>
   );

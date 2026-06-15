@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Search, Filter, ChevronDown, AlertCircle, Loader, RefreshCw, Eye, ArrowRightLeft, Clock } from 'lucide-react';
 import atsService from '../services/atsService';
-import '../styles/atsPipelineBoard.css';
+import '../styles/adminModule.css';
 import MoveApplicationModal from './MoveApplicationModal';
 import CandidateDetailModal from './CandidateDetailModal';
 
@@ -105,9 +105,9 @@ const ATSPipelineBoard = () => {
 
   if (loading && applications.length === 0) {
     return (
-      <div className="ats-board-container">
-        <div className="ats-loading">
-          <Loader size={32} className="spinner" />
+      <div className="adm-mod">
+        <div className="adm-mod-empty">
+          <Loader size={28} className="adm-spin" />
           <p>Loading applications...</p>
         </div>
       </div>
@@ -115,148 +115,155 @@ const ATSPipelineBoard = () => {
   }
 
   return (
-    <div className="ats-board-container">
+    <div className="adm-mod">
       {error && (
-        <div className="ats-alert ats-alert-error">
-          <AlertCircle size={16} />
-          <div>
-            <strong>Error</strong>
-            <p>{error}</p>
+        <div className="admin-alert admin-alert-error" style={{ display: 'flex', alignItems: 'flex-start', gap: 10, justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+            <AlertCircle size={16} style={{ marginTop: 2, flexShrink: 0 }} />
+            <div>
+              <strong>Error</strong>
+              <p style={{ margin: 0, fontSize: 13 }}>{error}</p>
+            </div>
           </div>
-          <button onClick={() => setError(null)} className="ats-alert-close">×</button>
+          <button onClick={() => setError(null)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: 'inherit', opacity: 0.6, padding: 0, lineHeight: 1 }}>&times;</button>
         </div>
       )}
 
-      <div className="ats-board-controls">
-        <div className="ats-search-box">
-          <Search size={16} />
-          <input
-            type="text"
-            placeholder="Search by name, email, or job title..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="ats-search-input"
-          />
-          {searchTerm && (
-            <button className="ats-clear-search" onClick={() => setSearchTerm('')}>×</button>
-          )}
-        </div>
-
-        <div className="ats-filter-group">
-          <button className="ats-filter-btn" onClick={() => setFilterOpen(!filterOpen)}>
-            <Filter size={14} />
-            Stage
-            <ChevronDown size={12} />
-          </button>
-          {filterOpen && (
-            <div className="ats-filter-dropdown">
-              <button
-                className={`ats-filter-option ${!selectedStageFilter ? 'active' : ''}`}
-                onClick={() => { setSelectedStageFilter(''); setFilterOpen(false); }}
-              >
-                All Stages
-              </button>
-              {ALL_STAGES.map((stage) => (
-                <button
-                  key={stage}
-                  className={`ats-filter-option ${selectedStageFilter === stage ? 'active' : ''}`}
-                  onClick={() => { setSelectedStageFilter(stage); setFilterOpen(false); }}
-                >
-                  <span className="ats-filter-color" style={{ backgroundColor: STAGE_COLORS[stage] }} />
-                  {stage} ({stageCounts[stage]})
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <button className="ats-refresh-btn" onClick={fetchApplications} type="button">
-          <RefreshCw size={14} />
-          Refresh
-        </button>
-
-        <div className="ats-stats-summary">
-          <span className="ats-stat">
-            <strong>{applications.length}</strong> applications
-          </span>
+      <div className="adm-mod-header">
+        <div className="adm-mod-header-text">
+          <h1>ATS Pipeline</h1>
+          <p>Track candidates through every stage of your hiring pipeline.</p>
         </div>
       </div>
 
-      <div className="ats-table-wrap">
-        <table className="ats-table">
-          <thead>
-            <tr>
-              <th>Candidate</th>
-              <th>Job</th>
-              <th>Stage</th>
-              <th>Applied</th>
-              <th>Updated</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {applications.length === 0 ? (
-              <tr>
-                <td colSpan="6" className="ats-empty-state">
-                  {searchTerm || selectedStageFilter
-                    ? 'No applications match your filters.'
-                    : 'No applications in the pipeline yet.'}
-                </td>
-              </tr>
-            ) : (
-              applications.map((app) => (
-                <tr key={app._id}>
-                  <td>
-                    <div className="ats-candidate-cell">
-                      <div
-                        className="ats-candidate-avatar"
-                        style={{ backgroundColor: STAGE_COLORS[app.stage] || '#6B7280' }}
-                      >
-                        {app.seeker?.name?.charAt(0).toUpperCase() || '?'}
-                      </div>
-                      <div>
-                        <strong>{app.seeker?.name || 'Unknown'}</strong>
-                        <div className="ats-muted-text">{app.seeker?.email || ''}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <strong>{app.job?.title || 'N/A'}</strong>
-                    <div className="ats-muted-text">{app.job?.location || ''}</div>
-                  </td>
-                  <td>
-                    <span
-                      className="ats-stage-badge"
-                      style={{ backgroundColor: STAGE_COLORS[app.stage] || '#6B7280' }}
-                    >
-                      {app.stage}
-                    </span>
-                  </td>
-                  <td>{new Date(app.createdAt).toLocaleDateString()}</td>
-                  <td>{new Date(app.updatedAt).toLocaleDateString()}</td>
-                  <td>
-                    <div className="ats-actions-cell">
-                      <button
-                        className="ats-action-btn"
-                        onClick={() => handleViewDetail(app)}
-                      >
-                        <Eye size={13} />
-                        View
-                      </button>
-                      <button
-                        className="ats-action-btn ats-action-primary"
-                        onClick={() => handleMoveStage(app)}
-                      >
-                        <ArrowRightLeft size={13} />
-                        Move
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
+      <div className="adm-mod-card">
+        <div className="adm-mod-toolbar">
+          <div className="adm-mod-search">
+            <Search size={15} />
+            <input
+              type="text"
+              placeholder="Search by name, email, or job title..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+
+          <div style={{ position: 'relative' }}>
+            <button
+              className="adm-mod-tab"
+              onClick={() => setFilterOpen(!filterOpen)}
+              style={{ gap: 6 }}
+            >
+              <Filter size={14} />
+              Stage
+              <ChevronDown size={12} />
+            </button>
+            {filterOpen && (
+              <div className="ats-filter-dropdown" style={{
+                position: 'absolute', top: 'calc(100% + 6px)', left: 0, background: 'var(--bg-primary)',
+                border: '1px solid rgba(0,0,0,0.08)', borderRadius: 'var(--radius-md)', minWidth: 220,
+                maxHeight: 320, overflowY: 'auto', zIndex: 100, boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
+              }}>
+                <button
+                  className={!selectedStageFilter ? 'adm-mod-tab active' : 'adm-mod-tab'}
+                  onClick={() => { setSelectedStageFilter(''); setFilterOpen(false); }}
+                  style={{ width: '100%', justifyContent: 'flex-start', borderRadius: 0 }}
+                >
+                  All Stages
+                </button>
+                {ALL_STAGES.map((stage) => (
+                  <button
+                    key={stage}
+                    className={selectedStageFilter === stage ? 'adm-mod-tab active' : 'adm-mod-tab'}
+                    onClick={() => { setSelectedStageFilter(stage); setFilterOpen(false); }}
+                    style={{ width: '100%', justifyContent: 'flex-start', borderRadius: 0, gap: 8 }}
+                  >
+                    <span style={{ width: 10, height: 10, borderRadius: 3, backgroundColor: STAGE_COLORS[stage], flexShrink: 0, display: 'inline-block' }} />
+                    {stage} ({stageCounts[stage]})
+                  </button>
+                ))}
+              </div>
             )}
-          </tbody>
-        </table>
+          </div>
+
+          <button className="adm-mod-tab" onClick={fetchApplications} type="button">
+            <RefreshCw size={14} />
+            Refresh
+          </button>
+
+          <div style={{ marginLeft: 'auto', fontSize: 13, color: 'var(--text-muted)', fontWeight: 500, whiteSpace: 'nowrap' }}>
+            <strong style={{ color: 'var(--text-primary)' }}>{applications.length}</strong> applications
+          </div>
+        </div>
+
+        {loading && applications.length === 0 ? (
+          <div className="adm-mod-empty"><Loader size={28} className="adm-spin" /><p>Loading...</p></div>
+        ) : applications.length === 0 ? (
+          <div className="adm-mod-empty">
+            <Clock size={36} />
+            <p>No applications found</p>
+            <span>{searchTerm || selectedStageFilter ? 'Try adjusting your search or filters.' : 'No applications in the pipeline yet.'}</span>
+          </div>
+        ) : (
+          <div className="adm-mod-table-wrap">
+            <table className="adm-mod-table">
+              <thead>
+                <tr>
+                  <th>Candidate</th>
+                  <th>Job</th>
+                  <th>Stage</th>
+                  <th>Applied</th>
+                  <th>Updated</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {applications.map((app) => (
+                  <tr key={app._id}>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <div style={{
+                          width: 36, height: 36, borderRadius: '50%',
+                          backgroundColor: STAGE_COLORS[app.stage] || '#6B7280',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          color: '#fff', fontSize: 14, fontWeight: 700, flexShrink: 0
+                        }}>
+                          {app.seeker?.name?.charAt(0).toUpperCase() || '?'}
+                        </div>
+                        <div>
+                          <p className="adm-mod-cell-main">{app.seeker?.name || 'Unknown'}</p>
+                          <p className="adm-mod-cell-sub">{app.seeker?.email || ''}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <p className="adm-mod-cell-main">{app.job?.title || 'N/A'}</p>
+                      <p className="adm-mod-cell-sub">{app.job?.location || ''}</p>
+                    </td>
+                    <td>
+                      <span className="adm-badge" style={{ backgroundColor: STAGE_COLORS[app.stage] || '#6B7280', color: '#fff' }}>
+                        {app.stage}
+                      </span>
+                    </td>
+                    <td className="adm-mod-date">{new Date(app.createdAt).toLocaleDateString()}</td>
+                    <td className="adm-mod-date">{new Date(app.updatedAt).toLocaleDateString()}</td>
+                    <td>
+                      <div style={{ display: 'flex', gap: 6 }}>
+                        <button className="adm-mod-view-btn" onClick={() => handleViewDetail(app)}>
+                          <Eye size={13} /> View
+                        </button>
+                        <button className="adm-mod-view-btn" onClick={() => handleMoveStage(app)}
+                          style={{ borderColor: 'rgba(16, 185, 129, 0.2)', background: 'rgba(16, 185, 129, 0.06)', color: '#059669' }}>
+                          <ArrowRightLeft size={13} /> Move
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       {detailModalOpen && selectedApplication && (

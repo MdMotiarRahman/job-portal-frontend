@@ -40,6 +40,9 @@ import AdminEmployerManagement from './components/AdminEmployerManagement';
 import AdminUserManagement from './components/AdminUserManagement';
 import AdminWorkspacePage from './components/AdminWorkspacePage';
 import ATSPage from './components/ATSPage';
+import AnalyticsUsers from './components/AnalyticsUsers';
+import AnalyticsJobs from './components/AnalyticsJobs';
+import AnalyticsApplications from './components/AnalyticsApplications';
 import EmployerLayout from './components/EmployerLayout';
 import EmployerDashboard from './components/EmployerDashboard';
 import EmployerProfile from './pages/EmployerProfile';
@@ -775,7 +778,34 @@ const AppContent = () => {
           />
 
           <Route
-            path="/admin/analytics/*"
+            path="/admin/analytics/users"
+            element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AnalyticsUsers />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/analytics/jobs"
+            element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AnalyticsJobs />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/analytics/applications"
+            element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AnalyticsApplications />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/analytics"
             element={
               <ProtectedRoute allowedRoles={['admin']}>
                 <AdminWorkspacePage page="analytics" />

@@ -1,60 +1,6 @@
 /* ============================
-   ATS DASHBOARD
+   ATS DASHBOARD - Updated to match adminModule.css pattern
    ============================ */
-
-.ats-simple-container {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.ats-state-center {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 300px;
-  gap: 12px;
-  color: var(--text-muted);
-}
-
-.ats-state-center.text-error {
-  color: var(--error);
-}
-
-.text-brand {
-  color: var(--brand-primary);
-}
-
-.animate-spin {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-/* Header */
-.ats-header-section {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.ats-page-title {
-  margin: 0 0 4px 0;
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--text-primary);
-  letter-spacing: -0.02em;
-}
-
-.ats-page-subtitle {
-  margin: 0;
-  font-size: 14px;
-  color: var(--text-secondary);
-}
 
 /* KPI Grid */
 .ats-kpi-grid {
@@ -65,24 +11,36 @@
 
 .ats-kpi-card {
   background: var(--bg-primary);
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
   padding: 18px;
   display: flex;
   align-items: center;
   gap: 14px;
-  border: 1px solid var(--border-color);
-  transition: all var(--transition-fast);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all 0.15s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.ats-kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
 }
 
 .ats-kpi-card:hover {
-  border-color: var(--brand-primary-light);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
 }
 
 .ats-kpi-icon {
   width: 44px;
   height: 44px;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -90,18 +48,23 @@
   flex-shrink: 0;
 }
 
-.ats-kpi-icon.bg-blue { background: var(--info); }
-.ats-kpi-icon.bg-green { background: var(--success); }
-.ats-kpi-icon.bg-purple { background: var(--brand-secondary); }
-.ats-kpi-icon.bg-orange { background: var(--warning); }
+.ats-kpi-blue { background: #3b82f6; }
+.ats-kpi-green { background: #10b981; }
+.ats-kpi-purple { background: #8b5cf6; }
+.ats-kpi-orange { background: #f59e0b; }
+
+.ats-kpi-card:nth-child(1)::before { background: #3b82f6; }
+.ats-kpi-card:nth-child(2)::before { background: #10b981; }
+.ats-kpi-card:nth-child(3)::before { background: #8b5cf6; }
+.ats-kpi-card:nth-child(4)::before { background: #f59e0b; }
 
 .ats-kpi-label {
   margin: 0 0 4px;
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.05em;
 }
 
 .ats-kpi-value {
@@ -121,9 +84,10 @@
 
 .ats-card {
   background: var(--bg-primary);
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
   padding: 22px;
-  border: 1px solid var(--border-color);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .ats-card-title {
@@ -171,15 +135,15 @@
 }
 
 .ats-pipeline-track {
-  height: 8px;
-  background: var(--bg-tertiary);
-  border-radius: 4px;
+  height: 10px;
+  background: var(--bg-secondary);
+  border-radius: 5px;
   overflow: hidden;
 }
 
 .ats-pipeline-fill {
   height: 100%;
-  border-radius: 4px;
+  border-radius: 5px;
   transition: width 0.6s ease-out;
   min-width: 2px;
 }
@@ -214,7 +178,7 @@
   align-items: flex-start;
   gap: 10px;
   padding: 14px;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   font-size: 13px;
   line-height: 1.5;
 }
@@ -224,22 +188,26 @@
 }
 
 .ats-insight-item.success {
-  background: rgba(16, 185, 129, 0.08);
-  color: var(--success);
+  background: rgba(16, 185, 129, 0.06);
+  border: 1px solid rgba(16, 185, 129, 0.1);
+  color: #059669;
 }
 
 .ats-insight-item.warning {
-  background: rgba(245, 158, 11, 0.08);
-  color: var(--warning);
+  background: rgba(245, 158, 11, 0.06);
+  border: 1px solid rgba(245, 158, 11, 0.1);
+  color: #d97706;
 }
 
 .ats-insight-item.highlight {
-  background: rgba(99, 102, 241, 0.08);
-  color: var(--brand-primary);
+  background: rgba(99, 102, 241, 0.06);
+  border: 1px solid rgba(99, 102, 241, 0.1);
+  color: #6366f1;
 }
 
 .ats-insight-item.neutral {
   background: var(--bg-secondary);
+  border: 1px solid rgba(0, 0, 0, 0.04);
   color: var(--text-secondary);
 }
 

@@ -10,9 +10,32 @@
   background: var(--bg-secondary);
 }
 
+/* Professional scrollbar for main content */
+.admin-layout {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.12) transparent;
+}
+
+.admin-layout::-webkit-scrollbar {
+  width: 6px;
+}
+
+.admin-layout::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-layout::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: 10px;
+}
+
+.admin-layout::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.22);
+}
+
 .admin-layout-main {
   flex: 1;
-  margin-left: 280px;
+  margin-left: 272px;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -20,7 +43,7 @@
 }
 
 .admin-layout-main.sidebar-closed {
-  margin-left: 280px;
+  margin-left: 272px;
 }
 
 @media (max-width: 767px) {

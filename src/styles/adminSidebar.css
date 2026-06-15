@@ -14,10 +14,10 @@
   left: 0;
   top: 0;
   height: 100vh;
-  width: 280px;
+  width: 272px;
   background: #ffffff;
-  border-right: 1px solid #d7dde5;
-  box-shadow: none;
+  border-right: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 1px 0 8px rgba(0, 0, 0, 0.02);
   display: flex;
   flex-direction: column;
   z-index: 1000;
@@ -26,22 +26,35 @@
   transition: transform var(--transition-base), opacity var(--transition-base);
 }
 
-/* Scrollbar Styling */
+/* Scrollbar Styling — Professional & Minimal */
 .admin-sidebar::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
 }
 
 .admin-sidebar::-webkit-scrollbar-track {
   background: transparent;
+  margin: 8px 0;
 }
 
 .admin-sidebar::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: 10px;
+  border: 1px solid transparent;
+  transition: background 0.2s ease;
 }
 
 .admin-sidebar::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
+  background: rgba(0, 0, 0, 0.22);
+}
+
+.admin-sidebar::-webkit-scrollbar-thumb:active {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Firefox scrollbar */
+.admin-sidebar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.12) transparent;
 }
 
 /* MOBILE: Sidebar Hidden by Default */
@@ -74,9 +87,9 @@
 
 /* SIDEBAR HEADER */
 .admin-sidebar-header {
-  min-height: 76px;
-  padding: 18px var(--admin-sidebar-gutter);
-  border-bottom: 1px solid #e5e7eb;
+  min-height: 68px;
+  padding: 14px var(--admin-sidebar-gutter);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -103,13 +116,13 @@
 }
 
 .admin-logo-icon {
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
   border-radius: 10px;
-  background: #f3f4f6;
-  border: 1px solid #e5e7eb;
-  color: #111827;
-  font-size: 24px;
+  background: linear-gradient(135deg, #1e293b, #334155);
+  border: none;
+  color: #fff;
+  font-size: 20px;
   line-height: 1;
   display: flex;
   align-items: center;
@@ -156,6 +169,25 @@
   padding: 18px 0 12px;
   overflow-y: auto;
   overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.1) transparent;
+}
+
+.admin-sidebar-nav::-webkit-scrollbar {
+  width: 4px;
+}
+
+.admin-sidebar-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-sidebar-nav::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+.admin-sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.2);
 }
 
 .admin-nav-section {
@@ -175,7 +207,7 @@
   left: var(--admin-sidebar-gutter);
   right: var(--admin-sidebar-gutter);
   height: 1px;
-  background: #e5e7eb;
+  background: rgba(0, 0, 0, 0.05);
 }
 
 .admin-nav-label {
@@ -190,7 +222,7 @@
 
 /* NAV ITEMS */
 .admin-nav-item-wrapper {
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .admin-nav-item {
@@ -202,27 +234,29 @@
   padding: 10px 12px;
   border: 1px solid transparent;
   background: transparent;
-  color: #374151;
-  font-size: 14px;
+  color: #4b5563;
+  font-size: 13.5px;
   font-weight: 500;
   cursor: pointer;
-  border-radius: 10px;
-  transition: background-color var(--transition-base), border-color var(--transition-base), color var(--transition-base);
+  border-radius: 8px;
+  transition: all 0.15s ease;
   position: relative;
   text-align: left;
 }
 
 .admin-nav-item:hover {
-  background: #f8fafc;
-  border-color: #e5e7eb;
+  background: rgba(0, 0, 0, 0.03);
   color: #111827;
 }
 
 .admin-nav-item.active {
-  background: #f3f4f6;
-  border-color: #d1d5db;
-  color: #111827;
-  box-shadow: none;
+  background: rgba(99, 102, 241, 0.06);
+  color: #4338ca;
+  font-weight: 600;
+}
+
+.admin-nav-item.active .admin-nav-icon {
+  color: #6366f1;
 }
 
 .admin-nav-icon {
@@ -288,45 +322,27 @@
   padding: 8px 12px 8px calc(12px + var(--admin-sidebar-icon-size) + 12px);
   border: 1px solid transparent;
   background: transparent;
-  color: #4b5563;
+  color: #6b7280;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  border-radius: 8px;
-  transition: background-color var(--transition-base), border-color var(--transition-base), color var(--transition-base);
+  border-radius: 6px;
+  transition: all 0.15s ease;
   position: relative;
   text-align: left;
   line-height: 1.25;
   white-space: nowrap;
 }
 
-.admin-submenu-item + .admin-submenu-item {
-  border-top-color: #e5e7eb;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-}
-
-.admin-submenu-item:not(:last-child) {
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-}
-
-.admin-submenu-item::before {
-  content: none;
-}
-
 .admin-submenu-item:hover {
-  background: #f8fafc;
-  border-color: #e5e7eb;
+  background: rgba(0, 0, 0, 0.03);
   color: #111827;
 }
 
 .admin-submenu-item.active {
-  background: #f3f4f6;
-  border-color: #d1d5db;
-  color: #111827;
+  background: rgba(99, 102, 241, 0.06);
+  color: #4338ca;
   font-weight: 600;
-  box-shadow: none;
 }
 
 .admin-submenu-item > * {
@@ -339,8 +355,8 @@
 
 /* SIDEBAR FOOTER */
 .admin-sidebar-footer {
-  padding: 16px var(--admin-sidebar-gutter) 18px;
-  border-top: 1px solid var(--border-color);
+  padding: 12px var(--admin-sidebar-gutter) 14px;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
   flex-shrink: 0;
 }
 
@@ -349,23 +365,23 @@
   align-items: center;
   gap: 12px;
   width: 100%;
-  min-height: 44px;
-  padding: 10px 12px;
-  border: 1px solid #fecaca;
-  background: #fef2f2;
-  color: var(--error-color);
-  font-size: 14px;
+  min-height: 40px;
+  padding: 9px 12px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  border-radius: 10px;
-  transition: background-color var(--transition-base), color var(--transition-base), border-color var(--transition-base);
+  border-radius: 8px;
+  transition: all 0.15s ease;
   text-align: left;
 }
 
 .admin-logout-btn:hover {
-  background: var(--error-color);
-  color: white;
-  box-shadow: none;
+  background: rgba(239, 68, 68, 0.06);
+  border-color: rgba(239, 68, 68, 0.15);
+  color: #dc2626;
 }
 
 .admin-logout-icon {

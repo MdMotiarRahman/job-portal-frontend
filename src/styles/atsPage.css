@@ -1,5 +1,5 @@
 /* ============================
-   ATS PAGE
+   ATS PAGE - Updated to match adminModule pattern
    ============================ */
 
 .ats-page-container {
@@ -9,11 +9,16 @@
   min-height: 0;
 }
 
-/* Tabs */
+/* Reuse adm-mod-tabs styling from adminModule.css */
+/* Tabs override for ATS page (underline style) */
 .ats-page-tabs {
   display: flex;
   gap: 0;
-  border-bottom: 2px solid var(--border-color);
+  background: none;
+  border: none;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+  padding: 0;
+  box-shadow: none;
 }
 
 .ats-page-tab {
@@ -25,21 +30,25 @@
   margin-bottom: -2px;
   cursor: pointer;
   font-size: 14px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  transition: all var(--transition-fast);
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: all 0.15s ease;
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 0;
 }
 
 .ats-page-tab:hover {
   color: var(--text-primary);
-  background: var(--bg-secondary);
+  background: rgba(99, 102, 241, 0.03);
 }
 
 .ats-page-tab.active {
   color: var(--brand-primary);
   border-bottom-color: var(--brand-primary);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 /* Content */
