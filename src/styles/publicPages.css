@@ -1,0 +1,332 @@
+/* ============================
+   PUBLIC PAGES — Shared Styles
+   ============================ */
+
+.pp-page { padding: 0 0 60px; }
+
+.pp-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Page Header */
+.pp-page-header {
+  text-align: center;
+  padding: 48px 0 32px;
+}
+
+.pp-page-header h1 {
+  margin: 0 0 8px;
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.pp-page-header p {
+  margin: 0;
+  font-size: 16px;
+  color: var(--text-muted);
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Back Link */
+.pp-back-link, .pp-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 12px 0 0;
+  transition: color 0.15s;
+  text-decoration: none;
+}
+.pp-back-link:hover, .pp-back-btn:hover { color: var(--brand-primary); }
+
+/* Card */
+.pp-card {
+  background: var(--bg-primary);
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.pp-card h3 { margin: 0 0 12px; font-size: 16px; font-weight: 700; color: var(--text-primary); }
+
+/* Buttons */
+.pp-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  background: #6366f1;
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-decoration: none;
+}
+.pp-btn-primary:hover { background: #4f46e5; box-shadow: 0 2px 8px rgba(99,102,241,0.3); }
+.pp-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+.pp-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.pp-btn-outline:hover { border-color: var(--brand-primary); color: var(--brand-primary); }
+.pp-btn-outline-only { background: transparent; color: var(--text-primary); border: 1px solid rgba(0,0,0,0.1); }
+.pp-btn-outline-only:hover { border-color: var(--brand-primary); color: var(--brand-primary); background: transparent; }
+.pp-full-width { width: 100%; justify-content: center; }
+
+/* Search */
+.pp-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  background: var(--bg-primary);
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: var(--radius-lg);
+  max-width: 500px;
+  margin: 0 auto 32px;
+  transition: border-color 0.15s;
+}
+.pp-search-bar:focus-within { border-color: var(--brand-primary); }
+.pp-search-bar svg { color: var(--text-muted); flex-shrink: 0; }
+.pp-search-bar input { flex: 1; border: none; background: none; font-size: 14px; color: var(--text-primary); outline: none; }
+
+/* Tags */
+.pp-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: rgba(99,102,241,0.08);
+  color: #6366f1;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.pp-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.pp-meta-item { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; color: var(--text-muted); }
+.pp-muted { color: var(--text-muted); }
+.pp-link { color: #6366f1; font-weight: 600; font-size: 13px; cursor: pointer; text-decoration: none; }
+.pp-link:hover { text-decoration: underline; }
+
+/* Loading / Empty / Error */
+.pp-loading, .pp-empty, .pp-error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 80px 24px;
+  text-align: center;
+  color: var(--text-muted);
+}
+.pp-loading p, .pp-empty p, .pp-error-state p { margin: 0; font-size: 15px; }
+.pp-error-state h2 { margin: 0; font-size: 22px; color: var(--text-primary); }
+.pp-spin { animation: ppSpin 0.7s linear infinite; color: #6366f1; }
+@keyframes ppSpin { to { transform: rotate(360deg); } }
+
+/* ============================
+   JOB DETAILS
+   ============================ */
+
+.pp-job-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 24px;
+  align-items: start;
+}
+.pp-job-detail-header { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 16px; }
+.pp-job-company-logo { width: 52px; height: 52px; border-radius: var(--radius-md); background: rgba(99,102,241,0.08); display: flex; align-items: center; justify-content: center; color: #6366f1; flex-shrink: 0; }
+.pp-job-detail-header h1 { margin: 0; font-size: 22px; font-weight: 700; color: var(--text-primary); }
+.pp-job-company-name { margin: 4px 0 0; font-size: 14px; color: var(--text-muted); }
+.pp-job-meta-row { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; }
+.pp-job-section { margin-bottom: 24px; }
+.pp-job-section h3 { margin: 0 0 10px; font-size: 15px; font-weight: 700; color: var(--text-primary); }
+.pp-prose { font-size: 14px; line-height: 1.7; color: var(--text-secondary); white-space: pre-wrap; }
+.pp-check-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.pp-check-list li { display: flex; align-items: flex-start; gap: 8px; font-size: 14px; color: var(--text-secondary); }
+.pp-check-list li svg { color: #10b981; margin-top: 3px; flex-shrink: 0; }
+.pp-sticky-card { position: sticky; top: 24px; }
+.pp-sticky-card h3 { margin-bottom: 8px; }
+.pp-sidebar-actions { display: flex; gap: 8px; margin-top: 12px; }
+.pp-sidebar-actions .pp-btn-outline { flex: 1; justify-content: center; font-size: 13px; padding: 8px; }
+.pp-company-mini { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.pp-company-mini-logo { width: 40px; height: 40px; border-radius: var(--radius-md); background: rgba(99,102,241,0.08); display: flex; align-items: center; justify-content: center; color: #6366f1; flex-shrink: 0; }
+.pp-company-mini-name { margin: 0; font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.pp-company-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin: 0 0 12px; }
+
+/* ============================
+   COMPANY LISTING
+   ============================ */
+
+.pp-company-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.pp-company-card { display: flex; gap: 16px; padding: 20px; background: var(--bg-primary); border: 1px solid rgba(0,0,0,0.06); border-radius: var(--radius-lg); text-decoration: none; transition: all 0.15s; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+.pp-company-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); transform: translateY(-2px); border-color: rgba(99,102,241,0.2); }
+.pp-company-card-logo { width: 48px; height: 48px; border-radius: var(--radius-md); background: rgba(99,102,241,0.08); display: flex; align-items: center; justify-content: center; color: #6366f1; flex-shrink: 0; }
+.pp-company-card-body { min-width: 0; }
+.pp-company-card-body h3 { margin: 0 0 4px; font-size: 15px; font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pp-company-card-body .pp-muted { font-size: 13px; }
+.pp-company-card-body .pp-meta-item { font-size: 12px; margin-top: 4px; }
+
+/* Company Details */
+.pp-company-hero { display: flex; align-items: center; gap: 20px; padding: 32px 0; }
+.pp-company-hero-logo { width: 72px; height: 72px; border-radius: var(--radius-lg); background: rgba(99,102,241,0.08); display: flex; align-items: center; justify-content: center; color: #6366f1; flex-shrink: 0; }
+.pp-company-hero h1 { margin: 0; font-size: 28px; font-weight: 800; }
+.pp-company-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 32px; }
+.pp-info-rows { display: flex; flex-direction: column; gap: 0; }
+.pp-info-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.04); font-size: 14px; color: var(--text-secondary); }
+.pp-info-row:last-child { border-bottom: none; }
+.pp-info-row svg { color: var(--text-muted); flex-shrink: 0; }
+
+/* ============================
+   JOB LIST
+   ============================ */
+
+.pp-job-list { display: flex; flex-direction: column; gap: 8px; }
+.pp-job-list-item { display: flex; align-items: center; gap: 16px; padding: 16px 20px; background: var(--bg-primary); border: 1px solid rgba(0,0,0,0.06); border-radius: var(--radius-lg); text-decoration: none; transition: all 0.15s; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+.pp-job-list-item:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.06); border-color: rgba(99,102,241,0.2); }
+.pp-job-list-company { width: 40px; height: 40px; border-radius: var(--radius-md); background: rgba(99,102,241,0.08); display: flex; align-items: center; justify-content: center; color: #6366f1; flex-shrink: 0; }
+.pp-job-list-info { flex: 1; min-width: 0; }
+.pp-job-list-info h4 { margin: 0 0 4px; font-size: 15px; font-weight: 700; color: var(--text-primary); }
+.pp-job-list-info .pp-muted { font-size: 13px; }
+.pp-job-list-meta { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
+/* Category Pills */
+.pp-category-pills { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 32px; }
+.pp-pill { padding: 6px 16px; border-radius: var(--radius-full); font-size: 13px; font-weight: 600; background: var(--bg-primary); border: 1px solid rgba(0,0,0,0.08); color: var(--text-secondary); text-decoration: none; transition: all 0.15s; }
+.pp-pill:hover, .pp-pill.active { background: #6366f1; color: #fff; border-color: #6366f1; }
+
+/* Section Header */
+.pp-section-header { display: flex; align-items: center; gap: 10px; margin: 32px 0 16px; }
+.pp-section-header svg { color: var(--text-muted); }
+.pp-section-header h2 { margin: 0; font-size: 18px; font-weight: 700; }
+
+/* ============================
+   ABOUT
+   ============================ */
+
+.pp-about-hero { padding: 40px 0; }
+.pp-about-text h2 { margin: 0 0 12px; font-size: 24px; font-weight: 800; }
+.pp-about-text p { font-size: 16px; line-height: 1.7; color: var(--text-secondary); max-width: 640px; }
+
+.pp-features-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; margin: 24px 0 40px; }
+.pp-about-card { padding: 24px; background: var(--bg-primary); border: 1px solid rgba(0,0,0,0.06); border-radius: var(--radius-lg); box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+.pp-about-icon { width: 44px; height: 44px; border-radius: var(--radius-md); background: rgba(99,102,241,0.08); display: flex; align-items: center; justify-content: center; color: #6366f1; margin-bottom: 14px; }
+.pp-about-card h3 { margin: 0 0 6px; font-size: 16px; font-weight: 700; }
+.pp-about-card p { margin: 0; font-size: 14px; color: var(--text-secondary); line-height: 1.5; }
+
+.pp-cta-section { text-align: center; padding: 48px 0; }
+.pp-cta-section h2 { margin: 0 0 8px; font-size: 24px; font-weight: 800; }
+.pp-cta-section p { margin: 0 0 20px; font-size: 15px; color: var(--text-muted); }
+.pp-cta-actions { display: flex; gap: 12px; justify-content: center; }
+
+/* ============================
+   CONTACT
+   ============================ */
+
+.pp-contact-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px; align-items: start; }
+.pp-contact-form { display: flex; flex-direction: column; gap: 14px; }
+.pp-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.pp-form-field { display: flex; flex-direction: column; gap: 6px; }
+.pp-form-field span { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.pp-form-field input, .pp-form-field textarea { padding: 10px 14px; border: 1px solid rgba(0,0,0,0.08); border-radius: var(--radius-md); font-size: 14px; color: var(--text-primary); background: var(--bg-primary); font-family: inherit; resize: vertical; transition: border-color 0.15s; }
+.pp-form-field input:focus, .pp-form-field textarea:focus { outline: none; border-color: #6366f1; }
+.pp-contact-success { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 40px 0; text-align: center; color: #10b981; }
+.pp-contact-success p { margin: 0; font-size: 15px; font-weight: 600; color: var(--text-primary); }
+
+/* ============================
+   FAQ
+   ============================ */
+
+.pp-faq-list { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 8px; }
+.pp-faq-item { background: var(--bg-primary); border: 1px solid rgba(0,0,0,0.06); border-radius: var(--radius-lg); overflow: hidden; transition: border-color 0.15s; }
+.pp-faq-item.open { border-color: rgba(99,102,241,0.2); }
+.pp-faq-question { display: flex; align-items: center; gap: 10px; width: 100%; padding: 16px 20px; background: none; border: none; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--text-primary); text-align: left; }
+.pp-faq-question svg:first-child { color: #6366f1; flex-shrink: 0; }
+.pp-faq-question span { flex: 1; }
+.pp-faq-chevron { color: var(--text-muted); transition: transform 0.2s; flex-shrink: 0; }
+.pp-faq-item.open .pp-faq-chevron { transform: rotate(180deg); }
+.pp-faq-answer { padding: 0 20px 16px 46px; }
+.pp-faq-answer p { margin: 0; font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+
+/* ============================
+   BLOG
+   ============================ */
+
+.pp-blog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+.pp-blog-card { background: var(--bg-primary); border: 1px solid rgba(0,0,0,0.06); border-radius: var(--radius-lg); padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); display: flex; flex-direction: column; transition: all 0.15s; }
+.pp-blog-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+.pp-blog-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.pp-blog-card h3 { margin: 0 0 8px; font-size: 16px; font-weight: 700; color: var(--text-primary); }
+.pp-blog-card p { margin: 0 0 16px; font-size: 14px; color: var(--text-secondary); line-height: 1.5; flex: 1; }
+.pp-blog-card-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid rgba(0,0,0,0.05); }
+
+/* ============================
+   STATIC CONTENT (Terms, Privacy)
+   ============================ */
+
+.pp-static-content { max-width: 760px; padding-top: 40px; }
+.pp-static-content h1 { margin: 0 0 8px; font-size: 28px; font-weight: 800; }
+.pp-static-content section { margin-bottom: 28px; }
+.pp-static-content h2 { margin: 0 0 8px; font-size: 18px; font-weight: 700; color: var(--text-primary); }
+.pp-static-content p { margin: 0; font-size: 15px; line-height: 1.7; color: var(--text-secondary); }
+.pp-static-content a { color: #6366f1; font-weight: 600; text-decoration: none; }
+.pp-static-content a:hover { text-decoration: underline; }
+
+/* ============================
+   ERROR / MAINTENANCE
+   ============================ */
+
+.pp-error-page { display: flex; align-items: center; justify-content: center; min-height: calc(100vh - 200px); }
+.pp-error-content { text-align: center; padding: 40px 0; }
+.pp-error-code { margin: 0; font-size: 120px; font-weight: 900; color: rgba(99,102,241,0.12); line-height: 1; letter-spacing: -0.04em; }
+.pp-error-content h2 { margin: 12px 0 8px; font-size: 24px; font-weight: 700; }
+.pp-error-content p { margin: 0 0 24px; font-size: 15px; color: var(--text-muted); }
+.pp-error-actions { display: flex; gap: 12px; justify-content: center; }
+.pp-maintenance-icon { color: #f59e0b; }
+
+/* ============================
+   RESPONSIVE
+   ============================ */
+
+@media (max-width: 900px) {
+  .pp-job-detail-grid { grid-template-columns: 1fr; }
+  .pp-company-detail-grid { grid-template-columns: 1fr; }
+  .pp-contact-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+  .pp-page-header h1 { font-size: 24px; }
+  .pp-page-header p { font-size: 14px; }
+  .pp-form-row { grid-template-columns: 1fr; }
+  .pp-company-grid { grid-template-columns: 1fr; }
+  .pp-blog-grid { grid-template-columns: 1fr; }
+  .pp-error-code { font-size: 80px; }
+  .pp-cta-actions { flex-direction: column; align-items: center; }
+}

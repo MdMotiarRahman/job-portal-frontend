@@ -116,6 +116,18 @@ body {
   color: var(--text-primary);
 }
 
+.nav-link-portal {
+  margin-left: 4px;
+  padding-left: 12px;
+  border-left: 2px solid rgba(99,102,241,0.25);
+  color: #6366f1;
+  font-weight: 600;
+}
+.nav-link-portal:hover, .nav-link-portal.active {
+  color: #4f46e5;
+  border-left-color: #6366f1;
+}
+
 .navbar-actions {
   display: flex;
   align-items: center;

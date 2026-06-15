@@ -12,6 +12,7 @@ import {
 import { getPublicJobs } from '../services/jobService';
 import '../styles/jobs.css';
 import { getMyApplications } from "../services/seekerService";
+import authService from '../services/auth.service';
 
 const jobTypes = ['', 'Full-time', 'Part-time', 'Contract', 'Internship'];
 const experienceLevels = ['', 'Entry', 'Mid', 'Senior'];
@@ -71,26 +72,29 @@ const Jobs = () => {
       : response.data?.jobs || [];
 
     try {
-      const applicationsResponse = await getMyApplications();
+      const user = authService.getCurrentUser();
+      if (user?.token) {
+        const applicationsResponse = await getMyApplications();
 
-      const myApplications = Array.isArray(applicationsResponse.data)
-        ? applicationsResponse.data
-        : applicationsResponse.data?.applications || [];
+        const myApplications = Array.isArray(applicationsResponse.data)
+          ? applicationsResponse.data
+          : applicationsResponse.data?.applications || [];
 
-      const appliedJobIds = myApplications
-        .map((app) =>
-          app.job?._id ||
-          app.job?.id ||
-          app.jobId?._id ||
-          app.jobId ||
-          app.job
-        )
-        .filter(Boolean)
-        .map(String);
+        const appliedJobIds = myApplications
+          .map((app) =>
+            app.job?._id ||
+            app.job?.id ||
+            app.jobId?._id ||
+            app.jobId ||
+            app.job
+          )
+          .filter(Boolean)
+          .map(String);
 
-      allJobs = allJobs.filter(
-        (job) => !appliedJobIds.includes(String(job._id))
-      );
+        allJobs = allJobs.filter(
+          (job) => !appliedJobIds.includes(String(job._id))
+        );
+      }
     } catch (applicationError) {
       console.log('Could not filter applied jobs', applicationError);
     }

@@ -61,6 +61,25 @@ import ProtectedRoute from './components/ProtectedRoute';
 
 import authService from './services/auth.service';
 
+// Public Pages
+import JobDetails from './pages/JobDetails';
+import CompanyListing from './pages/CompanyListing';
+import CompanyDetails from './pages/CompanyDetails';
+import JobCategory from './pages/JobCategory';
+import LocationJobs from './pages/LocationJobs';
+import ForgotPassword from './pages/ForgotPassword';
+import EmailVerification from './pages/EmailVerification';
+import About from './pages/About';
+import Contact from './pages/Contact';
+import FAQ from './pages/FAQ';
+import Blog from './pages/Blog';
+import Terms from './pages/Terms';
+import Privacy from './pages/Privacy';
+import NotFound from './pages/NotFound';
+import Maintenance from './pages/Maintenance';
+
+import './styles/publicPages.css';
+
 
 // ============================
 // NAVIGATION
@@ -129,6 +148,16 @@ const Navigation = () => {
     return location.pathname === path;
   };
 
+  const portalPath = userRole === 'admin' ? '/admin/dashboard'
+    : userRole === 'employer' ? '/employer/dashboard'
+    : userRole === 'seeker' ? '/seeker'
+    : '/login';
+
+  const portalLabel = userRole === 'admin' ? 'Admin Dashboard'
+    : userRole === 'employer' ? 'Employer Dashboard'
+    : userRole === 'seeker' ? 'My Dashboard'
+    : 'Dashboard';
+
   return (
 
     <nav className="modern-navbar">
@@ -136,176 +165,58 @@ const Navigation = () => {
       <div className="navbar-container">
 
         {/* LOGO */}
-
-        {user ? (
-
-          <div className="navbar-brand">
-
-            <div className="brand-logo">
-              <Briefcase size={24} />
-            </div>
-
-            <span>JobPortal</span>
-
+        <Link to="/" className="navbar-brand">
+          <div className="brand-logo">
+            <Briefcase size={24} />
           </div>
-
-        ) : (
-
-          <Link to="/" className="navbar-brand">
-
-            <div className="brand-logo">
-              <Briefcase size={24} />
-            </div>
-
-            <span>JobPortal</span>
-
-          </Link>
-
-        )}
+          <span>JobPortal</span>
+        </Link>
 
         {/* DESKTOP MENU */}
-
         <div className="navbar-menu desktop-only">
 
-          {!user ? (
-            <>
-  
+          {/* Public links — always visible */}
+          <Link
+            to="/jobs"
+            className={`nav-link ${isActive('/jobs') ? 'active' : ''}`}
+          >
+            Jobs
+          </Link>
+
+          <Link
+            to="/companies"
+            className={`nav-link ${isActive('/companies') ? 'active' : ''}`}
+          >
+            Companies
+          </Link>
+
+          <Link
+            to="/about"
+            className={`nav-link ${isActive('/about') ? 'active' : ''}`}
+          >
+            About
+          </Link>
+
+          <Link
+            to="/contact"
+            className={`nav-link ${isActive('/contact') ? 'active' : ''}`}
+          >
+            Contact
+          </Link>
+
+          {/* Portal link — authenticated users only */}
+          {user && (
             <Link
-                to="/home"
-                className={`nav-link ${isActive('/home') ? 'active' : ''}`}
-              >
-                Home
-              </Link>
-
-              <Link
-                to="/jobs"
-                className={`nav-link ${isActive('/jobs') ? 'active' : ''}`}
-              >
-                Jobs
-              </Link>
-            </>
-          ) : userRole === 'admin' ? (
-            <>
-              <Link
-                to="/admin"
-                className={`nav-link ${isActive('/admin') ? 'active' : ''}`}
-              >
-                Admin Dashboard
-              </Link>
-
-              <Link
-                to="/jobs"
-                className={`nav-link ${isActive('/jobs') ? 'active' : ''}`}
-              >
-                Jobs
-              </Link>
-            </>
-          ) : userRole === 'employer' ? (
-            <>
-              <Link
-                to="/employer"
-                className={`nav-link ${isActive('/employer') ? 'active' : ''}`}
-              >
-                Dashboard
-              </Link>
-
-              <Link
-                to="/jobs"
-                className={`nav-link ${isActive('/jobs') ? 'active' : ''}`}
-              >
-                Jobs
-              </Link>
-
-              <Link
-                to="/employer/messages"
-                className={`nav-link ${isActive('/employer/messages') ? 'active' : ''}`}
-              >
-                <MessageSquare size={16} style={{ marginRight: 4 }} />
-                Messages
-              </Link>
-            </>
-
-          ) : (
-
-            <>
-              {/* ADMIN */}
-
-              {userRole === 'admin' && (
-
-                <Link
-                  to="/admin"
-                  className={`nav-link ${isActive('/admin') ? 'active' : ''}`}
-                >
-                  Admin Dashboard
-                </Link>
-
-              )}
-
-              {/* EMPLOYER */}
-
-              {userRole === 'employer' && (
-
-                <Link
-                  to="/employer"
-                  className={`nav-link ${isActive('/employer') ? 'active' : ''}`}
-                >
-                  Employer Dashboard
-                </Link>
-
-              )}
-
-              {/* SEEKER */}
-
-              {userRole === 'seeker' && (
-
-                <>
-                  <Link
-                    to="/seeker"
-                    className={`nav-link ${isActive('/seeker') ? 'active' : ''}`}
-                  >
-                    Dashboard
-                  </Link>
-
-                  <Link
-                    to="/seeker/profile"
-                    className={`nav-link ${isActive('/seeker/profile') ? 'active' : ''}`}
-                  >
-                    Profile
-                  </Link>
-
-              <Link
-                to="/jobs"
-                className={`nav-link ${isActive('/jobs') ? 'active' : ''}`}
-              >
-                Jobs
-              </Link>
-
-                  <Link
-                    to="/seeker/applications"
-                    className={`nav-link ${isActive('/seeker/applications') ? 'active' : ''}`}
-                  >
-                    My Applications
-                  </Link>
-
-                  <Link
-                    to="/seeker/messages"
-                    className={`nav-link ${isActive('/seeker/messages') ? 'active' : ''}`}
-                  >
-                    <MessageSquare size={16} style={{ marginRight: 4 }} />
-                    Messages
-                  </Link>
-                </>
-
-              )}
-
-            </>
-
+              to={portalPath}
+              className={`nav-link nav-link-portal ${location.pathname.startsWith(`/${userRole}`) ? 'active' : ''}`}
+            >
+              {portalLabel}
+            </Link>
           )}
 
         </div>
 
         {/* RIGHT SIDE */}
-
         <div className="navbar-actions desktop-only">
 
           {user ? (
@@ -342,7 +253,6 @@ const Navigation = () => {
         </div>
 
         {/* MOBILE BUTTON */}
-
         <button
           className="mobile-menu-btn"
           onClick={() => setIsOpen(!isOpen)}
@@ -357,163 +267,57 @@ const Navigation = () => {
       </div>
 
       {/* MOBILE MENU */}
-
       {isOpen && (
 
         <div className="mobile-menu">
 
-          {!user ? (
-            <>
-  
+          {/* Public links — always visible */}
+          <Link
+            to="/jobs"
+            className="mobile-link"
+            onClick={() => setIsOpen(false)}
+          >
+            <Briefcase size={18} />
+            Jobs
+          </Link>
+
+          <Link
+            to="/companies"
+            className="mobile-link"
+            onClick={() => setIsOpen(false)}
+          >
+            <Briefcase size={18} />
+            Companies
+          </Link>
+
+          <Link
+            to="/about"
+            className="mobile-link"
+            onClick={() => setIsOpen(false)}
+          >
+            <Home size={18} />
+            About
+          </Link>
+
+          <Link
+            to="/contact"
+            className="mobile-link"
+            onClick={() => setIsOpen(false)}
+          >
+            <MessageSquare size={18} />
+            Contact
+          </Link>
+
+          {/* Portal link — authenticated users only */}
+          {user && (
             <Link
-                to="/home"
-                className="mobile-link"
-                onClick={() => setIsOpen(false)}
-              >
-                <Home size={18} />
-                Home
-              </Link>
-
-              <Link
-                to="/jobs"
-                className="mobile-link"
-                onClick={() => setIsOpen(false)}
-              >
-                <Briefcase size={18} />
-                Jobs
-              </Link>
-            </>
-          ) : userRole === 'admin' ? (
-            <>
-              <Link
-                to="/admin"
-                className="mobile-link"
-                onClick={() => setIsOpen(false)}
-              >
-                Dashboard
-              </Link>
-
-              <Link
-                to="/jobs"
-                className="mobile-link"
-                onClick={() => setIsOpen(false)}
-              >
-                <Briefcase size={18} />
-                Jobs
-              </Link>
-            </>
-          ) : userRole === 'employer' ? (
-            <>
-              <Link
-                to="/employer"
-                className="mobile-link"
-                onClick={() => setIsOpen(false)}
-              >
-                Dashboard
-              </Link>
-
-              <Link
-                to="/jobs"
-                className="mobile-link"
-                onClick={() => setIsOpen(false)}
-              >
-                <Briefcase size={18} />
-                Jobs
-              </Link>
-
-              <Link
-                to="/employer/messages"
-                className="mobile-link"
-                onClick={() => setIsOpen(false)}
-              >
-                <MessageSquare size={18} />
-                Messages
-              </Link>
-            </>
-
-          ) : (
-
-            <>
-              {/* ADMIN */}
-
-              {userRole === 'admin' && (
-
-                <Link
-                  to="/admin"
-                  className="mobile-link"
-                  onClick={() => setIsOpen(false)}
-                >
-                  Admin Dashboard
-                </Link>
-
-              )}
-
-              {/* EMPLOYER */}
-
-              {userRole === 'employer' && (
-
-                <Link
-                  to="/employer"
-                  className="mobile-link"
-                  onClick={() => setIsOpen(false)}
-                >
-                  Employer Dashboard
-                </Link>
-
-              )}
-
-              {/* SEEKER */}
-
-              {userRole === 'seeker' && (
-
-                <>
-                  <Link
-                    to="/seeker"
-                    className="mobile-link"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Dashboard
-                  </Link>
-
-                  <Link
-                    to="/seeker/profile"
-                    className="mobile-link"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Profile
-                  </Link>
-
-              <Link
-                to="/jobs"
-                className="mobile-link"
-                onClick={() => setIsOpen(false)}
-              >
-                <Briefcase size={18} />
-                Jobs
-              </Link>
-
-                  <Link
-                    to="/seeker/applications"
-                    className="mobile-link"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    My Applications
-                  </Link>
-
-                  <Link
-                    to="/seeker/messages"
-                    className="mobile-link"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    <MessageSquare size={18} />
-                    Messages
-                  </Link>
-                </>
-
-              )}
-
-            </>
-
+              to={portalPath}
+              className="mobile-link"
+              onClick={() => setIsOpen(false)}
+            >
+              <Briefcase size={18} />
+              {portalLabel}
+            </Link>
           )}
 
           {user ? (
@@ -596,20 +400,52 @@ const Footer = () => {
               Platform
             </h4>
 
-            <Link to="/seeker">
-              Dashboard
-            </Link>
-
-            <Link to="/seeker/profile">
-              Profile
-            </Link>
-
             <Link to="/jobs">
-              Jobs
+              Browse Jobs
             </Link>
 
-            <Link to="/seeker/applications">
-              My Applications
+            <Link to="/companies">
+              Companies
+            </Link>
+
+            <Link to="/about">
+              About Us
+            </Link>
+
+          </div>
+
+          <div className="footer-links-col">
+
+            <h4 className="footer-heading">
+              Resources
+            </h4>
+
+            <Link to="/blog">
+              Blog
+            </Link>
+
+            <Link to="/faq">
+              FAQ
+            </Link>
+
+            <Link to="/contact">
+              Contact
+            </Link>
+
+          </div>
+
+          <div className="footer-links-col">
+
+            <h4 className="footer-heading">
+              Legal
+            </h4>
+
+            <Link to="/terms">
+              Terms &amp; Conditions
+            </Link>
+
+            <Link to="/privacy">
+              Privacy Policy
             </Link>
 
           </div>
@@ -680,8 +516,83 @@ const AppContent = () => {
           />
 
           <Route
+            path="/forgot-password"
+            element={<ForgotPassword />}
+          />
+
+          <Route
+            path="/verify-email"
+            element={<EmailVerification />}
+          />
+
+          <Route
             path="/jobs"
             element={<Jobs />}
+          />
+
+          <Route
+            path="/jobs/:id"
+            element={<JobDetails />}
+          />
+
+          <Route
+            path="/companies"
+            element={<CompanyListing />}
+          />
+
+          <Route
+            path="/companies/:id"
+            element={<CompanyDetails />}
+          />
+
+          <Route
+            path="/category/:category"
+            element={<JobCategory />}
+          />
+
+          <Route
+            path="/location/:location"
+            element={<LocationJobs />}
+          />
+
+          <Route
+            path="/about"
+            element={<About />}
+          />
+
+          <Route
+            path="/contact"
+            element={<Contact />}
+          />
+
+          <Route
+            path="/faq"
+            element={<FAQ />}
+          />
+
+          <Route
+            path="/blog"
+            element={<Blog />}
+          />
+
+          <Route
+            path="/terms"
+            element={<Terms />}
+          />
+
+          <Route
+            path="/privacy"
+            element={<Privacy />}
+          />
+
+          <Route
+            path="/maintenance"
+            element={<Maintenance />}
+          />
+
+          <Route
+            path="*"
+            element={<NotFound />}
           />
 
           {/* REMINDERS - ACCESSIBLE TO ALL AUTHENTICATED USERS */}
@@ -690,7 +601,12 @@ const AppContent = () => {
             path="/reminders"
             element={
               <ProtectedRoute allowedRoles={['admin', 'employer', 'seeker']}>
-                <ReminderCenter />
+                {(() => {
+                  const role = authService.getCurrentUserRole();
+                  if (role === 'admin') return <AdminLayout><ReminderCenter /></AdminLayout>;
+                  if (role === 'employer') return <EmployerLayout><ReminderCenter /></EmployerLayout>;
+                  return <SeekerLayout><ReminderCenter /></SeekerLayout>;
+                })()}
               </ProtectedRoute>
             }
           />

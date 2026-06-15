@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Bell } from 'lucide-react';
+import { Bell, Check, X, BellOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/reminderBell.css';
 import reminderService from '../services/reminderService';
+import { formatReminderType, getReminderColor } from '../utils/reminderFormatters';
 
 const ReminderBell = () => {
   const [reminders, setReminders] = useState([]);
@@ -75,18 +76,6 @@ const ReminderBell = () => {
     }
   };
 
-  const getReminderIcon = (type) => {
-    const colors = {
-      'new-application': '#3b82f6',
-      'interview': '#8b5cf6',
-      'application-status': '#10b981',
-      'job-deadline': '#f59e0b',
-      'job-expiring': '#ef4444',
-      'verification-pending': '#f97316',
-    };
-    return colors[type] || '#94a3b8';
-  };
-
   return (
     <div className="reminder-bell-container" ref={dropdownRef}>
       <button
@@ -111,6 +100,7 @@ const ReminderBell = () => {
 
           {reminders.length === 0 ? (
             <div className="empty-reminders">
+              <BellOff size={32} strokeWidth={1.5} />
               <p>No reminders yet</p>
             </div>
           ) : (
@@ -121,14 +111,16 @@ const ReminderBell = () => {
                   className={`reminder-item ${reminder.isViewed ? 'viewed' : 'unviewed'}`}
                 >
                   <div className="reminder-icon">
-                    <span style={{ display: 'block', width: 8, height: 8, borderRadius: '50%', background: getReminderIcon(reminder.type) }} />
+                    <span style={{ display: 'block', width: 8, height: 8, borderRadius: '50%', background: getReminderColor(reminder.type) }} />
                   </div>
                   <div className="reminder-content">
                     <h5>{reminder.templateData?.title || 'Reminder'}</h5>
                     <p className="reminder-message">
                       {reminder.templateData?.message || reminder.content}
                     </p>
-                    <span className="reminder-type">{reminder.type}</span>
+                    <span className="reminder-type" style={{ background: getReminderColor(reminder.type) + '18', color: getReminderColor(reminder.type) }}>
+                      {formatReminderType(reminder.type)}
+                    </span>
                   </div>
                   <div className="reminder-actions">
                     {!reminder.isViewed && (
@@ -137,7 +129,7 @@ const ReminderBell = () => {
                         onClick={() => handleMarkAsViewed(reminder._id)}
                         title="Mark as read"
                       >
-                        ✓
+                        <Check size={14} />
                       </button>
                     )}
                     <button
@@ -145,7 +137,7 @@ const ReminderBell = () => {
                       onClick={() => handleDismiss(reminder._id)}
                       title="Dismiss"
                     >
-                      ✕
+                      <X size={14} />
                     </button>
                   </div>
                 </div>

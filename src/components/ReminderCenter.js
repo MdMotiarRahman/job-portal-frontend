@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Trash2, Eye, Clock, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Trash2, Eye, Clock, Filter, ChevronLeft, ChevronRight, BellOff, Loader2 } from 'lucide-react';
 import '../styles/reminderCenter.css';
 import reminderService from '../services/reminderService';
+import { formatReminderType, formatReminderStatus, getReminderColor } from '../utils/reminderFormatters';
 
 const ReminderCenter = () => {
-  const navigate = useNavigate();
   const [reminders, setReminders] = useState([]);
   const [filteredReminders, setFilteredReminders] = useState([]);
   const [stats, setStats] = useState({});
@@ -29,7 +28,6 @@ const ReminderCenter = () => {
       setTotalPages(response.totalPages || 1);
     } catch (error) {
       console.error('Failed to fetch reminders:', error);
-      alert('Failed to load reminders');
     } finally {
       setLoading(false);
     }
@@ -137,22 +135,6 @@ const ReminderCenter = () => {
     });
   };
 
-  const getReminderTypeColor = (type) => {
-    const colors = {
-      'new-application': '#3b82f6',
-      'interview': '#8b5cf6',
-      'application-status': '#10b981',
-      'job-deadline': '#f59e0b',
-      'job-expiring': '#ef4444',
-      'verification-pending': '#f97316',
-    };
-    return colors[type] || '#94a3b8';
-  };
-
-  const getReminderIcon = (type) => {
-    return null;
-  };
-
   const filterOptions = [
     { value: 'all', label: 'All Reminders' },
     { value: 'unviewed', label: 'Unread' },
@@ -171,36 +153,19 @@ const ReminderCenter = () => {
 
   return (
     <div className="reminder-center-container">
-      {/* Header */}
-      <div className="reminder-center-header">
-        <div className="header-title">
-          <button
-            className="back-button"
-            onClick={() => navigate(-1)}
-            title="Go back"
-          >
-            <ChevronLeft size={20} />
-          </button>
-          <div>
-            <h1>Reminder Center</h1>
-            <p className="header-subtitle">
-              Manage your reminders and stay updated
-            </p>
+      {/* Stats Cards */}
+      {stats.totalReminders !== undefined && (
+        <div className="reminder-stats-row">
+          <div className="reminder-stat-card">
+            <span className="reminder-stat-label">Total</span>
+            <span className="reminder-stat-value">{stats.totalReminders || 0}</span>
+          </div>
+          <div className="reminder-stat-card">
+            <span className="reminder-stat-label">Unread</span>
+            <span className="reminder-stat-value unread">{stats.unviewedCount || 0}</span>
           </div>
         </div>
-        {stats.totalReminders !== undefined && (
-          <div className="header-stats">
-            <div className="stat-item">
-              <span className="stat-label">Total</span>
-              <span className="stat-value">{stats.totalReminders || 0}</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-label">Unread</span>
-              <span className="stat-value unread">{stats.unviewedCount || 0}</span>
-            </div>
-          </div>
-        )}
-      </div>
+      )}
 
       {/* Controls */}
       <div className="reminder-controls">
@@ -259,13 +224,13 @@ const ReminderCenter = () => {
       <div className="reminders-content">
         {loading ? (
           <div className="loading-state">
-            <div className="spinner"></div>
+            <Loader2 size={32} className="spinner" />
             <p>Loading reminders...</p>
           </div>
         ) : filteredReminders.length === 0 ? (
             <div className="empty-state">
               <div className="empty-icon">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                <BellOff size={28} strokeWidth={1.5} />
               </div>
               <h3>No reminders found</h3>
               <p>You don't have any reminders matching this filter.</p>
@@ -287,10 +252,10 @@ const ReminderCenter = () => {
                   className={`table-row ${reminder.isViewed ? 'viewed' : 'unviewed'}`}
                 >
                   <div className="col-type">
-                    <span className="type-badge">
-                      <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: getReminderTypeColor(reminder.type), flexShrink: 0 }} />
+                    <span className="type-badge" style={{ background: getReminderColor(reminder.type) + '18', color: getReminderColor(reminder.type) }}>
+                      <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: getReminderColor(reminder.type), flexShrink: 0 }} />
                       <span className="type-text">
-                        {reminder.type.replace('-', ' ')}
+                        {formatReminderType(reminder.type)}
                       </span>
                     </span>
                   </div>
@@ -312,7 +277,7 @@ const ReminderCenter = () => {
                     <span
                       className={`status-badge status-${reminder.status}`}
                     >
-                      {reminder.status}
+                      {formatReminderStatus(reminder.status)}
                     </span>
                   </div>
 
