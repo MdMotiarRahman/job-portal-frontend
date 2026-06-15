@@ -3,18 +3,27 @@ import { useNavigate, useParams } from 'react-router-dom';
 import {
   AlertCircle,
   CheckCircle2,
-  ChevronRight,
   Loader2,
   Search,
   ShieldX,
   UserRound,
   X,
   Users,
-  ShieldAlert
+  ShieldAlert,
+  Ban,
+  UserCheck,
+  Clock,
+  Mail,
+  MapPin,
+  Calendar,
+  Trash2,
+  Eye,
 } from 'lucide-react';
 import AdminLayout from './AdminLayout';
+import UserAvatar from './UserAvatar';
 import { deleteUser, getUsers, updateUserStatus, verifyUser, updateUser } from '../services/adminService';
 import '../styles/adminDashboard.css';
+import '../styles/adminUserMgmt.css';
 
 const roleOptions = [
   { value: '', label: 'All roles' },
@@ -28,8 +37,13 @@ const availablePermissions = [
   'manage_jobs',
   'manage_employers',
   'manage_settings',
-  'view_reports'
+  'view_reports',
 ];
+
+const formatDate = (v) => {
+  if (!v) return '—';
+  return new Date(v).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+};
 
 const AdminUserManagement = () => {
   const navigate = useNavigate();
@@ -39,42 +53,26 @@ const AdminUserManagement = () => {
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState([]);
   const [pagination, setPagination] = useState({ total: 0, page: 1, pages: 1 });
-
   const [searchTerm, setSearchTerm] = useState('');
   const [role, setRole] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-
   const [page, setPage] = useState(1);
   const limit = 10;
 
-  // Details modal
   const [selectedUser, setSelectedUser] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState('details');
   const [banReason, setBanReason] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
-  
-  // RBAC Form
   const [rbacForm, setRbacForm] = useState({ role: '', permissions: [] });
-
-  const authSummary = useMemo(() => {
-    return {
-      icon: <UserRound size={18} />,
-    };
-  }, []);
 
   const loadUsers = useCallback(async () => {
     setLoading(true);
     setError('');
     setSuccess('');
-
     try {
-      const query = {
-        page,
-        limit,
-      };
-
+      const query = { page, limit };
       if (role) query.role = role;
       if (currentTab === 'active') query.status = 'active';
       if (currentTab === 'inactive') query.status = 'inactive';
@@ -82,17 +80,14 @@ const AdminUserManagement = () => {
       if (searchTerm.trim()) query.search = searchTerm.trim();
 
       const res = await getUsers(query);
-
-      const nextUsers = res.data.users || [];
+      let nextUsers = res.data.users || [];
       const nextPagination = res.data.pagination || { total: 0, page, pages: 1 };
 
-      // client-side pending verification filter
-      const enrichedUsers =
-        currentTab === 'pending'
-          ? nextUsers.filter((u) => u && u.isVerified === false)
-          : nextUsers;
+      if (currentTab === 'pending') {
+        nextUsers = nextUsers.filter((u) => u && u.isVerified === false);
+      }
 
-      setUsers(enrichedUsers);
+      setUsers(nextUsers);
       setPagination({ ...nextPagination, page });
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to load users.');
@@ -101,14 +96,8 @@ const AdminUserManagement = () => {
     }
   }, [page, limit, role, currentTab, searchTerm]);
 
-  useEffect(() => {
-    // reset to first page when filters change
-    setPage(1);
-  }, [role, currentTab, searchTerm]);
-
-  useEffect(() => {
-    loadUsers();
-  }, [loadUsers]);
+  useEffect(() => { setPage(1); }, [role, currentTab, searchTerm]);
+  useEffect(() => { loadUsers(); }, [loadUsers]);
 
   const openDetails = (u) => {
     setSelectedUser(u);
@@ -132,7 +121,6 @@ const AdminUserManagement = () => {
     setError('');
     setSuccess('');
     setActionLoading(true);
-
     try {
       if (action === 'verify') {
         await verifyUser(selectedUser._id);
@@ -144,10 +132,7 @@ const AdminUserManagement = () => {
         await updateUserStatus(selectedUser._id, 'deactivate', {});
         setSuccess('User deactivated successfully.');
       } else if (action === 'ban') {
-        if (!banReason.trim()) {
-          setError('Ban reason is required.');
-          return;
-        }
+        if (!banReason.trim()) { setError('Ban reason is required.'); setActionLoading(false); return; }
         await updateUserStatus(selectedUser._id, 'ban', { reason: banReason.trim() });
         setSuccess('User banned successfully.');
       } else if (action === 'unban') {
@@ -155,21 +140,18 @@ const AdminUserManagement = () => {
         setSuccess('User unbanned successfully.');
       } else if (action === 'delete') {
         const ok = window.confirm('Delete user permanently? This cannot be undone.');
-        if (!ok) return;
+        if (!ok) { setActionLoading(false); return; }
         await deleteUser(selectedUser._id);
         setSuccess('User deleted successfully.');
         closeModal();
       } else if (action === 'update_rbac') {
         const res = await updateUser(selectedUser._id, { role: rbacForm.role, permissions: rbacForm.permissions });
-        setSuccess('Role and permissions updated successfully.');
+        setSuccess('Role and permissions updated.');
         setModalMode('details');
         setSelectedUser(res.data.user);
       }
-
       await loadUsers();
-      if (action !== 'update_rbac' && action !== 'delete') {
-        closeModal();
-      }
+      if (action !== 'update_rbac' && action !== 'delete') closeModal();
     } catch (err) {
       setError(err.response?.data?.message || 'User action failed.');
     } finally {
@@ -178,401 +160,320 @@ const AdminUserManagement = () => {
   };
 
   const togglePermission = (perm) => {
-    setRbacForm(prev => {
-      const perms = prev.permissions.includes(perm)
+    setRbacForm(prev => ({
+      ...prev,
+      permissions: prev.permissions.includes(perm)
         ? prev.permissions.filter(p => p !== perm)
-        : [...prev.permissions, perm];
-      return { ...prev, permissions: perms };
-    });
+        : [...prev.permissions, perm],
+    }));
   };
 
-  const statusBadgeClass = (u) => {
-    if (u.isBanned) return 'admin-badge-error';
-    if (!u.isActive) return 'admin-badge-warning';
-    return 'admin-badge-success';
+  const statusBadge = (u) => {
+    if (u.isBanned) return { cls: 'adm-badge-error', text: 'Banned' };
+    if (!u.isActive) return { cls: 'adm-badge-warning', text: 'Inactive' };
+    return { cls: 'adm-badge-success', text: 'Active' };
   };
 
   const pages = Math.max(pagination.pages || 1, 1);
 
   const tabs = [
-    { id: 'all', label: 'All Users', icon: <Users size={16} /> },
-    { id: 'active', label: 'Active', icon: <CheckCircle2 size={16} /> },
-    { id: 'banned', label: 'Banned', icon: <ShieldX size={16} /> },
-    { id: 'pending', label: 'Pending', icon: <AlertCircle size={16} /> },
+    { id: 'all', label: 'All Users', icon: Users },
+    { id: 'active', label: 'Active', icon: UserCheck },
+    { id: 'banned', label: 'Banned', icon: Ban },
+    { id: 'pending', label: 'Pending', icon: Clock },
   ];
 
   return (
     <AdminLayout>
-      <div className="admin-page">
-        <div className="admin-header-card">
-          <div className="admin-header">
-            <div>
-              <p className="admin-subtitle" style={{ marginBottom: 6 }}>
-                {authSummary.icon} User management
-              </p>
-              <h1>Users</h1>
-              <p className="admin-subtitle">Manage accounts: status, bans, verification, roles and permissions.</p>
-            </div>
+      <div className="admin-page adm-umgmt">
+        {/* Header */}
+        <div className="adm-umgmt-header">
+          <div className="adm-umgmt-header-text">
+            <h1>User Management</h1>
+            <p>Manage accounts, roles, verification and access control.</p>
           </div>
         </div>
 
-        {error ? (
-          <div className="admin-alert admin-alert-error">
-            <AlertCircle size={18} />
-            {error}
-          </div>
-        ) : null}
+        {error && <div className="admin-alert admin-alert-error">{error}</div>}
+        {success && <div className="admin-alert admin-alert-success">{success}</div>}
 
-        {success ? (
-          <div className="admin-alert admin-alert-success">
-            <CheckCircle2 size={18} />
-            {success}
-          </div>
-        ) : null}
-
-        <div className="admin-tabs">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              className={`admin-tab ${currentTab === tab.id ? 'active' : ''}`}
-              onClick={() => navigate(`/admin/users/${tab.id}`)}
-            >
-              <span className="admin-tab-icon">{tab.icon}</span>
-              {tab.label}
-            </button>
-          ))}
+        {/* Tabs */}
+        <div className="adm-umgmt-tabs">
+          {tabs.map((tab) => {
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                className={`adm-umgmt-tab ${currentTab === tab.id ? 'active' : ''}`}
+                onClick={() => navigate(`/admin/users/${tab.id}`)}
+              >
+                <Icon size={15} />
+                {tab.label}
+              </button>
+            );
+          })}
         </div>
 
-        <section className="admin-section">
-          <div className="admin-section-heading-row">
-            <h2 className="admin-section-title">
-              <UserRound size={18} /> {tabs.find(t => t.id === currentTab)?.label || 'All Users'}
-            </h2>
-
-            <div className="admin-filter-row">
-              <div className="admin-search-field">
-                <Search size={16} />
-                <input
-                  type="text"
-                  placeholder="Search by name or email"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-
-              <select className="admin-select" value={role} onChange={(e) => setRole(e.target.value)}>
-                {roleOptions.map((opt) => (
-                  <option key={opt.value || 'all'} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
+        {/* Filters + Table */}
+        <div className="adm-umgmt-card">
+          <div className="adm-umgmt-toolbar">
+            <div className="adm-umgmt-search">
+              <Search size={15} />
+              <input
+                type="text"
+                placeholder="Search by name or email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
+            <select className="adm-umgmt-select" value={role} onChange={(e) => setRole(e.target.value)}>
+              {roleOptions.map((opt) => (
+                <option key={opt.value || 'all'} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
           </div>
 
           {loading ? (
-            <div className="employer-state">
-              <Loader2 size={32} className="animate-spin" />
+            <div className="adm-umgmt-empty">
+              <Loader2 size={28} className="adm-spin" />
               <p>Loading users...</p>
             </div>
           ) : users.length === 0 ? (
-            <div className="employer-state">
-              <ShieldX size={48} />
+            <div className="adm-umgmt-empty">
+              <ShieldX size={36} />
               <p>No users found</p>
               <span>Try adjusting your search or filters.</span>
             </div>
           ) : (
-            <div className="admin-table-wrap">
-              <table className="admin-table">
+            <div className="adm-umgmt-table-wrap">
+              <table className="adm-umgmt-table">
                 <thead>
                   <tr>
-                    <th>Name</th>
-                    <th>Email</th>
+                    <th>User</th>
                     <th>Role</th>
                     <th>Verification</th>
                     <th>Status</th>
+                    <th>Joined</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {users.map((u) => (
-                    <tr key={u._id}>
-                      <td>{u.name}</td>
-                      <td>{u.email}</td>
-                      <td>
-                        <span className="admin-badge admin-badge-role">{u.role}</span>
-                      </td>
-                      <td>
-                        <span className={`admin-badge ${u.isVerified ? 'admin-badge-success' : 'admin-badge-warning'}`}>
-                          {u.isVerified ? 'Verified' : 'Pending'}
-                        </span>
-                      </td>
-                      <td>
-                        <span className={`admin-badge ${statusBadgeClass(u)}`}>
-                          {u.isBanned ? 'Banned' : u.isActive ? 'Active' : 'Inactive'}
-                        </span>
-                      </td>
-                      <td className="admin-actions-cell">
-                        <button
-                          type="button"
-                          className="admin-action-btn admin-action-neutral"
-                          onClick={() => openDetails(u)}
-                        >
-                          Manage <ChevronRight size={13} />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                  {users.map((u) => {
+                    const st = statusBadge(u);
+                    return (
+                      <tr key={u._id}>
+                        <td>
+                          <div className="adm-umgmt-user-cell">
+                            <UserAvatar user={u} size={36} />
+                            <div>
+                              <p className="adm-umgmt-user-name">{u.name}</p>
+                              <p className="adm-umgmt-user-email">{u.email}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td><span className="adm-badge adm-badge-role">{u.role}</span></td>
+                        <td>
+                          <span className={`adm-badge ${u.isVerified ? 'adm-badge-success' : 'adm-badge-warning'}`}>
+                            {u.isVerified ? 'Verified' : 'Pending'}
+                          </span>
+                        </td>
+                        <td><span className={`adm-badge ${st.cls}`}>{st.text}</span></td>
+                        <td className="adm-umgmt-date">{formatDate(u.createdAt || u.lastLogin)}</td>
+                        <td>
+                          <button className="adm-umgmt-view-btn" onClick={() => openDetails(u)} title="View details">
+                            <Eye size={14} />
+                            View
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
           )}
 
-          {pages > 1 ? (
-            <div className="admin-pagination">
-              <span>
-                Page {page} of {pages}
-              </span>
-              <div className="admin-pagination-actions">
-                <button
-                  className="admin-action-btn admin-action-neutral"
-                  type="button"
-                  disabled={page <= 1 || loading}
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                >
-                  Previous
-                </button>
-                <button
-                  className="admin-action-btn admin-action-neutral"
-                  type="button"
-                  disabled={page >= pages || loading}
-                  onClick={() => setPage((p) => Math.min(pages, p + 1))}
-                >
-                  Next
-                </button>
+          {pages > 1 && (
+            <div className="adm-umgmt-pagination">
+              <span>Page {page} of {pages}</span>
+              <div className="adm-umgmt-pagination-btns">
+                <button disabled={page <= 1 || loading} onClick={() => setPage(p => Math.max(1, p - 1))}>Previous</button>
+                <button disabled={page >= pages || loading} onClick={() => setPage(p => Math.min(pages, p + 1))}>Next</button>
               </div>
             </div>
-          ) : null}
-        </section>
+          )}
+        </div>
 
-        {showModal && selectedUser ? (
-          <div className="employer-modal-backdrop" onClick={closeModal}>
-            <section
-              className="employer-modal"
-              onClick={(e) => e.stopPropagation()}
-              role="dialog"
-              aria-modal="true"
-            >
-              <div className="employer-modal-header">
+        {/* Modal */}
+        {showModal && selectedUser && (
+          <div className="adm-modal-backdrop" onClick={closeModal}>
+            <div className="adm-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+              <button className="adm-modal-close" onClick={closeModal} aria-label="Close"><X size={18} /></button>
+
+              {/* Modal Header */}
+              <div className="adm-modal-header">
+                <UserAvatar user={selectedUser} size={52} />
                 <div>
-                  <p className="admin-subtitle" style={{ marginBottom: 4 }}>User management</p>
                   <h2>{selectedUser.name}</h2>
+                  <p>{selectedUser.email}</p>
                 </div>
-                <button className="admin-icon-btn employer-modal-close" type="button" onClick={closeModal} aria-label="Close">
-                  <X size={16} />
-                </button>
               </div>
 
-              {modalMode === 'details' || modalMode === 'ban' ? (
-                <>
-                  <div className="employer-detail-grid">
-                    <div>
-                      <span>Email</span>
-                      <strong>{selectedUser.email}</strong>
+              {/* Modal Body */}
+              <div className="adm-modal-body">
+                {modalMode === 'details' && (
+                  <>
+                    {/* Status Row */}
+                    <div className="adm-modal-status-row">
+                      <span className={`adm-badge ${selectedUser.isVerified ? 'adm-badge-success' : 'adm-badge-warning'}`}>
+                        {selectedUser.isVerified ? 'Verified' : 'Pending'}
+                      </span>
+                      <span className={`adm-badge ${statusBadge(selectedUser).cls}`}>
+                        {statusBadge(selectedUser).text}
+                      </span>
+                      <span className="adm-badge adm-badge-role">{selectedUser.role}</span>
                     </div>
-                    <div>
-                      <span>Role</span>
-                      <strong>{selectedUser.role}</strong>
-                    </div>
-                    <div>
-                      <span>Verification</span>
-                      <strong>{selectedUser.isVerified ? 'Verified' : 'Pending'}</strong>
-                    </div>
-                    <div>
-                      <span>Account</span>
-                      <strong>
-                        {selectedUser.isBanned ? 'Banned' : selectedUser.isActive ? 'Active' : 'Inactive'}
-                      </strong>
-                    </div>
-                    {selectedUser.bannedReason ? (
-                      <div className="employer-detail-wide employer-rejection-reason">
-                        <span>Ban reason</span>
-                        <p>{selectedUser.bannedReason}</p>
-                      </div>
-                    ) : null}
-                    {selectedUser.adminNotes ? (
-                      <div className="employer-detail-wide">
-                        <span>Admin notes</span>
-                        <p>{selectedUser.adminNotes}</p>
-                      </div>
-                    ) : null}
-                  </div>
 
-                  <div className="employer-modal-actions" style={{ flexWrap: 'wrap' }}>
-                    <button
-                      type="button"
-                      className="admin-action-btn admin-action-neutral"
-                      disabled={actionLoading}
-                      onClick={() => setModalMode('rbac')}
-                    >
-                      <ShieldAlert size={14} />
-                      Manage RBAC
-                    </button>
-
-                    {!selectedUser.isVerified ? (
-                      <button
-                        type="button"
-                        className="admin-action-btn admin-action-success"
-                        disabled={actionLoading}
-                        onClick={() => handleAction('verify')}
-                      >
-                        Verify
-                      </button>
-                    ) : null}
-
-                    {selectedUser.isActive ? (
-                      <button
-                        type="button"
-                        className="admin-action-btn admin-action-neutral"
-                        disabled={actionLoading}
-                        onClick={() => handleAction('deactivate')}
-                      >
-                        Deactivate
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        className="admin-action-btn admin-action-neutral"
-                        disabled={actionLoading}
-                        onClick={() => handleAction('activate')}
-                      >
-                        Activate
-                      </button>
-                    )}
-
-                    {selectedUser.isBanned ? (
-                      <button
-                        type="button"
-                        className="admin-action-btn admin-action-warning"
-                        disabled={actionLoading}
-                        onClick={() => handleAction('unban')}
-                      >
-                        Unban
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        className="admin-action-btn admin-action-warning"
-                        disabled={actionLoading}
-                        onClick={() => setModalMode('ban')}
-                      >
-                        Ban
-                      </button>
-                    )}
-
-                    <button
-                      type="button"
-                      className="admin-action-btn admin-action-danger"
-                      disabled={actionLoading}
-                      onClick={() => handleAction('delete')}
-                    >
-                      Delete
-                    </button>
-
-                    {modalMode === 'ban' ? (
-                      <div style={{ width: '100%', marginTop: 10 }}>
-                        <label className="admin-form-field" style={{ width: '100%' }}>
-                          <span>Ban reason *</span>
-                          <textarea
-                            rows={3}
-                            value={banReason}
-                            onChange={(e) => setBanReason(e.target.value)}
-                          />
-                        </label>
-
-                        <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
-                          <button
-                            type="button"
-                            className="admin-action-btn admin-action-neutral"
-                            disabled={actionLoading}
-                            onClick={() => setModalMode('details')}
-                          >
-                            <X size={14} />
-                            Cancel
-                          </button>
-                          <button
-                            type="button"
-                            className="admin-action-btn admin-action-warning"
-                            disabled={actionLoading || !banReason.trim()}
-                            onClick={() => handleAction('ban')}
-                          >
-                            {actionLoading ? <Loader2 size={14} className="animate-spin" /> : null}
-                            Confirm Ban
-                          </button>
+                    {/* Info Grid */}
+                    <div className="adm-modal-info">
+                      <div className="adm-modal-info-item">
+                        <Mail size={14} />
+                        <div>
+                          <span>Email</span>
+                          <strong>{selectedUser.email}</strong>
                         </div>
                       </div>
-                    ) : null}
-                  </div>
-                </>
-              ) : modalMode === 'rbac' ? (
-                <div style={{ marginTop: 20 }}>
-                  <label className="admin-form-field">
-                    <span>Role Assignment</span>
-                    <select
-                      className="admin-select"
-                      value={rbacForm.role}
-                      onChange={(e) => setRbacForm({ ...rbacForm, role: e.target.value })}
-                    >
-                      <option value="seeker">Seeker</option>
-                      <option value="employer">Employer</option>
-                      <option value="admin">Admin</option>
-                    </select>
-                  </label>
+                      <div className="adm-modal-info-item">
+                        <UserRound size={14} />
+                        <div>
+                          <span>Role</span>
+                          <strong>{selectedUser.role}</strong>
+                        </div>
+                      </div>
+                      <div className="adm-modal-info-item">
+                        <Calendar size={14} />
+                        <div>
+                          <span>Last Login</span>
+                          <strong>{formatDate(selectedUser.lastLogin)}</strong>
+                        </div>
+                      </div>
+                      <div className="adm-modal-info-item">
+                        <MapPin size={14} />
+                        <div>
+                          <span>Location</span>
+                          <strong>{selectedUser.location || '—'}</strong>
+                        </div>
+                      </div>
+                    </div>
 
-                  <div className="admin-form-field" style={{ marginTop: 20 }}>
-                    <span>Granular Permissions</span>
-                    <div style={{ display: 'grid', gap: 10, marginTop: 10 }}>
+                    {selectedUser.bannedReason && (
+                      <div className="adm-modal-banner adm-modal-banner-error">
+                        <Ban size={14} />
+                        <div>
+                          <strong>Ban Reason</strong>
+                          <p>{selectedUser.bannedReason}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Actions */}
+                    <div className="adm-modal-actions">
+                      <button className="adm-action adm-action-primary" disabled={actionLoading} onClick={() => setModalMode('rbac')}>
+                        <ShieldAlert size={14} /> Manage RBAC
+                      </button>
+                      {!selectedUser.isVerified && (
+                        <button className="adm-action adm-action-success" disabled={actionLoading} onClick={() => handleAction('verify')}>
+                          <CheckCircle2 size={14} /> Verify
+                        </button>
+                      )}
+                      {selectedUser.isActive ? (
+                        <button className="adm-action adm-action-neutral" disabled={actionLoading} onClick={() => handleAction('deactivate')}>
+                          Deactivate
+                        </button>
+                      ) : (
+                        <button className="adm-action adm-action-neutral" disabled={actionLoading} onClick={() => handleAction('activate')}>
+                          Activate
+                        </button>
+                      )}
+                      {selectedUser.isBanned ? (
+                        <button className="adm-action adm-action-warning" disabled={actionLoading} onClick={() => handleAction('unban')}>
+                          Unban
+                        </button>
+                      ) : (
+                        <button className="adm-action adm-action-warning" disabled={actionLoading} onClick={() => setModalMode('ban')}>
+                          <Ban size={14} /> Ban
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="adm-modal-danger">
+                      <button className="adm-action adm-action-danger" disabled={actionLoading} onClick={() => handleAction('delete')}>
+                        <Trash2 size={14} /> Delete User
+                      </button>
+                    </div>
+                  </>
+                )}
+
+                {modalMode === 'ban' && (
+                  <div className="adm-modal-ban-form">
+                    <h3>Ban User</h3>
+                    <p>Provide a reason for banning <strong>{selectedUser.name}</strong>.</p>
+                    <textarea
+                      rows={3}
+                      placeholder="Enter ban reason..."
+                      value={banReason}
+                      onChange={(e) => setBanReason(e.target.value)}
+                    />
+                    <div className="adm-modal-ban-actions">
+                      <button className="adm-action adm-action-neutral" disabled={actionLoading} onClick={() => setModalMode('details')}>Cancel</button>
+                      <button className="adm-action adm-action-warning" disabled={actionLoading || !banReason.trim()} onClick={() => handleAction('ban')}>
+                        {actionLoading ? <Loader2 size={14} className="adm-spin" /> : null}
+                        Confirm Ban
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {modalMode === 'rbac' && (
+                  <div className="adm-modal-rbac">
+                    <h3>Role & Permissions</h3>
+                    <label className="adm-rbac-field">
+                      <span>Role</span>
+                      <select className="adm-umgmt-select" value={rbacForm.role} onChange={(e) => setRbacForm({ ...rbacForm, role: e.target.value })}>
+                        <option value="seeker">Seeker</option>
+                        <option value="employer">Employer</option>
+                        <option value="admin">Admin</option>
+                      </select>
+                    </label>
+                    <div className="adm-rbac-perms">
+                      <span>Permissions</span>
                       {availablePermissions.map(perm => (
-                        <label key={perm} className="admin-checkbox-field" style={{ cursor: 'pointer' }}>
+                        <label key={perm} className="adm-rbac-check">
                           <input
                             type="checkbox"
                             checked={rbacForm.permissions.includes(perm)}
                             onChange={() => togglePermission(perm)}
                           />
-                          <span style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>{perm.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
+                          <span>{perm.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
                         </label>
                       ))}
                     </div>
+                    <div className="adm-modal-rbac-actions">
+                      <button className="adm-action adm-action-neutral" disabled={actionLoading} onClick={() => setModalMode('details')}>Cancel</button>
+                      <button className="adm-action adm-action-primary" disabled={actionLoading} onClick={() => handleAction('update_rbac')}>
+                        {actionLoading ? <Loader2 size={14} className="adm-spin" /> : null}
+                        Save Changes
+                      </button>
+                    </div>
                   </div>
-
-                  <div className="employer-modal-actions" style={{ marginTop: 24, paddingTop: 16, borderTop: '1px solid var(--bg-tertiary)' }}>
-                    <button
-                      type="button"
-                      className="admin-action-btn admin-action-neutral"
-                      disabled={actionLoading}
-                      onClick={() => setModalMode('details')}
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="button"
-                      className="admin-primary-btn"
-                      disabled={actionLoading}
-                      onClick={() => handleAction('update_rbac')}
-                    >
-                      {actionLoading ? <Loader2 size={14} className="animate-spin" /> : null}
-                      Save RBAC Changes
-                    </button>
-                  </div>
-                </div>
-              ) : null}
-            </section>
+                )}
+              </div>
+            </div>
           </div>
-        ) : null}
+        )}
       </div>
     </AdminLayout>
   );
 };
 
 export default AdminUserManagement;
-
