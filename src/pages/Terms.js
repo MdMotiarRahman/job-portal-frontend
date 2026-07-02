@@ -10,7 +10,7 @@ const Terms = () => (
 
       <section>
         <h2>1. Acceptance of Terms</h2>
-        <p>By accessing and using JobPortal ("the Platform"), you agree to be bound by these Terms and Conditions. If you do not agree, please do not use the Platform.</p>
+        <p>By accessing and using JobLand ("the Platform"), you agree to be bound by these Terms and Conditions. If you do not agree, please do not use the Platform.</p>
       </section>
 
       <section>
@@ -20,7 +20,7 @@ const Terms = () => (
 
       <section>
         <h2>3. Platform Usage</h2>
-        <p>JobPortal provides a platform for job seekers and employers to connect. We do not guarantee employment or the accuracy of job listings. Users must comply with all applicable laws when using the Platform.</p>
+        <p>JobLand provides a platform for job seekers and employers to connect. We do not guarantee employment or the accuracy of job listings. Users must comply with all applicable laws when using the Platform.</p>
       </section>
 
       <section>
@@ -30,12 +30,12 @@ const Terms = () => (
 
       <section>
         <h2>5. Intellectual Property</h2>
-        <p>All content on the Platform, including text, graphics, logos, and software, is the property of JobPortal or its licensors and is protected by intellectual property laws.</p>
+        <p>All content on the Platform, including text, graphics, logos, and software, is the property of JobLand or its licensors and is protected by intellectual property laws.</p>
       </section>
 
       <section>
         <h2>6. Limitation of Liability</h2>
-        <p>JobPortal shall not be liable for any indirect, incidental, or consequential damages arising from your use of the Platform. We provide the Platform "as is" without warranties of any kind.</p>
+        <p>JobLand shall not be liable for any indirect, incidental, or consequential damages arising from your use of the Platform. We provide the Platform "as is" without warranties of any kind.</p>
       </section>
 
       <section>

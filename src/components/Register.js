@@ -65,7 +65,7 @@ const Register = () => {
             <CheckCircle2 size={48} className="text-success" />
           </div>
           <h2 className="text-2xl font-bold mb-2">Account Created!</h2>
-          <p className="text-muted mb-6">Welcome to JobPortal. You are being redirected to sign in.</p>
+          <p className="text-muted mb-6">Welcome to JobLand. You are being redirected to sign in.</p>
           <Loader2 size={24} className="animate-spin text-primary mx-auto" />
         </div>
       </div>
@@ -80,7 +80,7 @@ const Register = () => {
             <Briefcase size={32} strokeWidth={2.5} />
           </div>
           <h1>Create an account</h1>
-          <p className="text-muted">Start your journey with JobPortal today</p>
+          <p className="text-muted">Start your journey with JobLand today</p>
         </div>
 
         {apiError && (

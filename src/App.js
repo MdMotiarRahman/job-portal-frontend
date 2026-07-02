@@ -169,7 +169,7 @@ const Navigation = () => {
           <div className="brand-logo">
             <Briefcase size={24} />
           </div>
-          <span>JobPortal</span>
+          <span>JobLand</span>
         </Link>
 
         {/* DESKTOP MENU */}
@@ -384,7 +384,7 @@ const Footer = () => {
 
               <Briefcase size={24} />
 
-              <span>JobPortal</span>
+              <span>JobLand</span>
 
             </Link>
 
@@ -455,7 +455,7 @@ const Footer = () => {
         <div className="footer-bottom">
 
           <p>
-            © {new Date().getFullYear()} JobPortal. All rights reserved.
+            © {new Date().getFullYear()} JobLand. All rights reserved.
           </p>
 
         </div>

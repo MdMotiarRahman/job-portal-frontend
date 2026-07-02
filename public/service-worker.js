@@ -26,7 +26,7 @@ self.addEventListener('push', function (event) {
     };
 
     event.waitUntil(
-      self.registration.showNotification(data.title || 'JobPortal Reminder', options)
+      self.registration.showNotification(data.title || 'JobLand Reminder', options)
     );
   }
 });

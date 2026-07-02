@@ -118,7 +118,7 @@ const Home = () => {
                 Verified companies, cleaner applications
               </div>
 
-              <h1>JobPortal</h1>
+              <h1>JobLand</h1>
 
               <p className="hero-lead">
                 A focused hiring workspace for candidates who want relevant roles

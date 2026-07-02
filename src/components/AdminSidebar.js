@@ -191,7 +191,7 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
         <div className="admin-sidebar-header">
           <div className="admin-sidebar-logo">
             <Building2 className="admin-logo-icon" size={24} strokeWidth={1.5} />
-            <span className="admin-logo-text">JobPortal</span>
+            <span className="admin-logo-text">JobLand</span>
           </div>
           <div className="admin-sidebar-header-actions">
             <ReminderBell />

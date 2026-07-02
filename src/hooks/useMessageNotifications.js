@@ -42,7 +42,7 @@ const useMessageNotifications = (currentPath) => {
       new Notification('New Message', {
         body: `You have ${count} unread message${count > 1 ? 's' : ''}`,
         icon: '/favicon.ico',
-        tag: 'job-portal-messages',
+        tag: 'jobland-messages',
         renotify: true,
       });
       lastNotifiedTime.current = now;

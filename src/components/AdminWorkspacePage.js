@@ -168,7 +168,7 @@ const AdminWorkspacePage = ({ page = 'analytics' }) => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `jobportal-admin-report-${period}.csv`;
+    link.download = `jobland-admin-report-${period}.csv`;
     link.click();
     URL.revokeObjectURL(url);
   };

@@ -1,7 +1,7 @@
-# Job Portal Frontend
+# JobLand Frontend
 
 ## 1. Overview
-This repository contains the frontend client for the Job Portal system. It provides role-based user interfaces for `admin`, `employer`, and `seeker` users and consumes REST APIs from the backend service.
+This repository contains the frontend client for the JobLand system. It provides role-based user interfaces for `admin`, `employer`, and `seeker` users and consumes REST APIs from the backend service.
 
 ## 2. Technology Stack
 - React (Create React App)

@@ -69,7 +69,7 @@ const SeekerLayout = ({ children }) => {
               />
               <div className="admin-user-meta">
                 <strong>{currentUser?.name || 'Job Seeker'}</strong>
-                <span>{currentUser?.email || 'Job portal account'}</span>
+                <span>{currentUser?.email || 'JobLand account'}</span>
               </div>
             </div>
           </div>

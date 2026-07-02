@@ -60,7 +60,7 @@ const Contact = () => {
             <div className="pp-card">
               <h3>Get in Touch</h3>
               <div className="pp-info-rows">
-                <div className="pp-info-row"><Mail size={16} /><span>support@jobportal.com</span></div>
+                <div className="pp-info-row"><Mail size={16} /><span>support@jobland.com</span></div>
                 <div className="pp-info-row"><Phone size={16} /><span>+1 (555) 123-4567</span></div>
                 <div className="pp-info-row"><MapPin size={16} /><span>123 Innovation St, Tech City</span></div>
               </div>

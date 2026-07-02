@@ -7,14 +7,14 @@ const About = () => (
   <div className="pp-page">
     <div className="pp-container">
       <div className="pp-page-header">
-        <h1>About JobPortal</h1>
+        <h1>About JobLand</h1>
         <p>Connecting talent with opportunity through intelligent matching and modern hiring tools.</p>
       </div>
 
       <div className="pp-about-hero">
         <div className="pp-about-text">
           <h2>Our Mission</h2>
-          <p>We believe finding the right job or the right candidate shouldn't be hard. JobPortal uses AI-powered recommendations to match the best talent with the best opportunities, making hiring faster, smarter, and more human.</p>
+          <p>We believe finding the right job or the right candidate shouldn't be hard. JobLand uses AI-powered recommendations to match the best talent with the best opportunities, making hiring faster, smarter, and more human.</p>
         </div>
       </div>
 
@@ -35,7 +35,7 @@ const About = () => (
 
       <div className="pp-cta-section">
         <h2>Ready to Get Started?</h2>
-        <p>Join thousands of professionals and companies already using JobPortal.</p>
+        <p>Join thousands of professionals and companies already using JobLand.</p>
         <div className="pp-cta-actions">
           <Link to="/register" className="pp-btn-primary">Get Started <ArrowRight size={16} /></Link>
           <Link to="/jobs" className="pp-btn-outline"><Briefcase size={16} /> Browse Jobs</Link>
